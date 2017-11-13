@@ -11,7 +11,7 @@ UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectI
 
 }
 
-int32 UXsollaPluginBPLibrary::CreateShop()
+int32 UXsollaPluginBPLibrary::CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed)
 {
 	UXsollaPluginWebBrowser * browser = CreateWidget<UXsollaPluginWebBrowser>(GEngine->GetWorld(), UXsollaPluginWebBrowser::StaticClass());
 	browser->GetToken();
