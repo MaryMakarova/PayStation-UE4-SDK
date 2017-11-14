@@ -4,8 +4,8 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "XsollaPluginWebBrowser.h"
-#include "Runtime/UMG/Public/UMG.h"
 #include "Slate.h"
+#include "XsollaPluginHttpTool.h"
 #include "XsollaPluginBPLibrary.generated.h"
 
 /* 
@@ -37,5 +37,20 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	static int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
+	int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
+
+	void OnLoadResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+private:
+	void GetToken(FString shopJson);
+
+private:
+	XsollaPluginHttpTool * HttpTool;
+
+	FString XsollaToken;
+	FString ShopUrl;
+	FString MerchantId;
+	FString ApiKey;
+	FString ProjectId;
+	bool bIsSandbox;
 };

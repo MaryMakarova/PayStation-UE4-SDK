@@ -3,10 +3,6 @@
 #pragma once
 
 #include "Widget.h"
-#include "Runtime/UMG/Public/UMG.h"
-#include "Runtime/Online/HTTP/Public/Http.h"
-#include "Runtime/JsonUtilities/Public/JsonUtilities.h"
-#include "Runtime/Json/Public/Json.h"
 #include "XsollaPluginWebBrowser.generated.h"
 
 class IWebBrowserWindow;
@@ -15,7 +11,7 @@ class IWebBrowserWindow;
 *
 */
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaPluginWebBrowser : public UUserWidget
+class XSOLLAPLUGIN_API UXsollaPluginWebBrowser : public UWidget
 {
 	GENERATED_UCLASS_BODY()
 
@@ -24,9 +20,6 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadCompleted);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadError);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCloseWindow);
-
-	UFUNCTION(BlueprintCallable, Category = "Web Browser")
-		void GetToken();
 
 	/**
 	* Load the specified URL
@@ -115,35 +108,4 @@ protected:
 	void HandleOnLoadCompleted();
 	void HandleOnLoadError();
 	bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
-
-private:
-	FHttpModule* Http;
-
-	// xsolla stuffs
-	FString ApiBaseUrl = "https://api.xsolla.com/merchant/merchants/";
-	FString ShopUrl;
-	FString MerchantId;
-	FString ApiKey;
-	FString ProjectId;
-	bool bIsSandbox;
-
-
-	FString AuthorizationHeader = TEXT("Authorization");
-	void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request);
-
-	TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute);
-	void SetRequestHeaders(TSharedRef<IHttpRequest>& Request);
-
-	TSharedRef<IHttpRequest> GetRequest(FString Subroute);
-	TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString);
-	void Send(TSharedRef<IHttpRequest>& Request);
-
-	bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful);
-
-	void OnLoadResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
-	template <typename StructType>
-	void GetJsonStringFromStruct(StructType FilledStruct, FString& StringOutput);
-	template <typename StructType>
-	void GetStructFromJsonString(FHttpResponsePtr Response, StructType& StructOutput);
 };
