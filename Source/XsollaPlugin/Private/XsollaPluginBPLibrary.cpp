@@ -76,13 +76,13 @@ void UXsollaPluginBPLibrary::GetToken(FString shopJson)
 
 	TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, shopJson);
 
-	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginBPLibrary::OnLoadResponse);
+	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginBPLibrary::OnGetTokenRequestComplete);
 	HttpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + ApiKey), Request);
 
 	HttpTool->Send(Request);
 }
 
-void UXsollaPluginBPLibrary::OnLoadResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+void UXsollaPluginBPLibrary::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	if (!HttpTool->ResponseIsValid(Response, bWasSuccessful))
 		return;
