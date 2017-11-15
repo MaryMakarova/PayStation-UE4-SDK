@@ -3,9 +3,6 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "XsollaPluginWebBrowser.h"
-#include "Runtime/UMG/Public/UMG.h"
-#include "Slate.h"
 #include "XsollaPluginBPLibrary.generated.h"
 
 /* 
@@ -26,10 +23,6 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, int32, Num);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
-
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -37,5 +30,5 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	static int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
+	static int32 CreateXsollaShop();
 };
