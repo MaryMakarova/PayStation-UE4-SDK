@@ -3,9 +3,6 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "XsollaPluginWebBrowser.h"
-#include "Slate.h"
-#include "XsollaPluginHttpTool.h"
 #include "XsollaPluginBPLibrary.generated.h"
 
 /* 
@@ -26,10 +23,6 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, int32, Num);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
-
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -37,20 +30,5 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
-
-	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
-private:
-	void GetToken(FString shopJson);
-
-private:
-	XsollaPluginHttpTool * HttpTool;
-
-	FString XsollaToken;
-	FString ShopUrl;
-	FString MerchantId;
-	FString ApiKey;
-	FString ProjectId;
-	bool bIsSandbox;
+	static int32 CreateXsollaShop();
 };
