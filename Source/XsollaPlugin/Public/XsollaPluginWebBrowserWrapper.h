@@ -34,8 +34,9 @@ public:
 
 private:
 	TSharedPtr<class SWebBrowser> WebBrowserWidget;
+	TSharedPtr<class SCanvas> Canvas;
 
-	FString InitialURL = "google.com";
+	FString InitialURL = "";
 	bool bSupportsTransparency = true;
 
 	void HandleOnUrlChanged(const FText& Text);
