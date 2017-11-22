@@ -34,10 +34,11 @@ public:
 
 private:
 	TSharedPtr<class SWebBrowser> WebBrowserWidget;
-	TSharedPtr<class SCanvas> Canvas;
 
-	FString InitialURL = "";
+	FString InitialURL = "google.com";
 	bool bSupportsTransparency = true;
+
+	TSharedPtr<SVerticalBox> MainContent;
 
 	void HandleOnUrlChanged(const FText& Text);
 	void HandleOnLoadCompleted();
