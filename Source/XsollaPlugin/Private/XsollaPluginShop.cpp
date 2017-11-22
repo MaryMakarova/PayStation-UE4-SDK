@@ -49,6 +49,10 @@ void UXsollaPluginShop::CreateShop()
 		settingsJsonObj->SetStringField("mode", "sandbox");
 	}
 
+	// purchase json
+	TSharedPtr<FJsonObject> purchaseJsonObj = MakeShareable(new FJsonObject);
+
+
 	// combine into main section
 	TSharedPtr<FJsonObject> requestJsonObj = MakeShareable(new FJsonObject);
 	requestJsonObj->SetObjectField("user", userJsonObj);
@@ -61,9 +65,6 @@ void UXsollaPluginShop::CreateShop()
 
 	// get shop token
 	GetToken(outputString);
-
-	BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
-	BrowserWrapper->AddToViewport(9999);
 }
 
 void UXsollaPluginShop::GetToken(FString shopJson)
@@ -94,6 +95,8 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		XsollaToken = tokenString;
 		UE_LOG(LogTemp, Warning, TEXT("token: %s"), *ShopUrl);
 
+		BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+		BrowserWrapper->AddToViewport(9999);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
 }

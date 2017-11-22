@@ -38,6 +38,8 @@ private:
 	FString InitialURL = "google.com";
 	bool bSupportsTransparency = true;
 
+	TSharedPtr<SVerticalBox> MainContent;
+
 	void HandleOnUrlChanged(const FText& Text);
 	void HandleOnLoadCompleted();
 	void HandleOnLoadError();
