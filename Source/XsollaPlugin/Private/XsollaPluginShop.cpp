@@ -23,8 +23,13 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 	ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
 }
 
-void UXsollaPluginShop::CreateShop()
+void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed)
 {
+	// delegates setting
+	this->OnSucceeded = OnSucceeded;
+	this->OnCanceled = OnCanceled;
+	this->OnFailed = OnFailed;
+
 	/* SHOP JSON */
 	// user section
 	TSharedPtr<FJsonObject> userIdJsonObj = MakeShareable(new FJsonObject);
@@ -83,7 +88,10 @@ void UXsollaPluginShop::GetToken(FString shopJson)
 void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
 	if (!HttpTool->ResponseIsValid(Response, bWasSuccessful))
+	{
+		OnCanceled.Execute(Response->GetResponseCode());
 		return;
+	}
 
 	TSharedPtr<FJsonObject> JsonParsed;
 	TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(Response->GetContentAsString());

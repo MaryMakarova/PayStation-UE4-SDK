@@ -1,5 +1,6 @@
 #pragma once
 
+#include "XsollaPluginBPLibrary.h"
 #include "Slate.h"
 #include "XsollaPluginHttpTool.h"
 #include "XsollaPluginWebBrowserWrapper.h"
@@ -11,7 +12,7 @@ class UXsollaPluginShop : public UObject
 	GENERATED_UCLASS_BODY()
 
 public:
-	void CreateShop();
+	void CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
 	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
@@ -28,4 +29,8 @@ private:
 	bool bIsSandbox;
 
 	UXsollaPluginWebBrowserWrapper* BrowserWrapper;
+
+	FOnPaymantSucceeded OnSucceeded;
+	FOnPaymantCanceled OnCanceled;
+	FOnPaymantFailed OnFailed;
 };
