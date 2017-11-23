@@ -23,6 +23,10 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, int32, Num);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
+
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 {
@@ -30,5 +34,5 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	static int32 CreateXsollaShop();
+	static int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
 };
