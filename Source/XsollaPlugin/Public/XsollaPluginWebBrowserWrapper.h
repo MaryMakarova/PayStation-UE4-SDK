@@ -34,6 +34,16 @@ public:
 
 private:
 	TSharedPtr<class SWebBrowser> WebBrowserWidget;
+	TSharedPtr<class SSpinningImage> SpinnerImage;
+	TSharedPtr<class SButton> CloseButton;
+
+	SHorizontalBox::FSlot& BrowserSlot = SHorizontalBox::Slot();
+	SHorizontalBox::FSlot& BrowserSlotMarginLeft = SHorizontalBox::Slot();
+	SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();
+
+	float ButtonSize = 50.0f;
+	FVector2D ViewportSize;
+	FVector2D ContentSize;
 
 	FString InitialURL = "google.com";
 	bool bSupportsTransparency = true;

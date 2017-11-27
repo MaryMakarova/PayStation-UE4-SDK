@@ -70,6 +70,9 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 
 	// get shop token
 	GetToken(outputString);
+
+	//FTimerHandle TimerHandle;
+	//GEngine->GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UXsollaPluginShop::ReceiveUpdateTimer, 5.0f, true, 2.0f);
 }
 
 void UXsollaPluginShop::GetToken(FString shopJson)
@@ -107,4 +110,9 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		BrowserWrapper->AddToViewport(9999);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
+}
+
+void UXsollaPluginShop::ReceiveUpdateTimer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Timer recieved"));
 }
