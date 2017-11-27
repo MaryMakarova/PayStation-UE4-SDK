@@ -17,51 +17,61 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	const FVector2D viewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+	ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 
-	FVector2D contentSize(viewportSize * 0.8);
-	contentSize.X = contentSize.X > 720.0f ? 720.0f : contentSize.X;
+	ContentSize = ViewportSize * 0.8;
+	ContentSize.X = ContentSize.X > 720.0f ? 720.0f : ContentSize.X;
 
-	float buttonSize = 50.0f;
-
-	TSharedRef<FSlateGameResources> SlateResources = FSlateGameResources::New(
+	TSharedRef<FSlateGameResources> SlateButtonResources = FSlateGameResources::New(
 		FName("ButtonStyle"), 
 		"/XsollaPlugin/CloseButton", 
 		"/XsollaPlugin/CloseButton"
 	);
-	FSlateGameResources& Style = SlateResources.Get();
-	const FSlateBrush* slate_close_red = Style.GetBrush(FName("close_red_brush"));
+	FSlateGameResources& ButtonStyle = SlateButtonResources.Get();
+	const FSlateBrush* slate_close_red = ButtonStyle.GetBrush(FName("close_red_brush"));
+
+	TSharedRef<FSlateGameResources> SlateSpinnerResources = FSlateGameResources::New(
+		FName("SpinnerStyle"),
+		"/XsollaPlugin/LoadingSpinner",
+		"/XsollaPlugin/LoadingSpinner"
+	);
+	FSlateGameResources& SpinnerStyle = SlateSpinnerResources.Get();
+	const FSlateBrush* slate_spinner = SpinnerStyle.GetBrush(FName("spinner_brush"));
+
+	SAssignNew(WebBrowserWidget, SWebBrowser)
+		.InitialURL(InitialURL)
+		.ShowControls(false)
+		.ViewportSize(ContentSize)
+		.SupportsTransparency(bSupportsTransparency)
+		.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
+		.OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
+		.OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
+		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow));
+
+	BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(slate_spinner));
+	BrowserSlot.FillWidth(ContentSize.Y);
+
+	BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.Y) / 2);
+	BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.Y) / 2 - ButtonSize);
 
 	MainContent = SNew(SVerticalBox)
 			+ SVerticalBox::Slot()
-			.FillHeight((viewportSize.Y - contentSize.Y) / 2)
+			.FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
 			+ SVerticalBox::Slot()
-			.FillHeight(contentSize.Y)
+			.FillHeight(ContentSize.Y)
 		    [
 				SNew(SHorizontalBox)
+				+ BrowserSlotMarginLeft
+				+ BrowserSlot
 				+ SHorizontalBox::Slot()
-				.FillWidth((viewportSize.X - contentSize.X) / 2)
-				+ SHorizontalBox::Slot()
-				.FillWidth(contentSize.X)
-				[
-					SAssignNew(WebBrowserWidget, SWebBrowser)
-						.InitialURL(InitialURL)
-						.ShowControls(false)
-						.ViewportSize(contentSize)
-						.SupportsTransparency(bSupportsTransparency)
-						.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
-						.OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
-						.OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
-						.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
-				]
-				+ SHorizontalBox::Slot()
-					.FillWidth(buttonSize)
+					.FillWidth(ButtonSize)
 					[
 						SNew(SVerticalBox)
 						+ SVerticalBox::Slot()
-						.FillHeight(buttonSize)
+						.FillHeight(ButtonSize)
 						[
-							SNew(SButton)
+							SAssignNew(CloseButton, SButton)
+							.Visibility(EVisibility::Hidden)
 							.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
 							.OnClicked_Lambda([this]()
 							{
@@ -79,19 +89,14 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 							]
 						]
 						+ SVerticalBox::Slot()
-						.FillHeight(contentSize.Y - buttonSize)
+						.FillHeight(ContentSize.Y - ButtonSize)
 					]
-				+ SHorizontalBox::Slot()
-				.FillWidth((viewportSize.X - contentSize.X) / 2 - buttonSize)
+				+ BrowserSlotMarginRight
 			]
 			+ SVerticalBox::Slot()
-			.FillHeight((viewportSize.Y - contentSize.Y) / 2);
+			.FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
 		
 	GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef());
-
-	FInputModeUIOnly inputModeUIOnly;
-	inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
-	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
@@ -105,6 +110,19 @@ void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
+	BrowserSlot.DetachWidget();
+	BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+	BrowserSlot.FillWidth(ContentSize.X);
+
+	CloseButton->SetVisibility(EVisibility::Visible);
+
+	BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
+	BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+
+	FInputModeUIOnly inputModeUIOnly;
+	inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
+	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+
 	OnUrlChanged.Broadcast(InText);
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
