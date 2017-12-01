@@ -71,8 +71,8 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 	// get shop token
 	GetToken(outputString);
 
-	//FTimerHandle TimerHandle;
-	//GEngine->GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UXsollaPluginShop::ReceiveUpdateTimer, 5.0f, true, 2.0f);
+	FTimerHandle myTimer;
+	GEngine->GameViewport->GetWorld()->GetTimerManager().SetTimer(myTimer, this, &UXsollaPluginShop::ReceiveUpdateTimer, 3.0f, true);
 }
 
 void UXsollaPluginShop::GetToken(FString shopJson)

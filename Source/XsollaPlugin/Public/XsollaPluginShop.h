@@ -15,7 +15,6 @@ public:
 	void CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
 	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
-	UFUNCTION()
 	void ReceiveUpdateTimer();
 
 private:
