@@ -23,8 +23,7 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 
 	ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 
-	ContentSize = ViewportSize * 0.8;
-	ContentSize.X = ContentSize.X > 720.0f ? 720.0f : ContentSize.X;
+	ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
 
 	TSharedRef<FSlateGameResources> SlateButtonResources = FSlateGameResources::New(
 		FName("ButtonStyle"), 
@@ -144,8 +143,16 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 
 		CloseButton->SetVisibility(EVisibility::Visible);
 
-		BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
-		BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+		if ((ViewportSize.X - ContentSize.X) / 2 > 0)
+		{
+			BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
+			BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+		}
+		else
+		{
+			BrowserSlotMarginLeft.FillWidth(0);
+			BrowserSlotMarginRight.FillWidth(0);
+		}
 
 		FInputModeUIOnly inputModeUIOnly;
 		inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());

@@ -12,10 +12,14 @@ class UXsollaPluginShop : public UObject
 	GENERATED_UCLASS_BODY()
 
 public:
-	void CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
-	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void CreateShop(
+		FString shopSize, 
+		FString shopDesign,
+		FOnPaymantSucceeded OnSucceeded,
+		FOnPaymantCanceled OnCanceled, 
+		FOnPaymantFailed OnFailed);
 
-	void ReceiveUpdateTimer();
+	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
 	void GetToken(FString shopJson);
