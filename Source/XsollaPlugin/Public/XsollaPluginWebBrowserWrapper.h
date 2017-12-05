@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Runtime/UMG/Public/UMG.h"
+#include "XsollaPluginBPLibrary.h"
+#include "XsollaPluginHttpTool.h"
 #include "XsollaPluginWebBrowserWrapper.generated.h"
 
 class IWebBrowserWindow;
@@ -18,6 +20,10 @@ public:
 
 	virtual void NativeConstruct() override;
 
+	void LoadURL(FString NewURL);
+	void SetExternalId(FString str) { ExternalId = str; }
+
+public:
 	UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
 		FOnUrlChanged OnUrlChanged;
 
@@ -30,28 +36,38 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
 		FOnCloseWindow OnCloseWindow;
 
-	void LoadURL(FString NewURL);
+	// shop delegates
+	FOnPaymantSucceeded OnSucceeded;
+	FOnPaymantCanceled OnCanceled;
+	FOnPaymantFailed OnFailed;
 
 private:
-	TSharedPtr<class SWebBrowser> WebBrowserWidget;
-	TSharedPtr<class SSpinningImage> SpinnerImage;
-	TSharedPtr<class SButton> CloseButton;
-
-	SHorizontalBox::FSlot& BrowserSlot = SHorizontalBox::Slot();
-	SHorizontalBox::FSlot& BrowserSlotMarginLeft = SHorizontalBox::Slot();
-	SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();
-
-	float ButtonSize = 50.0f;
-	FVector2D ViewportSize;
-	FVector2D ContentSize;
-
-	FString InitialURL = "google.com";
-	bool bSupportsTransparency = true;
-
-	TSharedPtr<SVerticalBox> MainContent;
+	void CloseShop();
 
 	void HandleOnUrlChanged(const FText& Text);
 	void HandleOnLoadCompleted();
 	void HandleOnLoadError();
 	bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
+
+	void OnTransactionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+
+private:
+	TSharedPtr<class SVerticalBox>		MainContent;
+	TSharedPtr<class SWebBrowser>		WebBrowserWidget;
+	TSharedPtr<class SSpinningImage>	SpinnerImage;
+	TSharedPtr<class SButton>			CloseButton;
+	TSharedPtr<class SVerticalBox>		Background;
+
+	SHorizontalBox::FSlot& BrowserSlot				= SHorizontalBox::Slot();
+	SHorizontalBox::FSlot& BrowserSlotMarginLeft	= SHorizontalBox::Slot();
+	SHorizontalBox::FSlot& BrowserSlotMarginRight	= SHorizontalBox::Slot();
+
+	float		ButtonSize;
+	FVector2D	ViewportSize;
+	FVector2D	ContentSize;
+
+	FString		InitialURL = "";
+	bool		bSupportsTransparency = true;
+
+	FString		ExternalId;
 };

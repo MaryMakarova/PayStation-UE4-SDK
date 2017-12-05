@@ -1,14 +1,18 @@
 #include "XsollaPluginWebBrowserWrapper.h"
 #include "SWebBrowser.h"
+#include "XsollaPluginShop.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/Text/STextBlock.h"
 #include "Slate/SlateGameResources.h"
+#include "XsollaPluginSettings.h"
+#include "Misc/Base64.h"
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
 UXsollaPluginWebBrowserWrapper::UXsollaPluginWebBrowserWrapper(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	: Super(ObjectInitializer),
+	ButtonSize(50.0f)
 {
 	bIsVariable = true;
 }
@@ -48,7 +52,7 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 		.OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
 		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow));
 
-	BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(slate_spinner));
+	BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(slate_spinner).Period(3.0f));
 	BrowserSlot.FillWidth(ContentSize.Y);
 
 	BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.Y) / 2);
@@ -75,10 +79,7 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 							.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
 							.OnClicked_Lambda([this]()
 							{
-								GEngine->GameViewport->RemoveViewportWidgetContent(this->MainContent.ToSharedRef());
-
-								FInputModeGameOnly inputModeGameOnly;
-								GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameOnly);
+								this->CloseShop();
 
 								return FReply::Handled();
 							})
@@ -95,8 +96,24 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 			]
 			+ SVerticalBox::Slot()
 			.FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
+
+	Background = SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
+			 .FillHeight(ViewportSize.Y)
+			[
+				SNew(SHorizontalBox)
+				+ SHorizontalBox::Slot()
+				 .FillWidth(ViewportSize.X)
+				[
+					SNew(SColorBlock).Color(FLinearColor(0.0f, 0.0f, 0.0f, 0.5f))
+				]
+			];
 		
-	GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef());
+	GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 10);
+	GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
+
+	FInputModeUIOnly inputModeUIOnly;
+	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
@@ -110,23 +127,31 @@ void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
-	BrowserSlot.DetachWidget();
-	BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-	BrowserSlot.FillWidth(ContentSize.X);
-
-	CloseButton->SetVisibility(EVisibility::Visible);
-
-	BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
-	BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
-
-	FInputModeUIOnly inputModeUIOnly;
-	inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
-	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+	if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
+	{
+		CloseShop();
+	}
 
 	OnUrlChanged.Broadcast(InText);
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 {
+	if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+	{
+		BrowserSlot.DetachWidget();
+		BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+		BrowserSlot.FillWidth(ContentSize.X);
+
+		CloseButton->SetVisibility(EVisibility::Visible);
+
+		BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
+		BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+
+		FInputModeUIOnly inputModeUIOnly;
+		inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
+		GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+	}
+
 	OnLoadCompleted.Broadcast();
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadError()
@@ -137,6 +162,63 @@ bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrow
 {
 	OnCloseWindow.Broadcast();
 	return true;
+}
+
+void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
+{
+	TSharedPtr<FJsonValue> transactionJsonObj;
+	FString content = Response->GetContentAsString();
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(*content);
+
+	if (FJsonSerializer::Deserialize(JsonReader, transactionJsonObj))
+	{
+		if (transactionJsonObj->AsArray().Num() != 0)
+		{
+			TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
+			TSharedPtr<FJsonObject> transaction = root->GetObjectField("transaction");
+
+			UTransactionDetails* transactionDetailsStruct = NewObject<UTransactionDetails>(UTransactionDetails::StaticClass());
+			transactionDetailsStruct->TransactionStatus = transaction->GetStringField("status");
+
+			if (true)
+			{
+				this->OnSucceeded.Execute(0, transactionDetailsStruct);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No transactions"));
+		}
+	}
+}
+
+void UXsollaPluginWebBrowserWrapper::CloseShop()
+{
+	GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
+	GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
+
+	FInputModeGameAndUI inputModeGameAndUI;
+	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
+
+	XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
+
+	FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
+	FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+	FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
+
+	FString route = "https://api.xsolla.com/merchant/v2/merchants/";
+	route += MerchantId;
+	route += "/reports/transactions/search.json";
+	route += "?external_id=";
+	route += ExternalId;
+	route += "&type=all";
+
+	TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
+
+	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
+	httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + ApiKey), Request);
+
+	httpTool->Send(Request);
 }
 
 #undef LOCTEXT_NAMESPACE
