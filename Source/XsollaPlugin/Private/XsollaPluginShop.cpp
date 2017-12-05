@@ -30,6 +30,15 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 	this->OnCanceled = OnCanceled;
 	this->OnFailed = OnFailed;
 
+	// show browwser wrapper
+	BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+	BrowserWrapper->AddToViewport(9999);
+
+	// shop delegates
+	BrowserWrapper->OnSucceeded = OnSucceeded;
+	BrowserWrapper->OnFailed = OnFailed;
+	BrowserWrapper->OnCanceled = OnCanceled;
+
 	/* SHOP JSON */
 	// user section
 	TSharedPtr<FJsonObject> userIdJsonObj = MakeShareable(new FJsonObject);
@@ -48,6 +57,12 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 
 	// settings section
 	TSharedPtr<FJsonObject> settingsJsonObj = MakeShareable(new FJsonObject);
+
+	ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
+	UE_LOG(LogTemp, Warning, TEXT("Ex id: %s"), *ExternalId);
+
+	settingsJsonObj->SetStringField("external_id", ExternalId);
+	settingsJsonObj->SetStringField("return_url", "https://www.unrealengine.com");
 	settingsJsonObj->SetNumberField("project_id", FCString::Atoi(*ProjectId));
 	if (bIsSandbox)
 	{
@@ -70,14 +85,12 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 
 	// get shop token
 	GetToken(outputString);
-
-	FTimerHandle myTimer;
-	GEngine->GameViewport->GetWorld()->GetTimerManager().SetTimer(myTimer, this, &UXsollaPluginShop::ReceiveUpdateTimer, 3.0f, true);
 }
 
 void UXsollaPluginShop::GetToken(FString shopJson)
 {
-	FString route = MerchantId;
+	FString route = "https://api.xsolla.com/merchant/merchants/";
+	route += MerchantId;
 	route += "/token";
 
 	TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, shopJson);
@@ -106,8 +119,7 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		XsollaToken = tokenString;
 		UE_LOG(LogTemp, Warning, TEXT("token: %s"), *ShopUrl);
 
-		BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
-		BrowserWrapper->AddToViewport(9999);
+		BrowserWrapper->SetExternalId(ExternalId);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
 }

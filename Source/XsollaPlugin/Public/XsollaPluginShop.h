@@ -32,7 +32,9 @@ private:
 
 	UXsollaPluginWebBrowserWrapper* BrowserWrapper;
 
-	FOnPaymantSucceeded OnSucceeded;
-	FOnPaymantCanceled OnCanceled;
-	FOnPaymantFailed OnFailed;
+	FOnPaymantSucceeded		OnSucceeded;
+	FOnPaymantCanceled		OnCanceled;
+	FOnPaymantFailed		OnFailed;
+
+	FString ExternalId;
 };

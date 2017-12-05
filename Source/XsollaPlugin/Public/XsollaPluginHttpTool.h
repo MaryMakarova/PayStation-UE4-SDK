@@ -60,7 +60,7 @@ public:
 			return true;
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d"), Response->GetResponseCode());
+			UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d, %s"), Response->GetResponseCode(), *Response->GetContentAsString());
 			return false;
 		}
 	}
@@ -69,5 +69,5 @@ private:
 	FHttpModule* Http;
 
 	FString AuthorizationHeader = TEXT("Authorization");
-	FString ApiBaseUrl = "https://api.xsolla.com/merchant/merchants/";
+	FString ApiBaseUrl = "";
 };

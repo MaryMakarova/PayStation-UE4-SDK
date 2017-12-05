@@ -23,7 +23,17 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, int32, Num);
+UCLASS()
+class UTransactionDetails : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transaction details")
+	FString TransactionStatus;
+};
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, UTransactionDetails*, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
 
