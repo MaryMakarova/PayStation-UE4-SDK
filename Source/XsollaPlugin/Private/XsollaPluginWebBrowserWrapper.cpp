@@ -175,14 +175,52 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
 		if (transactionJsonObj->AsArray().Num() != 0)
 		{
 			TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
+
+			UTransactionDetails* transactionDetails = NewObject<UTransactionDetails>(UTransactionDetails::StaticClass());
+
 			TSharedPtr<FJsonObject> transaction = root->GetObjectField("transaction");
+			transactionDetails->TransactionStatus = transaction->GetStringField("status");
+			transactionDetails->TransactionId = transaction->GetIntegerField("id");
 
-			UTransactionDetails* transactionDetailsStruct = NewObject<UTransactionDetails>(UTransactionDetails::StaticClass());
-			transactionDetailsStruct->TransactionStatus = transaction->GetStringField("status");
+			TSharedPtr<FJsonObject> transactionProject = transaction->GetObjectField("project");
+			transactionDetails->TransactionProjectId = transactionProject->GetStringField("id");
 
-			if (true)
+			TSharedPtr<FJsonObject> transactionPaymentMethod = transaction->GetObjectField("payment_method");
+			transactionDetails->PaymentMethodId = transactionPaymentMethod->GetIntegerField("id");
+			transactionDetails->PaymentMethodName = transactionPaymentMethod->GetStringField("name");
+
+			TSharedPtr<FJsonObject> user = root->GetObjectField("user");
+			transactionDetails->UserId = user->GetIntegerField("id");
+			transactionDetails->UserEmail = user->GetStringField("email");
+			transactionDetails->UserCountry = user->GetStringField("country");
+
+			TSharedPtr<FJsonObject> paymentDetails = root->GetObjectField("payment_details");
+
+			TSharedPtr<FJsonObject> payment = paymentDetails->GetObjectField("payment");
+			transactionDetails->PaymentCurrency = payment->GetStringField("currency");
+			transactionDetails->PaymentAmount = payment->GetIntegerField("amount");
+			
+			TSharedPtr<FJsonObject> salesTax = paymentDetails->GetObjectField("sales_tax");
+			transactionDetails->PaymentSalesTaxAmount = salesTax->GetIntegerField("amount");
+			transactionDetails->PaymentSalesTaxPercent = salesTax->GetIntegerField("percent");
+
+			TSharedPtr<FJsonObject> purchase = root->GetObjectField("purchase");
+			transactionDetails->PurchaseVirtualItems = purchase->GetStringField("virtual_items");
+
+			TSharedPtr<FJsonObject> virtualCurrency = purchase->GetObjectField("virtual_currency");
+			transactionDetails->PurchaseVirtualCurrencyAmount = virtualCurrency->GetIntegerField("amount");
+			transactionDetails->PurchaseVirtualCurrencyName = virtualCurrency->GetStringField("name");
+
+			TSharedPtr<FJsonObject> simpleCheckout = purchase->GetObjectField("simple_checkout");
+			transactionDetails->PurchaseSimpleCheckoutAmount = simpleCheckout->GetIntegerField("amount");
+			transactionDetails->PurchaseSimpleCheckoutCurrency = simpleCheckout->GetStringField("currency");
+
+			TSharedPtr<FJsonObject> subscription = purchase->GetObjectField("subscription");
+			transactionDetails->PurchaseSubscriptionName = subscription->GetStringField("name");
+
+			if (transactionDetails->TransactionStatus == "done")
 			{
-				this->OnSucceeded.Execute(0, transactionDetailsStruct);
+				this->OnSucceeded.Execute(0, transactionDetails);
 			}
 		}
 		else
