@@ -3,6 +3,8 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "XsollaPluginTransactionDetails.h"
+
 #include "XsollaPluginBPLibrary.generated.h"
 
 /* 
@@ -22,16 +24,6 @@
 *	For more info on custom blueprint nodes visit documentation:
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
-
-UCLASS()
-class UTransactionDetails : public UObject
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transaction details")
-	FString TransactionStatus;
-};
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, UTransactionDetails*, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
