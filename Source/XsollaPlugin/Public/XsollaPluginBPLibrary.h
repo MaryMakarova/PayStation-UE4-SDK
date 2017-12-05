@@ -36,5 +36,10 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	static int32 CreateXsollaShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed);
+		static int32 CreateXsollaShop( 
+			FOnPaymantSucceeded OnSucceeded,
+			FOnPaymantCanceled OnCanceled, 
+			FOnPaymantFailed OnFailed,
+			FString shopSize,
+			FString shopDesign);
 };

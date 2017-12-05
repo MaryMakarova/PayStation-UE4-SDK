@@ -23,7 +23,12 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 	ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
 }
 
-void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCanceled OnCanceled, FOnPaymantFailed OnFailed)
+void UXsollaPluginShop::CreateShop(
+	FString shopSize,
+	FString shopDesign,
+	FOnPaymantSucceeded OnSucceeded, 
+	FOnPaymantCanceled OnCanceled,
+	FOnPaymantFailed OnFailed)
 {
 	// delegates setting
 	this->OnSucceeded = OnSucceeded;
@@ -32,6 +37,20 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 
 	// show browwser wrapper
 	BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+
+	if (shopSize.Compare("small") == 0)
+	{
+		BrowserWrapper->SetBrowserSize(620, 630);
+	}
+	else if (shopSize.Compare("medium") == 0)
+	{
+		BrowserWrapper->SetBrowserSize(740, 760);
+	}
+	else if (shopSize.Compare("large") == 0)
+	{
+		BrowserWrapper->SetBrowserSize(820, 840);
+	}
+
 	BrowserWrapper->AddToViewport(9999);
 
 	// shop delegates
@@ -68,6 +87,11 @@ void UXsollaPluginShop::CreateShop(FOnPaymantSucceeded OnSucceeded, FOnPaymantCa
 	{
 		settingsJsonObj->SetStringField("mode", "sandbox");
 	}
+
+	TSharedPtr<FJsonObject> settingsUiJsonObj = MakeShareable(new FJsonObject);
+	settingsUiJsonObj->SetStringField("size", shopSize);
+	settingsUiJsonObj->SetStringField("version", shopDesign);
+	settingsJsonObj->SetObjectField("ui", settingsUiJsonObj);
 
 	// purchase json
 	TSharedPtr<FJsonObject> purchaseJsonObj = MakeShareable(new FJsonObject);
@@ -122,9 +146,4 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		BrowserWrapper->SetExternalId(ExternalId);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
-}
-
-void UXsollaPluginShop::ReceiveUpdateTimer()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Timer recieved"));
 }

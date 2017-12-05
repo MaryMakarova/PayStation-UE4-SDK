@@ -22,6 +22,11 @@ public:
 
 	void LoadURL(FString NewURL);
 	void SetExternalId(FString str) { ExternalId = str; }
+	void SetBrowserSize(float w, float h) 
+	{ 
+		ContentSize.X = w;
+		ContentSize.Y = h;
+	}
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
@@ -65,6 +70,7 @@ private:
 	float		ButtonSize;
 	FVector2D	ViewportSize;
 	FVector2D	ContentSize;
+	FString		ShopSize;
 
 	FString		InitialURL = "";
 	bool		bSupportsTransparency = true;
