@@ -22,6 +22,7 @@ public:
 
 	void LoadURL(FString NewURL);
 	void SetExternalId(FString str) { ExternalId = str; }
+	void SetShopUrl(FString str) { ShopUrl = str; }
 	void SetBrowserSize(float w, float h) 
 	{ 
 		ContentSize.X = w;
@@ -61,6 +62,7 @@ private:
 	TSharedPtr<class SWebBrowser>		WebBrowserWidget;
 	TSharedPtr<class SSpinningImage>	SpinnerImage;
 	TSharedPtr<class SButton>			CloseButton;
+	TSharedPtr<class SButton>			HomeButton;
 	TSharedPtr<class SVerticalBox>		Background;
 
 	SHorizontalBox::FSlot& BrowserSlot				= SHorizontalBox::Slot();
@@ -73,6 +75,7 @@ private:
 	FString		ShopSize;
 
 	FString		InitialURL = "";
+	FString		ShopUrl;
 	bool		bSupportsTransparency = true;
 
 	FString		ExternalId;
