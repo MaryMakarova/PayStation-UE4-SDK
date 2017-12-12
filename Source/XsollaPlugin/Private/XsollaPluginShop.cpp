@@ -1,6 +1,7 @@
 #include "XsollaPluginShop.h"
 #include "XsollaPluginSettings.h"
 #include "Misc/Base64.h"
+#include "BigInt.h"
 
 UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -144,6 +145,7 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		UE_LOG(LogTemp, Warning, TEXT("token: %s"), *ShopUrl);
 
 		BrowserWrapper->SetExternalId(ExternalId);
+		BrowserWrapper->SetShopUrl(ShopUrl);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
 }

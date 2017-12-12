@@ -27,11 +27,12 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 
 	TSharedRef<FSlateGameResources> SlateButtonResources = FSlateGameResources::New(
 		FName("ButtonStyle"), 
-		"/XsollaPlugin/CloseButton", 
-		"/XsollaPlugin/CloseButton"
+		"/XsollaPlugin/Buttons", 
+		"/XsollaPlugin/Buttons"
 	);
 	FSlateGameResources& ButtonStyle = SlateButtonResources.Get();
 	const FSlateBrush* slate_close_red = ButtonStyle.GetBrush(FName("close_red_brush"));
+	const FSlateBrush* slate_back = ButtonStyle.GetBrush(FName("back_brush"));
 
 	TSharedRef<FSlateGameResources> SlateSpinnerResources = FSlateGameResources::New(
 		FName("SpinnerStyle"),
@@ -73,19 +74,42 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 						+ SVerticalBox::Slot()
 						.FillHeight(ButtonSize)
 						[
-							SAssignNew(CloseButton, SButton)
-							.Visibility(EVisibility::Hidden)
-							.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-							.OnClicked_Lambda([this]()
-							{
-								this->CloseShop();
-
-								return FReply::Handled();
-							})
-							.Content()
+							SNew(SVerticalBox)
+							+ SVerticalBox::Slot()
+							.FillHeight(ButtonSize)
 							[
-								SNew(SImage)
-								.Image(slate_close_red)
+								SAssignNew(CloseButton, SButton)
+								.Visibility(EVisibility::Hidden)
+								.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+								.OnClicked_Lambda([this]()
+								{
+									this->CloseShop();
+
+									return FReply::Handled();
+								})
+								.Content()
+								[
+									SNew(SImage)
+									.Image(slate_close_red)
+								]
+							]
+							+ SVerticalBox::Slot()
+							.FillHeight(ButtonSize)
+							[
+								SAssignNew(HomeButton, SButton)
+								.Visibility(EVisibility::Hidden)
+								.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+								.OnClicked_Lambda([this]()
+								{
+									LoadURL(ShopUrl);
+
+									return FReply::Handled();
+								})
+								.Content()
+								[
+									SNew(SImage)
+									.Image(slate_back)
+								]
 							]
 						]
 						+ SVerticalBox::Slot()
@@ -131,6 +155,19 @@ void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 		CloseShop();
 	}
 
+	if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
+	{
+		HomeButton->SetVisibility(EVisibility::Visible);
+		CloseButton->SetVisibility(EVisibility::Collapsed);
+	}
+
+	if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+	{
+		HomeButton->SetVisibility(EVisibility::Collapsed);
+		if (CloseButton->GetVisibility() == EVisibility::Collapsed)
+			CloseButton->SetVisibility(EVisibility::Visible);
+	}
+
 	OnUrlChanged.Broadcast(InText);
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
@@ -139,7 +176,7 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 	{
 		BrowserSlot.DetachWidget();
 		BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-		BrowserSlot.FillWidth(ContentSize.X);
+		BrowserSlot.FillWidth(ContentSize.X - ButtonSize);
 
 		CloseButton->SetVisibility(EVisibility::Visible);
 

@@ -8,7 +8,10 @@
 UCLASS(config = Game, defaultconfig)
 class UXsollaPluginSettings : public UObject
 {
-	GENERATED_UCLASS_BODY()
+	GENERATED_BODY()
+
+public:
+	UXsollaPluginSettings(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(config, EditAnywhere, Category = API)
 		FString MerchantId;
