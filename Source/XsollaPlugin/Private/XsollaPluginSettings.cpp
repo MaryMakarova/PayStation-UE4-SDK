@@ -4,9 +4,5 @@
 
 UXsollaPluginSettings::UXsollaPluginSettings(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, MerchantId("")
-	, ProjectId("")
-	, ApiKey("")
-	, bSandboxMode(false)
 {
 }
