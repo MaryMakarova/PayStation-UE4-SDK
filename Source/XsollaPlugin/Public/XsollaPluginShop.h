@@ -1,7 +1,7 @@
 #pragma once
 
 #include "XsollaPluginBPLibrary.h"
-#include "Slate.h"
+#include "SlateBasics.h"
 #include "XsollaPluginHttpTool.h"
 #include "XsollaPluginWebBrowserWrapper.h"
 #include "XsollaPluginShop.generated.h"
