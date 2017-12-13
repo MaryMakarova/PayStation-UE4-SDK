@@ -20,9 +20,7 @@
 			"LoadingPhase": "PreLoadingScreen",
 			"WhitelistPlatforms" :
 			[
-				"Win64",
-				"Win32",
-				"HTML5"
+				"Win64"
 			]
 		}
 	]
