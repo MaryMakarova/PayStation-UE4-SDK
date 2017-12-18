@@ -9,7 +9,7 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 	HttpTool = new XsollaPluginHttpTool();
 
 	// xsolla api stuffs
-	bIsSandbox = GetDefault<UXsollaPluginSettings>()->bSandboxMode;
+	GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
 	if (bIsSandbox)
 	{
 		ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
@@ -19,9 +19,9 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 		ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
 	}
 
-	MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
-	ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
-	ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
+	GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("MerchantId"), MerchantId, GGameIni);
+	GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ProjectId"), ProjectId, GGameIni);
+	GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), ApiKey, GGameIni);
 }
 
 void UXsollaPluginShop::CreateShop(
@@ -121,7 +121,7 @@ void UXsollaPluginShop::GetToken(FString shopJson)
 	TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, shopJson);
 
 	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginShop::OnGetTokenRequestComplete);
-	HttpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + ApiKey), Request);
+	HttpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
 
 	HttpTool->Send(Request);
 }
