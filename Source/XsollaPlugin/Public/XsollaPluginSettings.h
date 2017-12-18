@@ -33,9 +33,8 @@ public:
 			FString encryptedString;
 			FString stringToEncrypt = ApiKey;
 			FString decryptedString;
-			
-			auto encryptTool = new XsollaPluginEncryptTool;
-			encryptedString = encryptTool->EncryptString(stringToEncrypt);
+		
+			encryptedString = XsollaPluginEncryptTool::EncryptString(stringToEncrypt);
 			ApiKey = encryptedString;
 
 			GConfig->SetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), *encryptedString, GGameIni);

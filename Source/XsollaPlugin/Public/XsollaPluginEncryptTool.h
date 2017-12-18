@@ -3,15 +3,6 @@
 #include "CoreMinimal.h"
 #include "AES.h"
 
-#include <iostream>
-#include "Obfuscator/Log.h"
-#include "Obfuscator/MetaString.h"
-
-using namespace std;
-using namespace andrivet::ADVobfuscator;
-
-auto ProstoStroka = DEF_OBFUSCATED("hi");
-
 class XsollaPluginEncryptTool
 {
 public:
@@ -20,7 +11,7 @@ public:
 
 	}
 
-	FString EncryptString(FString& str)
+	static FString EncryptString(FString& str)
 	{
 		if (str.IsEmpty())
 			return str;
@@ -31,7 +22,7 @@ public:
 		uint8* blob = new uint8[size];
 		blob = (uint8*)TCHAR_TO_UTF8(str.GetCharArray().GetData());
 
-		FAES::EncryptData(blob, size, (ANSICHAR*)ProstoStroka.decrypt());
+		FAES::EncryptData(blob, size, "11111111111111111111111111111111");
 
 		TArray<uint8> encryptedArray;
 		encryptedArray.Append(blob, size);
@@ -40,7 +31,7 @@ public:
 		return encryptedStr;
 	}
 
-	FString DecryptString(FString& str)
+	static FString DecryptString(FString& str)
 	{
 		if (str.IsEmpty())
 			return str;
@@ -53,15 +44,14 @@ public:
 		uint8* blob = new uint8[size];
 		blob = encryptedArray.GetData();
 
-		FAES::DecryptData(blob, size, (ANSICHAR*)ProstoStroka.decrypt());
+		FAES::DecryptData(blob, size, "11111111111111111111111111111111");
 
 		FString decryptedStr = UTF8_TO_TCHAR(blob);
 
 		return decryptedStr;
 	}
 
-private:
-	TArray<uint8> FStringToBinaryArray(const FString& Input)
+	static TArray<uint8> FStringToBinaryArray(const FString& Input)
 	{
 		// We found that FSting char has 4 bytes on ios and 2 bytes on Windows
 		int32 len = Input.Len();
@@ -78,7 +68,7 @@ private:
 		return Output;
 	}
 
-	FString BinaryArrayToFString(const TArray<uint8>& Input, int32 Len /*= -1*/)
+	static FString BinaryArrayToFString(const TArray<uint8>& Input, int32 Len /*= -1*/)
 	{
 		if (Len < 0)
 		{
