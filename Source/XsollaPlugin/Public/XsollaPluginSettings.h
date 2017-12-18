@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "XsollaPluginEncryptTool.h"
 #include "XsollaPluginSettings.generated.h"
 
 UCLASS(config = Game, defaultconfig)
@@ -24,4 +25,23 @@ public:
 
 	UPROPERTY(config, EditAnywhere, Category = API)
 		bool bSandboxMode;
+
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override
+	{
+		if (PropertyChangedEvent.Property->GetFName().ToString().Compare("ApiKey") == 0)
+		{
+			FString encryptedString;
+			FString stringToEncrypt = ApiKey;
+			FString decryptedString;
+			
+			auto encryptTool = new XsollaPluginEncryptTool;
+			encryptedString = encryptTool->EncryptString(stringToEncrypt);
+			ApiKey = encryptedString;
+
+			GConfig->SetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), *encryptedString, GGameIni);
+			GConfig->Flush(true);
+
+			//decryptedString = encryptTool->DecryptString(encryptedString);
+		}
+	}
 };
