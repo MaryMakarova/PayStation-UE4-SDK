@@ -20,27 +20,34 @@ public:
 	UPROPERTY(config, EditAnywhere, Category = API)
 		FString ProjectId;
 
-	UPROPERTY(config, EditAnywhere, Category = API)
+	UPROPERTY(config /*EditAnywhere,*/ /*Category = API*/)
 		FString ApiKey;
+
+	UPROPERTY(/*config*/ EditAnywhere, Category = API)
+		FString ApiKeyDecrypted;
 
 	UPROPERTY(config, EditAnywhere, Category = API)
 		bool bSandboxMode;
 
+	virtual void PostInitProperties() override
+	{
+		Super::PostInitProperties();
+
+		ApiKeyDecrypted = XsollaPluginEncryptTool::DecryptString(ApiKey);
+	}
+
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override
 	{
-		if (PropertyChangedEvent.Property->GetFName().ToString().Compare("ApiKey") == 0)
+		if (PropertyChangedEvent.Property->GetFName().ToString().Compare("ApiKeyDecrypted") == 0)
 		{
 			FString encryptedString;
-			FString stringToEncrypt = ApiKey;
-			FString decryptedString;
+			FString stringToEncrypt = ApiKeyDecrypted;
 		
 			encryptedString = XsollaPluginEncryptTool::EncryptString(stringToEncrypt);
 			ApiKey = encryptedString;
 
 			GConfig->SetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), *encryptedString, GGameIni);
 			GConfig->Flush(true);
-
-			//decryptedString = encryptTool->DecryptString(encryptedString);
 		}
 	}
 };
