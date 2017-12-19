@@ -22,7 +22,7 @@ public:
 		uint8* blob = new uint8[size];
 		blob = (uint8*)TCHAR_TO_UTF8(str.GetCharArray().GetData());
 
-		FAES::EncryptData(blob, size, "11111111111111111111111111111111");
+		FAES::EncryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
 
 		TArray<uint8> encryptedArray;
 		encryptedArray.Append(blob, size);
@@ -44,7 +44,7 @@ public:
 		uint8* blob = new uint8[size];
 		blob = encryptedArray.GetData();
 
-		FAES::DecryptData(blob, size, "11111111111111111111111111111111");
+		FAES::DecryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
 
 		FString decryptedStr = UTF8_TO_TCHAR(blob);
 
