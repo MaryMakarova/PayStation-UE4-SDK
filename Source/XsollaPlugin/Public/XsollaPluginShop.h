@@ -14,15 +14,22 @@ class UXsollaPluginShop : public UObject
 public:
 	void CreateShop(
 		FString shopSize, 
-		FString shopDesign,
 		FOnPaymantSucceeded OnSucceeded,
 		FOnPaymantCanceled OnCanceled, 
 		FOnPaymantFailed OnFailed);
 
-	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	
+	/**
+	 * prop format is "{object}.{value}"
+	 */
+	bool SetProperty(FString prop, int value);
+	bool SetProperty(FString prop, bool value);
+	bool SetProperty(FString prop, FString value);
+	bool SetProperty(FString prop, const ANSICHAR* value);
 
 private:
 	void GetToken(FString shopJson);
+	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
 	XsollaPluginHttpTool * HttpTool;
@@ -40,5 +47,7 @@ private:
 	FOnPaymantCanceled		OnCanceled;
 	FOnPaymantFailed		OnFailed;
 
-	FString ExternalId;
+	FString					ExternalId;
+
+	TSharedPtr<FJsonObject> TokenJson;
 };

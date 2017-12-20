@@ -7,8 +7,9 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 	:Super(ObjectInitializer)
 {
 	HttpTool = new XsollaPluginHttpTool();
+	TokenJson = MakeShareable(new FJsonObject);
 
-	// xsolla api stuffs
+	// load properties drom global game config
 	GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
 	if (bIsSandbox)
 	{
@@ -26,12 +27,10 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 
 void UXsollaPluginShop::CreateShop(
 	FString shopSize,
-	FString shopDesign,
 	FOnPaymantSucceeded OnSucceeded, 
 	FOnPaymantCanceled OnCanceled,
 	FOnPaymantFailed OnFailed)
 {
-	// delegates setting
 	this->OnSucceeded = OnSucceeded;
 	this->OnCanceled = OnCanceled;
 	this->OnFailed = OnFailed;
@@ -59,56 +58,34 @@ void UXsollaPluginShop::CreateShop(
 	BrowserWrapper->OnFailed = OnFailed;
 	BrowserWrapper->OnCanceled = OnCanceled;
 
-	/* SHOP JSON */
-	// user section
-	TSharedPtr<FJsonObject> userIdJsonObj = MakeShareable(new FJsonObject);
-	userIdJsonObj->SetStringField("value", "1234567");
-	userIdJsonObj->SetBoolField("hidden", true);
+	// set token properties
+	SetProperty("user.id.value", "12345678");
+	SetProperty("user.id.hidden", true);
 
-	TSharedPtr<FJsonObject> userJsonObj = MakeShareable(new FJsonObject);
-	userJsonObj->SetObjectField("id", userIdJsonObj);
-
-	TSharedPtr<FJsonObject> emailJsonObj = MakeShareable(new FJsonObject);
-	emailJsonObj->SetStringField("value", "example@example.com");
-	emailJsonObj->SetBoolField("allow_modify", true);
-	emailJsonObj->SetBoolField("hidden", false);
-
-	userJsonObj->SetObjectField("email", emailJsonObj);
-
-	// settings section
-	TSharedPtr<FJsonObject> settingsJsonObj = MakeShareable(new FJsonObject);
+	SetProperty("user.email.value", "example@example.com");
+	SetProperty("user.email.allow_modify", true);
+	SetProperty("user.email.hidden", false);
 
 	ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
-	UE_LOG(LogTemp, Warning, TEXT("Ex id: %s"), *ExternalId);
 
-	settingsJsonObj->SetStringField("external_id", ExternalId);
-	settingsJsonObj->SetStringField("return_url", "https://www.unrealengine.com");
-	settingsJsonObj->SetNumberField("project_id", FCString::Atoi(*ProjectId));
-	if (bIsSandbox)
-	{
-		settingsJsonObj->SetStringField("mode", "sandbox");
-	}
+	SetProperty("settings.external_id", ExternalId);
+	SetProperty("settings.return_url", "https://www.unrealengine.com");
+	SetProperty("settings.project_id", FCString::Atoi(*ProjectId));
+	if (bIsSandbox) 
+		SetProperty("settings.mode", "sandbox");
 
-	TSharedPtr<FJsonObject> settingsUiJsonObj = MakeShareable(new FJsonObject);
-	settingsUiJsonObj->SetStringField("size", shopSize);
-	settingsUiJsonObj->SetStringField("version", shopDesign);
-	settingsJsonObj->SetObjectField("ui", settingsUiJsonObj);
-
-	// purchase json
-	TSharedPtr<FJsonObject> purchaseJsonObj = MakeShareable(new FJsonObject);
-
-
-	// combine into main section
-	TSharedPtr<FJsonObject> requestJsonObj = MakeShareable(new FJsonObject);
-	requestJsonObj->SetObjectField("user", userJsonObj);
-	requestJsonObj->SetObjectField("settings", settingsJsonObj);
+	SetProperty("settings.ui.size", shopSize);
+	SetProperty("settings.ui.version", "desktop");
+	SetProperty("settings.ui.theme", "dark");
 
 	// get string from json
 	FString outputString;
 	TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
-	FJsonSerializer::Serialize(requestJsonObj.ToSharedRef(), Writer);
+	FJsonSerializer::Serialize(TokenJson.ToSharedRef(), Writer);
 
-	// get shop token
+	UE_LOG(LogTemp, Warning, TEXT("JSON: %s"), *outputString);
+
+	// get shop
 	GetToken(outputString);
 }
 
@@ -142,10 +119,117 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 		FString tokenString = JsonParsed->GetStringField("token");
 		ShopUrl += tokenString;
 		XsollaToken = tokenString;
-		UE_LOG(LogTemp, Warning, TEXT("token: %s"), *ShopUrl);
 
 		BrowserWrapper->SetExternalId(ExternalId);
 		BrowserWrapper->SetShopUrl(ShopUrl);
 		BrowserWrapper->LoadURL(ShopUrl);
 	}
+}
+
+bool UXsollaPluginShop::SetProperty(FString prop, int value)
+{
+	TArray<FString> subStrings;
+	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+
+	prop.ParseIntoArray(subStrings, TEXT("."));
+
+	for (int i = 0; i < subStrings.Num(); ++i)
+	{
+		if (i + 1 == subStrings.Num())
+		{
+			currentObj->SetNumberField(subStrings.Last(), value);
+			continue;
+		}
+
+		if (!currentObj->HasField(subStrings[i]))
+		{
+			TSharedPtr<FJsonObject> subObject = MakeShareable(new FJsonObject);
+			currentObj->SetObjectField(subStrings[i], subObject.ToSharedRef());
+		}
+
+		currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
+	}
+
+	return true;
+}
+
+bool UXsollaPluginShop::SetProperty(FString prop, bool value)
+{
+	TArray<FString> subStrings;
+	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+
+	prop.ParseIntoArray(subStrings, TEXT("."));
+
+	for (int i = 0; i < subStrings.Num(); ++i)
+	{
+		if (i + 1 == subStrings.Num())
+		{
+			currentObj->SetBoolField(subStrings.Last(), value);
+			continue;
+		}
+
+		if (!currentObj->HasField(subStrings[i]))
+		{
+			TSharedPtr<FJsonObject> subObject = MakeShareable(new FJsonObject);
+			currentObj->SetObjectField(subStrings[i], subObject.ToSharedRef());
+		}
+
+		currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
+	}
+
+	return true;
+}
+
+bool UXsollaPluginShop::SetProperty(FString prop, FString value)
+{
+	TArray<FString> subStrings;
+	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+
+	prop.ParseIntoArray(subStrings, TEXT("."));
+
+	for (int i = 0; i < subStrings.Num(); ++i)
+	{
+		if (i + 1 == subStrings.Num())
+		{
+			currentObj->SetStringField(subStrings.Last(), value);
+			continue;
+		}
+
+		if (!currentObj->HasField(subStrings[i]))
+		{
+			TSharedPtr<FJsonObject> subObject = MakeShareable(new FJsonObject);
+			currentObj->SetObjectField(subStrings[i], subObject.ToSharedRef());
+		}
+
+		currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
+	}
+
+	return true;
+}
+
+bool UXsollaPluginShop::SetProperty(FString prop, const ANSICHAR* value)
+{
+	TArray<FString> subStrings;
+	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+
+	prop.ParseIntoArray(subStrings, TEXT("."));
+
+	for (int i = 0; i < subStrings.Num(); ++i)
+	{
+		if (i + 1 == subStrings.Num())
+		{
+			currentObj->SetStringField(subStrings.Last(), FString(ANSI_TO_TCHAR(value)));
+			continue;
+		}
+
+		if (!currentObj->HasField(subStrings[i]))
+		{
+			TSharedPtr<FJsonObject> subObject = MakeShareable(new FJsonObject);
+			currentObj->SetObjectField(subStrings[i], subObject.ToSharedRef());
+		}
+
+		currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
+	}
+
+	return true;
 }
