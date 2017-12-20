@@ -4,12 +4,11 @@
 
 #include "XsollaPluginTransactionDetails.generated.h"
 
-UCLASS()
-class UTransactionDetails : public UObject
+USTRUCT()
+struct FTransactionDetails
 {
 	GENERATED_BODY()
 
-public:
 	// transaction section
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Transaction details")
 		FString TransactionStatus;
