@@ -41,4 +41,7 @@ public:
 			FOnPaymantCanceled OnCanceled, 
 			FOnPaymantFailed OnFailed,
 			FString shopSize);
+
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static class UXsollaPluginShop* GetXsollaPlugin();
 };

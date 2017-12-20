@@ -1,5 +1,6 @@
 #include "XsollaPluginBPLibrary.h"
 #include "XsollaPluginShop.h"
+#include "XsollaPlugin.h"
 
 UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -17,5 +18,10 @@ int32 UXsollaPluginBPLibrary::CreateXsollaShop(
 	shop->CreateShop(shopSize, OnSucceeded, OnCanceled, OnFailed);
 
 	return -1;
+}
+
+UXsollaPluginShop* UXsollaPluginBPLibrary::GetXsollaPlugin()
+{
+    return IXsollaPluginModule::Get().Shop;
 }
 

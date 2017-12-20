@@ -7,7 +7,7 @@
 #include "XsollaPluginShop.generated.h"
 
 UCLASS()
-class UXsollaPluginShop : public UObject
+class XSOLLAPLUGIN_API UXsollaPluginShop : public UObject
 {
 	GENERATED_UCLASS_BODY()
 
