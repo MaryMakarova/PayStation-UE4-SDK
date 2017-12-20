@@ -220,49 +220,30 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
 		{
 			TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
 
-			UTransactionDetails* transactionDetails = NewObject<UTransactionDetails>(UTransactionDetails::StaticClass());
+			FTransactionDetails transactionDetails;
 
-			TSharedPtr<FJsonObject> transaction = root->GetObjectField("transaction");
-			transactionDetails->TransactionStatus = transaction->GetStringField("status");
-			transactionDetails->TransactionId = transaction->GetIntegerField("id");
+			transactionDetails.TransactionStatus				= root->GetObjectField("transaction")->GetStringField("status");
+			transactionDetails.TransactionId					= root->GetObjectField("transaction")->GetNumberField("id");
+			transactionDetails.TransactionProjectId				= root->GetObjectField("project")->GetStringField("id");
+			transactionDetails.PaymentMethodId					= root->GetObjectField("payment_method")->GetNumberField("id");
+			transactionDetails.PaymentMethodName				= root->GetObjectField("payment_method")->GetStringField("name");
+			transactionDetails.UserId							= root->GetObjectField("user")->GetIntegerField("id");
+			transactionDetails.UserEmail						= root->GetObjectField("user")->GetStringField("email");
+			transactionDetails.UserCountry						= root->GetObjectField("user")->GetStringField("country");
+			transactionDetails.PaymentCurrency					= root->GetObjectField("payment_details")->GetObjectField("payment")->GetStringField("currency");
+			transactionDetails.PaymentAmount					= root->GetObjectField("payment_details")->GetObjectField("payment")->GetIntegerField("amount");
+			transactionDetails.PaymentSalesTaxAmount			= root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("amount");
+			transactionDetails.PaymentSalesTaxPercent			= root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("percent");
+			transactionDetails.PurchaseVirtualItems				= root->GetObjectField("purchase")->GetStringField("virtual_items");
+			transactionDetails.PurchaseVirtualCurrencyAmount	= root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetIntegerField("amount");
+			transactionDetails.PurchaseVirtualCurrencyName		= root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetStringField("name");
+			transactionDetails.PurchaseSimpleCheckoutAmount		= root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetIntegerField("amount");
+			transactionDetails.PurchaseSimpleCheckoutCurrency	= root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetStringField("currency");
+			transactionDetails.PurchaseSubscriptionName			= root->GetObjectField("purchase")->GetObjectField("subscription")->GetStringField("name");
 
-			TSharedPtr<FJsonObject> transactionProject = transaction->GetObjectField("project");
-			transactionDetails->TransactionProjectId = transactionProject->GetStringField("id");
+			//FJsonObjectConverter::JsonObjectToUStruct<FTransactionDetails>(root.ToSharedRef(), &transactionDetails, 0, 0);
 
-			TSharedPtr<FJsonObject> transactionPaymentMethod = transaction->GetObjectField("payment_method");
-			transactionDetails->PaymentMethodId = transactionPaymentMethod->GetIntegerField("id");
-			transactionDetails->PaymentMethodName = transactionPaymentMethod->GetStringField("name");
-
-			TSharedPtr<FJsonObject> user = root->GetObjectField("user");
-			transactionDetails->UserId = user->GetIntegerField("id");
-			transactionDetails->UserEmail = user->GetStringField("email");
-			transactionDetails->UserCountry = user->GetStringField("country");
-
-			TSharedPtr<FJsonObject> paymentDetails = root->GetObjectField("payment_details");
-
-			TSharedPtr<FJsonObject> payment = paymentDetails->GetObjectField("payment");
-			transactionDetails->PaymentCurrency = payment->GetStringField("currency");
-			transactionDetails->PaymentAmount = payment->GetIntegerField("amount");
-			
-			TSharedPtr<FJsonObject> salesTax = paymentDetails->GetObjectField("sales_tax");
-			transactionDetails->PaymentSalesTaxAmount = salesTax->GetIntegerField("amount");
-			transactionDetails->PaymentSalesTaxPercent = salesTax->GetIntegerField("percent");
-
-			TSharedPtr<FJsonObject> purchase = root->GetObjectField("purchase");
-			transactionDetails->PurchaseVirtualItems = purchase->GetStringField("virtual_items");
-
-			TSharedPtr<FJsonObject> virtualCurrency = purchase->GetObjectField("virtual_currency");
-			transactionDetails->PurchaseVirtualCurrencyAmount = virtualCurrency->GetIntegerField("amount");
-			transactionDetails->PurchaseVirtualCurrencyName = virtualCurrency->GetStringField("name");
-
-			TSharedPtr<FJsonObject> simpleCheckout = purchase->GetObjectField("simple_checkout");
-			transactionDetails->PurchaseSimpleCheckoutAmount = simpleCheckout->GetIntegerField("amount");
-			transactionDetails->PurchaseSimpleCheckoutCurrency = simpleCheckout->GetStringField("currency");
-
-			TSharedPtr<FJsonObject> subscription = purchase->GetObjectField("subscription");
-			transactionDetails->PurchaseSubscriptionName = subscription->GetStringField("name");
-
-			if (transactionDetails->TransactionStatus == "done")
+			if (transactionDetails.TransactionStatus == "done")
 			{
 				this->OnSucceeded.Execute(0, transactionDetails);
 			}
@@ -298,7 +279,7 @@ void UXsollaPluginWebBrowserWrapper::CloseShop()
 	TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
 
 	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
-	httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + ApiKey), Request);
+	httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
 
 	httpTool->Send(Request);
 }
