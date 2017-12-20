@@ -1,5 +1,3 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
-
 #include "XsollaPluginBPLibrary.h"
 #include "XsollaPluginShop.h"
 
@@ -12,12 +10,11 @@ int32 UXsollaPluginBPLibrary::CreateXsollaShop(
 	FOnPaymantSucceeded OnSucceeded, 
 	FOnPaymantCanceled OnCanceled, 
 	FOnPaymantFailed OnFailed, 
-	FString shopSize,
-	FString shopDesign)
+	FString shopSize)
 {
 	UXsollaPluginShop* shop = NewObject<UXsollaPluginShop>(UXsollaPluginShop::StaticClass());
 
-	shop->CreateShop(shopSize, shopDesign, OnSucceeded, OnCanceled, OnFailed);
+	shop->CreateShop(shopSize, OnSucceeded, OnCanceled, OnFailed);
 
 	return -1;
 }
