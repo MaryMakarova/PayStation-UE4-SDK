@@ -222,24 +222,24 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
 
 			FTransactionDetails transactionDetails;
 
-			transactionDetails.TransactionStatus				= root->GetObjectField("transaction")->GetStringField("status");
-			transactionDetails.TransactionId					= root->GetObjectField("transaction")->GetNumberField("id");
-			transactionDetails.TransactionProjectId				= root->GetObjectField("project")->GetStringField("id");
-			transactionDetails.PaymentMethodId					= root->GetObjectField("payment_method")->GetNumberField("id");
-			transactionDetails.PaymentMethodName				= root->GetObjectField("payment_method")->GetStringField("name");
-			transactionDetails.UserId							= root->GetObjectField("user")->GetIntegerField("id");
-			transactionDetails.UserEmail						= root->GetObjectField("user")->GetStringField("email");
-			transactionDetails.UserCountry						= root->GetObjectField("user")->GetStringField("country");
-			transactionDetails.PaymentCurrency					= root->GetObjectField("payment_details")->GetObjectField("payment")->GetStringField("currency");
-			transactionDetails.PaymentAmount					= root->GetObjectField("payment_details")->GetObjectField("payment")->GetIntegerField("amount");
-			transactionDetails.PaymentSalesTaxAmount			= root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("amount");
-			transactionDetails.PaymentSalesTaxPercent			= root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("percent");
-			transactionDetails.PurchaseVirtualItems				= root->GetObjectField("purchase")->GetStringField("virtual_items");
-			transactionDetails.PurchaseVirtualCurrencyAmount	= root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetIntegerField("amount");
-			transactionDetails.PurchaseVirtualCurrencyName		= root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetStringField("name");
-			transactionDetails.PurchaseSimpleCheckoutAmount		= root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetIntegerField("amount");
-			transactionDetails.PurchaseSimpleCheckoutCurrency	= root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetStringField("currency");
-			transactionDetails.PurchaseSubscriptionName			= root->GetObjectField("purchase")->GetObjectField("subscription")->GetStringField("name");
+			transactionDetails.TransactionStatus                = root->GetObjectField("transaction")->GetStringField("status");
+			transactionDetails.TransactionId                    = root->GetObjectField("transaction")->GetNumberField("id");
+			transactionDetails.TransactionProjectId             = root->GetObjectField("project")->GetStringField("id");
+			transactionDetails.PaymentMethodId                  = root->GetObjectField("payment_method")->GetNumberField("id");
+			transactionDetails.PaymentMethodName                = root->GetObjectField("payment_method")->GetStringField("name");
+			transactionDetails.UserId                           = root->GetObjectField("user")->GetIntegerField("id");
+			transactionDetails.UserEmail                        = root->GetObjectField("user")->GetStringField("email");
+			transactionDetails.UserCountry                      = root->GetObjectField("user")->GetStringField("country");
+			transactionDetails.PaymentCurrency                  = root->GetObjectField("payment_details")->GetObjectField("payment")->GetStringField("currency");
+			transactionDetails.PaymentAmount                    = root->GetObjectField("payment_details")->GetObjectField("payment")->GetIntegerField("amount");
+			transactionDetails.PaymentSalesTaxAmount            = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("amount");
+			transactionDetails.PaymentSalesTaxPercent           = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("percent");
+			transactionDetails.PurchaseVirtualItems             = root->GetObjectField("purchase")->GetStringField("virtual_items");
+			transactionDetails.PurchaseVirtualCurrencyAmount    = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetIntegerField("amount");
+			transactionDetails.PurchaseVirtualCurrencyName      = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetStringField("name");
+			transactionDetails.PurchaseSimpleCheckoutAmount     = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetIntegerField("amount");
+			transactionDetails.PurchaseSimpleCheckoutCurrency   = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetStringField("currency");
+			transactionDetails.PurchaseSubscriptionName         = root->GetObjectField("purchase")->GetObjectField("subscription")->GetStringField("name");
 
 			//FJsonObjectConverter::JsonObjectToUStruct<FTransactionDetails>(root.ToSharedRef(), &transactionDetails, 0, 0);
 
