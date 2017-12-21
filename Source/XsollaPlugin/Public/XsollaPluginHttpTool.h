@@ -7,67 +7,67 @@
 class XsollaPluginHttpTool
 {
 public:
-	XsollaPluginHttpTool()
-	{
-		Http = &FHttpModule::Get();
-	}
+    XsollaPluginHttpTool()
+    {
+        Http = &FHttpModule::Get();
+    }
 
-	void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request)
-	{
-		Request->SetHeader(AuthorizationHeader, Hash);
-	}
+    void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request)
+    {
+        Request->SetHeader(AuthorizationHeader, Hash);
+    }
 
-	TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute)
-	{
-		TSharedRef<IHttpRequest> Request = Http->CreateRequest();
-		Request->SetURL(ApiBaseUrl + Subroute);
-		SetRequestHeaders(Request);
-		return Request;
-	}
+    TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute)
+    {
+        TSharedRef<IHttpRequest> Request = Http->CreateRequest();
+        Request->SetURL(ApiBaseUrl + Subroute);
+        SetRequestHeaders(Request);
+        return Request;
+    }
 
-	void SetRequestHeaders(TSharedRef<IHttpRequest>& Request)
-	{
-		Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-		Request->SetHeader(TEXT("Accept"), TEXT("application/json"));
-	}
+    void SetRequestHeaders(TSharedRef<IHttpRequest>& Request)
+    {
+        Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+        Request->SetHeader(TEXT("Accept"), TEXT("application/json"));
+    }
 
-	TSharedRef<IHttpRequest> GetRequest(FString Subroute)
-	{
-		TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
-		Request->SetVerb("GET");
-		return Request;
-	}
+    TSharedRef<IHttpRequest> GetRequest(FString Subroute)
+    {
+        TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
+        Request->SetVerb("GET");
+        return Request;
+    }
 
-	TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString)
-	{
-		TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
-		Request->SetVerb("POST");
-		Request->SetContentAsString(ContentJsonString);
-		return Request;
-	}
+    TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString)
+    {
+        TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
+        Request->SetVerb("POST");
+        Request->SetContentAsString(ContentJsonString);
+        return Request;
+    }
 
-	void Send(TSharedRef<IHttpRequest>& Request)
-	{
-		Request->ProcessRequest();
-	}
+    void Send(TSharedRef<IHttpRequest>& Request)
+    {
+        Request->ProcessRequest();
+    }
 
-	bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful)
-	{
-		if (!bWasSuccessful || !Response.IsValid())
-			return false;
+    bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful)
+    {
+        if (!bWasSuccessful || !Response.IsValid())
+            return false;
 
-		if (EHttpResponseCodes::IsOk(Response->GetResponseCode()))
-			return true;
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d, %s"), Response->GetResponseCode(), *Response->GetContentAsString());
-			return false;
-		}
-	}
+        if (EHttpResponseCodes::IsOk(Response->GetResponseCode()))
+            return true;
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d, %s"), Response->GetResponseCode(), *Response->GetContentAsString());
+            return false;
+        }
+    }
 
 private:
-	FHttpModule* Http;
+    FHttpModule* Http;
 
-	FString AuthorizationHeader = TEXT("Authorization");
-	FString ApiBaseUrl = "";
+    FString AuthorizationHeader = TEXT("Authorization");
+    FString ApiBaseUrl = "";
 };

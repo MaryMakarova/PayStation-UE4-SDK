@@ -3,6 +3,6 @@
 #include "XsollaPluginSettings.h"
 
 UXsollaPluginSettings::UXsollaPluginSettings(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+    : Super(ObjectInitializer)
 {
 }

@@ -17,50 +17,50 @@ enum class EShopSizeEnum : uint8
 UCLASS()
 class UXsollaPluginShop : public UObject
 {
-	GENERATED_UCLASS_BODY()
+    GENERATED_UCLASS_BODY()
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	void CreateShop(
-                EShopSizeEnum shopSize,
-		FOnPaymantSucceeded OnSucceeded,
-		FOnPaymantCanceled OnCanceled, 
-		FOnPaymantFailed OnFailed);
+    void CreateShop(
+        EShopSizeEnum shopSize,
+        FOnPaymantSucceeded OnSucceeded,
+        FOnPaymantCanceled OnCanceled, 
+        FOnPaymantFailed OnFailed);
 
-	
+    
     /**
      * prop format is "{object}.{value}"
      */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	bool SetNumberProperty(FString prop, int value, bool bOverride = true);
+    bool SetNumberProperty(FString prop, int value, bool bOverride = true);
 
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	bool SetBoolProperty(FString prop, bool value, bool bOverride = true);
+    bool SetBoolProperty(FString prop, bool value, bool bOverride = true);
 
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-	bool SetStringProperty(FString prop, FString value, bool bOverride = true);
+    bool SetStringProperty(FString prop, FString value, bool bOverride = true);
 
 private:
-	void OpenShop(FString shopJson);
-	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+    void OpenShop(FString tokenRequestJson);
+    void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
-	XsollaPluginHttpTool * HttpTool;
+    XsollaPluginHttpTool * HttpTool;
 
-	FString XsollaToken;
-	FString ShopUrl;
-	FString MerchantId;
-	FString ApiKey;
-	FString ProjectId;
-	bool bIsSandbox;
+    FString XsollaToken;
+    FString ShopUrl;
+    FString MerchantId;
+    FString ApiKey;
+    FString ProjectId;
+    bool bIsSandbox;
 
-	UXsollaPluginWebBrowserWrapper* BrowserWrapper;
+    UXsollaPluginWebBrowserWrapper* BrowserWrapper;
 
-	FOnPaymantSucceeded		OnSucceeded;
-	FOnPaymantCanceled		OnCanceled;
-	FOnPaymantFailed		OnFailed;
+    FOnPaymantSucceeded		OnSucceeded;
+    FOnPaymantCanceled		OnCanceled;
+    FOnPaymantFailed		OnFailed;
 
-	FString				ExternalId;
+    FString					ExternalId;
 
-	TSharedPtr<FJsonObject> TokenRequestJson;
+    TSharedPtr<FJsonObject> TokenRequestJson;
 };

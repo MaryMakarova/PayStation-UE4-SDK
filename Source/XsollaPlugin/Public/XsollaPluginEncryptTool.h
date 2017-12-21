@@ -6,87 +6,87 @@
 class XsollaPluginEncryptTool
 {
 public:
-	XsollaPluginEncryptTool()
-	{
+    XsollaPluginEncryptTool()
+    {
 
-	}
+    }
 
-	static FString EncryptString(FString& str)
-	{
-		if (str.IsEmpty())
-			return str;
+    static FString EncryptString(FString& str)
+    {
+        if (str.IsEmpty())
+            return str;
 
-		uint32 size = str.Len();
-		size = size + (FAES::AESBlockSize - (size % FAES::AESBlockSize));
+        uint32 size = str.Len();
+        size = size + (FAES::AESBlockSize - (size % FAES::AESBlockSize));
 
-		uint8* blob = new uint8[size];
-		blob = (uint8*)TCHAR_TO_UTF8(str.GetCharArray().GetData());
+        uint8* blob = new uint8[size];
+        blob = (uint8*)TCHAR_TO_UTF8(str.GetCharArray().GetData());
 
-		FAES::EncryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
+        FAES::EncryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
 
-		TArray<uint8> encryptedArray;
-		encryptedArray.Append(blob, size);
+        TArray<uint8> encryptedArray;
+        encryptedArray.Append(blob, size);
 
-		FString encryptedStr = BinaryArrayToFString(encryptedArray, encryptedArray.Num());
-		return encryptedStr;
-	}
+        FString encryptedStr = BinaryArrayToFString(encryptedArray, encryptedArray.Num());
+        return encryptedStr;
+    }
 
-	static FString DecryptString(FString& str)
-	{
-		if (str.IsEmpty())
-			return str;
+    static FString DecryptString(FString& str)
+    {
+        if (str.IsEmpty())
+            return str;
 
-		uint32 size = str.Len();
-		size = size + (FAES::AESBlockSize - (size % FAES::AESBlockSize));
+        uint32 size = str.Len();
+        size = size + (FAES::AESBlockSize - (size % FAES::AESBlockSize));
 
-		TArray<uint8> encryptedArray = FStringToBinaryArray(str);
+        TArray<uint8> encryptedArray = FStringToBinaryArray(str);
 
-		uint8* blob = new uint8[size];
-		blob = encryptedArray.GetData();
+        uint8* blob = new uint8[size];
+        blob = encryptedArray.GetData();
 
-		FAES::DecryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
+        FAES::DecryptData(blob, size, "GffdH6446FVdfcbhFDFdIHNgD556GCdf");
 
-		FString decryptedStr = UTF8_TO_TCHAR(blob);
+        FString decryptedStr = UTF8_TO_TCHAR(blob);
 
-		return decryptedStr;
-	}
+        return decryptedStr;
+    }
 
-	static TArray<uint8> FStringToBinaryArray(const FString& Input)
-	{
-		// We found that FSting char has 4 bytes on ios and 2 bytes on Windows
-		int32 len = Input.Len();
+    static TArray<uint8> FStringToBinaryArray(const FString& Input)
+    {
+        // We found that FSting char has 4 bytes on ios and 2 bytes on Windows
+        int32 len = Input.Len();
 
-		TArray<uint8> Output;
-		Output.AddZeroed(2 * len);
+        TArray<uint8> Output;
+        Output.AddZeroed(2 * len);
 
-		for (int32 i = 0; i < len; ++i)
-		{
-			Output[2 * i + 0] = Input[i] & 0xFF; // Save first byte of char
-			Output[2 * i + 1] = (Input[i] >> 8) & 0xFF; // Save second byte of char
-		}
+        for (int32 i = 0; i < len; ++i)
+        {
+            Output[2 * i + 0] = Input[i] & 0xFF; // Save first byte of char
+            Output[2 * i + 1] = (Input[i] >> 8) & 0xFF; // Save second byte of char
+        }
 
-		return Output;
-	}
+        return Output;
+    }
 
-	static FString BinaryArrayToFString(const TArray<uint8>& Input, int32 Len /*= -1*/)
-	{
-		if (Len < 0)
-		{
-			Len = Input.Num();
-		}
+    static FString BinaryArrayToFString(const TArray<uint8>& Input, int32 Len /*= -1*/)
+    {
+        if (Len < 0)
+        {
+            Len = Input.Num();
+        }
 
-		// We found that FSting char has 4 bytes on ios and 2 bytes on Windows
-		Len /= 2;
+        // We found that FSting char has 4 bytes on ios and 2 bytes on Windows
+        Len /= 2;
 
-		FString Output;
-		auto& TCharArray = Output.GetCharArray();
-		TCharArray.AddZeroed(Len + 1);
+        FString Output;
+        auto& TCharArray = Output.GetCharArray();
+        TCharArray.AddZeroed(Len + 1);
 
-		for (int32 i = 0; i < Len; ++i)
-		{
-			TCharArray[i] = Input[2 * i + 0] | (Input[2 * i + 1] << 8);
-		}
+        for (int32 i = 0; i < Len; ++i)
+        {
+            TCharArray[i] = Input[2 * i + 0] | (Input[2 * i + 1] << 8);
+        }
 
-		return Output;
-	}
+        return Output;
+    }
 };

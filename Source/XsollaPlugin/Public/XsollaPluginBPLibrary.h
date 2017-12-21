@@ -32,7 +32,7 @@ DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, Er
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 {
-	GENERATED_UCLASS_BODY()
+    GENERATED_UCLASS_BODY()
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
