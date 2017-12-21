@@ -7,7 +7,7 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 	:Super(ObjectInitializer)
 {
 	HttpTool = new XsollaPluginHttpTool();
-	TokenJson = MakeShareable(new FJsonObject);
+	TokenRequestJson = MakeShareable(new FJsonObject);
 
 	// load properties drom global game config
 	GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
@@ -26,7 +26,7 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 }
 
 void UXsollaPluginShop::CreateShop(
-	FString shopSize,
+    EShopSizeEnum shopSize,
 	FOnPaymantSucceeded OnSucceeded, 
 	FOnPaymantCanceled OnCanceled,
 	FOnPaymantFailed OnFailed)
@@ -35,19 +35,23 @@ void UXsollaPluginShop::CreateShop(
 	this->OnCanceled = OnCanceled;
 	this->OnFailed = OnFailed;
 
-	// show browwser wrapper
+	// show browser wrapper
 	BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 
-	if (shopSize.Compare("small") == 0)
+    // set shop interface size
+	if (shopSize == EShopSizeEnum::VE_Small)
 	{
+        SetStringProperty("settings.ui.size", FString("small"), false);
 		BrowserWrapper->SetBrowserSize(620, 630);
 	}
-	else if (shopSize.Compare("medium") == 0)
+	else if (shopSize == EShopSizeEnum::VE_Medium)
 	{
+        SetStringProperty("settings.ui.size", FString("medium"), false);
 		BrowserWrapper->SetBrowserSize(740, 760);
 	}
-	else if (shopSize.Compare("large") == 0)
+	else if (shopSize == EShopSizeEnum::VE_Large)
 	{
+        SetStringProperty("settings.ui.size", FString("large"), false);
 		BrowserWrapper->SetBrowserSize(820, 840);
 	}
 
@@ -59,43 +63,42 @@ void UXsollaPluginShop::CreateShop(
 	BrowserWrapper->OnCanceled = OnCanceled;
 
 	// set token properties
-	SetProperty("user.id.value", "12345678");
-	SetProperty("user.id.hidden", true);
+    SetStringProperty("user.id.value", FString("12345678"), false);
+	SetBoolProperty("user.id.hidden", true);
 
-	SetProperty("user.email.value", "example@example.com");
-	SetProperty("user.email.allow_modify", true);
-	SetProperty("user.email.hidden", false);
+    SetStringProperty("user.email.value", FString("example@example.com"), false);
+	SetBoolProperty("user.email.allow_modify", true);
+	SetBoolProperty("user.email.hidden", false);
 
 	ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
 
-	SetProperty("settings.external_id", ExternalId);
-	SetProperty("settings.return_url", "https://www.unrealengine.com");
-	SetProperty("settings.project_id", FCString::Atoi(*ProjectId));
+	SetStringProperty("settings.external_id", ExternalId);
+    SetStringProperty("settings.return_url", FString("https://www.unrealengine.com"));
+	SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
 	if (bIsSandbox) 
-		SetProperty("settings.mode", "sandbox");
+		SetStringProperty("settings.mode", FString("sandbox"), false);
 
-	SetProperty("settings.ui.size", shopSize);
-	SetProperty("settings.ui.version", "desktop");
-	SetProperty("settings.ui.theme", "dark");
+	SetStringProperty("settings.ui.version", FString("desktop"), false);
+    SetStringProperty("settings.ui.theme", FString("dark"), false);
 
 	// get string from json
 	FString outputString;
 	TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
-	FJsonSerializer::Serialize(TokenJson.ToSharedRef(), Writer);
+	FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
 	UE_LOG(LogTemp, Warning, TEXT("JSON: %s"), *outputString);
 
-	// get shop
-	GetToken(outputString);
+	// load shop
+    OpenShop(outputString);
 }
 
-void UXsollaPluginShop::GetToken(FString shopJson)
+void UXsollaPluginShop::OpenShop(FString tokenRequestJson)
 {
 	FString route = "https://api.xsolla.com/merchant/merchants/";
 	route += MerchantId;
 	route += "/token";
 
-	TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, shopJson);
+	TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, tokenRequestJson);
 
 	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginShop::OnGetTokenRequestComplete);
 	HttpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
@@ -126,10 +129,10 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 	}
 }
 
-bool UXsollaPluginShop::SetProperty(FString prop, int value)
+bool UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
 {
 	TArray<FString> subStrings;
-	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+	TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
 
 	prop.ParseIntoArray(subStrings, TEXT("."));
 
@@ -137,7 +140,18 @@ bool UXsollaPluginShop::SetProperty(FString prop, int value)
 	{
 		if (i + 1 == subStrings.Num())
 		{
-			currentObj->SetNumberField(subStrings.Last(), value);
+            if (currentObj->HasField(subStrings.Last()))
+            {
+                if (bOverride)
+                    currentObj->SetNumberField(subStrings.Last(), value);
+                else
+                    continue;
+            }
+            else
+            {
+                currentObj->SetNumberField(subStrings.Last(), value);
+            }
+
 			continue;
 		}
 
@@ -153,10 +167,10 @@ bool UXsollaPluginShop::SetProperty(FString prop, int value)
 	return true;
 }
 
-bool UXsollaPluginShop::SetProperty(FString prop, bool value)
+bool UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride/*= true */)
 {
 	TArray<FString> subStrings;
-	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+	TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
 
 	prop.ParseIntoArray(subStrings, TEXT("."));
 
@@ -164,7 +178,18 @@ bool UXsollaPluginShop::SetProperty(FString prop, bool value)
 	{
 		if (i + 1 == subStrings.Num())
 		{
-			currentObj->SetBoolField(subStrings.Last(), value);
+            if (currentObj->HasField(subStrings.Last()))
+            {
+                if (bOverride)
+                    currentObj->SetBoolField(subStrings.Last(), value);
+                else
+                    continue;
+            }
+            else
+            {
+                currentObj->SetBoolField(subStrings.Last(), value);
+            }
+
 			continue;
 		}
 
@@ -180,10 +205,10 @@ bool UXsollaPluginShop::SetProperty(FString prop, bool value)
 	return true;
 }
 
-bool UXsollaPluginShop::SetProperty(FString prop, FString value)
+bool UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOverride/*= true */)
 {
 	TArray<FString> subStrings;
-	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
+	TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
 
 	prop.ParseIntoArray(subStrings, TEXT("."));
 
@@ -191,34 +216,18 @@ bool UXsollaPluginShop::SetProperty(FString prop, FString value)
 	{
 		if (i + 1 == subStrings.Num())
 		{
-			currentObj->SetStringField(subStrings.Last(), value);
-			continue;
-		}
+            if (currentObj->HasField(subStrings.Last()))
+            {
+                if (bOverride)
+                    currentObj->SetStringField(subStrings.Last(), value);
+                else
+                    continue;
+            }
+            else
+            {
+                currentObj->SetStringField(subStrings.Last(), value);
+            }
 
-		if (!currentObj->HasField(subStrings[i]))
-		{
-			TSharedPtr<FJsonObject> subObject = MakeShareable(new FJsonObject);
-			currentObj->SetObjectField(subStrings[i], subObject.ToSharedRef());
-		}
-
-		currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
-	}
-
-	return true;
-}
-
-bool UXsollaPluginShop::SetProperty(FString prop, const ANSICHAR* value)
-{
-	TArray<FString> subStrings;
-	TSharedPtr<FJsonObject> currentObj = TokenJson.ToSharedRef();
-
-	prop.ParseIntoArray(subStrings, TEXT("."));
-
-	for (int i = 0; i < subStrings.Num(); ++i)
-	{
-		if (i + 1 == subStrings.Num())
-		{
-			currentObj->SetStringField(subStrings.Last(), FString(ANSI_TO_TCHAR(value)));
 			continue;
 		}
 
