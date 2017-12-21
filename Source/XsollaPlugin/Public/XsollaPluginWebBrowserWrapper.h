@@ -61,11 +61,11 @@ private:
 	TSharedPtr<class SVerticalBox>		MainContent;
 	TSharedPtr<class SWebBrowser>		WebBrowserWidget;
 	TSharedPtr<class SSpinningImage>	SpinnerImage;
-	TSharedPtr<class SButton>			CloseButton;
-	TSharedPtr<class SButton>			HomeButton;
+	TSharedPtr<class SButton>		CloseButton;
+	TSharedPtr<class SButton>		HomeButton;
 	TSharedPtr<class SVerticalBox>		Background;
 
-	SHorizontalBox::FSlot& BrowserSlot				= SHorizontalBox::Slot();
+	SHorizontalBox::FSlot& BrowserSlot		= SHorizontalBox::Slot();
 	SHorizontalBox::FSlot& BrowserSlotMarginLeft	= SHorizontalBox::Slot();
 	SHorizontalBox::FSlot& BrowserSlotMarginRight	= SHorizontalBox::Slot();
 
