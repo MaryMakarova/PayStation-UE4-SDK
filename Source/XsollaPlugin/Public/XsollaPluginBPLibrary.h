@@ -36,5 +36,5 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-        static class UXsollaPluginShop* GetXsollaPlugin();
+    static class UXsollaPluginShop* GetXsollaPlugin();
 };
