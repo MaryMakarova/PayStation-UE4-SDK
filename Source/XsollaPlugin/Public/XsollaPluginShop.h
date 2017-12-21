@@ -22,15 +22,15 @@ class UXsollaPluginShop : public UObject
 public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
 	void CreateShop(
-        EShopSizeEnum shopSize,
+                EShopSizeEnum shopSize,
 		FOnPaymantSucceeded OnSucceeded,
 		FOnPaymantCanceled OnCanceled, 
 		FOnPaymantFailed OnFailed);
 
 	
-	/**
-	 * prop format is "{object}.{value}"
-	 */
+    /**
+     * prop format is "{object}.{value}"
+     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
 	bool SetNumberProperty(FString prop, int value, bool bOverride = true);
 
@@ -60,7 +60,7 @@ private:
 	FOnPaymantCanceled		OnCanceled;
 	FOnPaymantFailed		OnFailed;
 
-	FString					ExternalId;
+	FString				ExternalId;
 
 	TSharedPtr<FJsonObject> TokenRequestJson;
 };
