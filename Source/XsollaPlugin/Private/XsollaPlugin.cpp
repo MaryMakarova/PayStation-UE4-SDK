@@ -1,18 +1,36 @@
-// Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
-
 #include "XsollaPlugin.h"
+#include "XsollaPluginShop.h"
 #include "Developer/Settings/Public/ISettingsModule.h"
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "Developer/Settings/Public/ISettingsSection.h"
+#include "SlateBasics.h"
+#include "SWidget.h"
 #include "XsollaPluginSettings.h"
 
 #define LOCTEXT_NAMESPACE "FXsollaPluginModule"
+
+class FXsollaPluginModule : public IXsollaPluginModule
+{
+public:
+
+    /** IModuleInterface implementation */
+    virtual void StartupModule() override;
+    virtual void ShutdownModule() override;
+
+private:
+    void RegisterSettings();
+    void UnregisterSettings();
+};
+
+IMPLEMENT_MODULE(FXsollaPluginModule, XsollaPlugin)
 
 void FXsollaPluginModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
 	RegisterSettings();
+
+    UXsollaPluginShop* Shop = NewObject<UXsollaPluginShop>(UXsollaPluginShop::StaticClass());
 }
 
 void FXsollaPluginModule::ShutdownModule()
@@ -24,22 +42,6 @@ void FXsollaPluginModule::ShutdownModule()
 	{
 		UnregisterSettings();
 	}
-}
-
-bool FXsollaPluginModule::HandleSettingsSaved()
-{
-	UXsollaPluginSettings* Settings = GetMutableDefault<UXsollaPluginSettings>();
-	bool ResaveSettings = false;
-
-	// You can put any validation code in here and resave the settings in case an invalid
-	// value has been entered
-
-	if (ResaveSettings)
-	{
-		Settings->SaveConfig();
-	}
-
-	return true;
 }
 
 void FXsollaPluginModule::RegisterSettings()
@@ -63,13 +65,6 @@ void FXsollaPluginModule::RegisterSettings()
 			LOCTEXT("RuntimeGeneralSettingsDescription", "Base configuration"),
 			GetMutableDefault<UXsollaPluginSettings>()
 		);
-
-		// Register the save handler to your settings, you might want to use it to
-		// validate those or just act to settings changes.
-		if (SettingsSection.IsValid())
-		{
-			SettingsSection->OnModified().BindRaw(this, &FXsollaPluginModule::HandleSettingsSaved);
-		}
 	}
 }
 
@@ -85,5 +80,3 @@ void FXsollaPluginModule::UnregisterSettings()
 }
 
 #undef LOCTEXT_NAMESPACE
-	
-IMPLEMENT_MODULE(FXsollaPluginModule, XsollaPlugin)
