@@ -29,7 +29,4 @@ public:
     {
         return FModuleManager::Get().IsModuleLoaded("XsollaPlugin");
     }
-
-public:
-    UXsollaPluginShop * Shop;
 };
