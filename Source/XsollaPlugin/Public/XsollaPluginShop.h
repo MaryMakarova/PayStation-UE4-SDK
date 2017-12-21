@@ -6,14 +6,23 @@
 #include "XsollaPluginWebBrowserWrapper.h"
 #include "XsollaPluginShop.generated.h"
 
+UENUM(BlueprintType)
+enum class EShopSizeEnum : uint8
+{
+    VE_Small 	UMETA(DisplayName = "Small"),
+    VE_Medium 	UMETA(DisplayName = "Medium"),
+    VE_Large	UMETA(DisplayName = "Large")
+};
+
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaPluginShop : public UObject
+class UXsollaPluginShop : public UObject
 {
 	GENERATED_UCLASS_BODY()
 
 public:
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
 	void CreateShop(
-		FString shopSize, 
+        EShopSizeEnum shopSize,
 		FOnPaymantSucceeded OnSucceeded,
 		FOnPaymantCanceled OnCanceled, 
 		FOnPaymantFailed OnFailed);
@@ -22,13 +31,17 @@ public:
 	/**
 	 * prop format is "{object}.{value}"
 	 */
-	bool SetProperty(FString prop, int value);
-	bool SetProperty(FString prop, bool value);
-	bool SetProperty(FString prop, FString value);
-	bool SetProperty(FString prop, const ANSICHAR* value);
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+	bool SetNumberProperty(FString prop, int value, bool bOverride = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+	bool SetBoolProperty(FString prop, bool value, bool bOverride = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+	bool SetStringProperty(FString prop, FString value, bool bOverride = true);
 
 private:
-	void GetToken(FString shopJson);
+	void OpenShop(FString shopJson);
 	void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
@@ -49,5 +62,5 @@ private:
 
 	FString					ExternalId;
 
-	TSharedPtr<FJsonObject> TokenJson;
+	TSharedPtr<FJsonObject> TokenRequestJson;
 };
