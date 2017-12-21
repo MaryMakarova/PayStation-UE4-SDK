@@ -4,7 +4,7 @@
 
 #include "XsollaPluginTransactionDetails.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FTransactionDetails
 {
 	GENERATED_BODY()
