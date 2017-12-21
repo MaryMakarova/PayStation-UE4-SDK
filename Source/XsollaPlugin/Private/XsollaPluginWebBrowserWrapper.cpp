@@ -50,7 +50,8 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 		.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
 		.OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
 		.OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
-		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow));
+		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
+        .OnSuppressContextMenu_Lambda([]() { return true; });
 
 	BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(slate_spinner).Period(3.0f));
 	BrowserSlot.FillWidth(ContentSize.Y);
