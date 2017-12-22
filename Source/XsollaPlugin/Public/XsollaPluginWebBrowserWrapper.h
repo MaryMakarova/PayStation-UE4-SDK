@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Runtime/UMG/Public/UMG.h"
-#include "XsollaPluginBPLibrary.h"
 #include "XsollaPluginHttpTool.h"
 #include "XsollaPluginWebBrowserWrapper.generated.h"
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, FTransactionDetails, transactionDetails);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
 
 class IWebBrowserWindow;
 

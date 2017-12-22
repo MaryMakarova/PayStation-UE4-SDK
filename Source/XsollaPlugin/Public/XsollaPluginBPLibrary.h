@@ -25,10 +25,6 @@
 *	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
 */
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, FTransactionDetails, transactionDetails);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantCanceled, int32, Num);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FText, ErrorText, int32, ErrorCode);
-
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 {

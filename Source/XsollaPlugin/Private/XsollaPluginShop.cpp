@@ -79,7 +79,7 @@ void UXsollaPluginShop::CreateShop(
         SetStringProperty("settings.mode", FString("sandbox"), false);
 
     SetStringProperty("settings.ui.version", FString("desktop"), false);
-    SetStringProperty("settings.ui.theme", FString("dark"), false);
+    SetStringProperty("settings.ui.theme", FString("default"), false);
 
     // get string from json
     FString outputString;
