@@ -1,13 +1,12 @@
 # Xsolla Plugin
 
-# Blueprint
 ### Install 
 Clone or download and unpack plugin to `{YourProject}/Plugins/`
 
 ### Setting up
 Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, then set `merchant id`, `project id` and `api key`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
-### How to use
+### How to use in blueprint
 To get the shop reference in blueprint class, call `Get Xsolla Plugin Shop`. The function returns `Xsolla Plugin Shop` reference.
 
 `Xsolla Plugin Shop` has 2 available blueprint functions:
@@ -17,4 +16,5 @@ To get the shop reference in blueprint class, call `Get Xsolla Plugin Shop`. The
 ### Example
 ![Blueprint example](https://github.com/SomeInc/XsollaUE4Plugin/blob/master/blueprint_example.png)
 
-# C++
+### How to use in c++
+
