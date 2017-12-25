@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ModuleManager.h"
+#include "XsollaPluginShop.h"
 
 class IXsollaPluginModule : public IModuleInterface
 {
@@ -25,5 +26,17 @@ public:
     static inline bool IsAvailable()
     {
         return FModuleManager::Get().IsModuleLoaded("XsollaPlugin");
+    }
+
+    /**
+    * Returns default Xsolla Shop object.
+    *
+    * @return Xsolla Shop
+    */
+    static inline UXsollaPluginShop* GetShop()
+    {
+        UXsollaPluginShop* shop = (UXsollaPluginShop*)UXsollaPluginShop::StaticClass()->GetDefaultObject();
+
+        return shop;
     }
 };
