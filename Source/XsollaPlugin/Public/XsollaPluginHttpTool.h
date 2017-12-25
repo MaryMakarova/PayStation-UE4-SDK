@@ -7,10 +7,7 @@
 class XsollaPluginHttpTool
 {
 public:
-    XsollaPluginHttpTool()
-    {
-        Http = &FHttpModule::Get();
-    }
+    XsollaPluginHttpTool();
 
     /**
     * Set request authorization header. 
@@ -19,10 +16,7 @@ public:
     * @param Hash - Hash based on type, username and password.
     * @param Request - Http request object.
     */
-    void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request)
-    {
-        Request->SetHeader(AuthorizationHeader, Hash);
-    }
+    void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request);
 
     /**
     * Set request URL with template [base url] + [subrout url].
@@ -31,24 +25,14 @@ public:
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute)
-    {
-        TSharedRef<IHttpRequest> Request = Http->CreateRequest();
-        Request->SetURL(ApiBaseUrl + Subroute);
-        SetRequestHeaders(Request);
-        return Request;
-    }
+    TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute);
 
     /**
     * Set default request headers.
     *
     * @param Request - Request object.
     */
-    void SetRequestHeaders(TSharedRef<IHttpRequest>& Request)
-    {
-        Request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-        Request->SetHeader(TEXT("Accept"), TEXT("application/json"));
-    }
+    void SetRequestHeaders(TSharedRef<IHttpRequest>& Request);
 
     /**
     * Creates GET request object.
@@ -57,12 +41,7 @@ public:
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> GetRequest(FString Subroute)
-    {
-        TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
-        Request->SetVerb("GET");
-        return Request;
-    }
+    TSharedRef<IHttpRequest> GetRequest(FString Subroute);
 
     /**
     * Creates POST request object.
@@ -72,23 +51,14 @@ public:
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString)
-    {
-        TSharedRef<IHttpRequest> Request = RequestWithRoute(Subroute);
-        Request->SetVerb("POST");
-        Request->SetContentAsString(ContentJsonString);
-        return Request;
-    }
+    TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString);
 
     /**
     * Process request.
     *
     * @param Request - Request object.
     */
-    void Send(TSharedRef<IHttpRequest>& Request)
-    {
-        Request->ProcessRequest();
-    }
+    void Send(TSharedRef<IHttpRequest>& Request);
 
     /**
     * Check is response is valid. If not, log error code and response content.
@@ -98,19 +68,7 @@ public:
     *
     * @return Is response valid
     */
-    bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful)
-    {
-        if (!bWasSuccessful || !Response.IsValid())
-            return false;
-
-        if (EHttpResponseCodes::IsOk(Response->GetResponseCode()))
-            return true;
-        else
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Http Response returned error code: %d, %s"), Response->GetResponseCode(), *Response->GetContentAsString());
-            return false;
-        }
-    }
+    bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
     FHttpModule* Http;
