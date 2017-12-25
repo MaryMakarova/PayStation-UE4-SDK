@@ -3,7 +3,6 @@
 #pragma once
 
 #include "ModuleManager.h"
-#include "XsollaPluginShop.h"
 
 class IXsollaPluginModule : public IModuleInterface
 {

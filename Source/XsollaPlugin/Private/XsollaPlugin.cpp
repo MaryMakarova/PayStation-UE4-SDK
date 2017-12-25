@@ -1,11 +1,10 @@
 #include "XsollaPlugin.h"
+
+#include "XsollaPluginSettings.h"
 #include "XsollaPluginShop.h"
 #include "Developer/Settings/Public/ISettingsModule.h"
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "Developer/Settings/Public/ISettingsSection.h"
-#include "SlateBasics.h"
-#include "SWidget.h"
-#include "XsollaPluginSettings.h"
 
 #define LOCTEXT_NAMESPACE "FXsollaPluginModule"
 

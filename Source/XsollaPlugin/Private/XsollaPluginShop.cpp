@@ -1,7 +1,7 @@
 #include "XsollaPluginShop.h"
+
 #include "XsollaPluginSettings.h"
 #include "Misc/Base64.h"
-#include "BigInt.h"
 
 UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer)
     :Super(ObjectInitializer)

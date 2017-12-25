@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "AES.h"
+#include "CoreMinimal.h"
 
 class XsollaPluginEncryptTool
 {

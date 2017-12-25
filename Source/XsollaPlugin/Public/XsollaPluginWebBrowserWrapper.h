@@ -2,6 +2,8 @@
 
 #include "Runtime/UMG/Public/UMG.h"
 #include "XsollaPluginHttpTool.h"
+#include "XsollaPluginTransactionDetails.h"
+
 #include "XsollaPluginWebBrowserWrapper.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, FTransactionDetails, transactionDetails);

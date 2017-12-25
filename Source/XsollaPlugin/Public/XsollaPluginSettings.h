@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "XsollaPluginEncryptTool.h"
+
 #include "XsollaPluginSettings.generated.h"
 
 UCLASS(config = Game, defaultconfig)

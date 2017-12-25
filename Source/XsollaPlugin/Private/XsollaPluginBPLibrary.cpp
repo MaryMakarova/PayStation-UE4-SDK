@@ -1,6 +1,4 @@
 #include "XsollaPluginBPLibrary.h"
-#include "XsollaPluginShop.h"
-#include "XsollaPlugin.h"
 
 UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)

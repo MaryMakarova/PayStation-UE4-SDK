@@ -1,12 +1,11 @@
 #include "XsollaPluginWebBrowserWrapper.h"
-#include "SWebBrowser.h"
+
 #include "XsollaPluginShop.h"
-#include "Widgets/Layout/SBox.h"
-#include "Widgets/Text/STextBlock.h"
-#include "Slate/SlateGameResources.h"
 #include "XsollaPluginSettings.h"
+#include "SWebBrowser.h"
+#include "Widgets/Layout/SBox.h"
+#include "Slate/SlateGameResources.h"
 #include "Misc/Base64.h"
-#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
