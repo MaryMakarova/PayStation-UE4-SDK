@@ -9,44 +9,44 @@
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
 UXsollaPluginWebBrowserWrapper::UXsollaPluginWebBrowserWrapper(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer),
-	ButtonSize(50.0f)
+    : Super(ObjectInitializer),
+    ButtonSize(50.0f)
 {
-	bIsVariable = true;
+    bIsVariable = true;
 }
 
 void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 {
-	Super::NativeConstruct();
+    Super::NativeConstruct();
 
-	ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-	ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
+    ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
+    ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
 
     LoadSlateResources();
 
-	SAssignNew(WebBrowserWidget, SWebBrowser)
-		.InitialURL(InitialURL)
-		.ShowControls(false)
-		.ViewportSize(ContentSize)
-		.SupportsTransparency(bSupportsTransparency)
-		.OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
-		.OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
-		.OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
-		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
+    SAssignNew(WebBrowserWidget, SWebBrowser)
+        .InitialURL(InitialURL)
+        .ShowControls(false)
+        .ViewportSize(ContentSize)
+        .SupportsTransparency(bSupportsTransparency)
+        .OnUrlChanged(BIND_UOBJECT_DELEGATE(FOnTextChanged, HandleOnUrlChanged))
+        .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
+        .OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
+        .OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
         .OnSuppressContextMenu_Lambda([]() { return true; });
 
     ComposeShopWrapper();
 
-	FInputModeUIOnly inputModeUIOnly;
-	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+    FInputModeUIOnly inputModeUIOnly;
+    GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
 {
-	if (WebBrowserWidget.IsValid())
-	{
-		return WebBrowserWidget->LoadURL(NewURL);
-	}
+    if (WebBrowserWidget.IsValid())
+    {
+        return WebBrowserWidget->LoadURL(NewURL);
+    }
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadSlateResources()
@@ -169,109 +169,109 @@ void UXsollaPluginWebBrowserWrapper::CloseShop()
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
-	if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
-	{
-		CloseShop();
-	}
+    if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
+    {
+        CloseShop();
+    }
 
-	if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
-	{
-		HomeButton->SetVisibility(EVisibility::Visible);
-		CloseButton->SetVisibility(EVisibility::Collapsed);
-	}
+    if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
+    {
+        HomeButton->SetVisibility(EVisibility::Visible);
+        CloseButton->SetVisibility(EVisibility::Collapsed);
+    }
 
-	if (WebBrowserWidget->GetUrl().Contains("xsolla"))
-	{
-		HomeButton->SetVisibility(EVisibility::Collapsed);
-		if (CloseButton->GetVisibility() == EVisibility::Collapsed)
-			CloseButton->SetVisibility(EVisibility::Visible);
-	}
+    if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+    {
+        HomeButton->SetVisibility(EVisibility::Collapsed);
+        if (CloseButton->GetVisibility() == EVisibility::Collapsed)
+            CloseButton->SetVisibility(EVisibility::Visible);
+    }
 
-	OnUrlChanged.Broadcast(InText);
+    OnUrlChanged.Broadcast(InText);
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 {
-	if (WebBrowserWidget->GetUrl().Contains("xsolla"))
-	{
-		BrowserSlot.DetachWidget();
-		BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-		BrowserSlot.FillWidth(ContentSize.X - ButtonSize);
+    if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+    {
+        BrowserSlot.DetachWidget();
+        BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+        BrowserSlot.FillWidth(ContentSize.X - ButtonSize);
 
-		CloseButton->SetVisibility(EVisibility::Visible);
+        CloseButton->SetVisibility(EVisibility::Visible);
 
-		if ((ViewportSize.X - ContentSize.X) / 2 > 0)
-		{
-			BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
-			BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
-		}
-		else
-		{
-			BrowserSlotMarginLeft.FillWidth(0);
-			BrowserSlotMarginRight.FillWidth(0);
-		}
+        if ((ViewportSize.X - ContentSize.X) / 2 > 0)
+        {
+            BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
+            BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+        }
+        else
+        {
+            BrowserSlotMarginLeft.FillWidth(0);
+            BrowserSlotMarginRight.FillWidth(0);
+        }
 
-		FInputModeUIOnly inputModeUIOnly;
-		inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
-		GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
-	}
+        FInputModeUIOnly inputModeUIOnly;
+        inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
+        GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+    }
 
-	OnLoadCompleted.Broadcast();
+    OnLoadCompleted.Broadcast();
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadError()
 {
-	OnLoadError.Broadcast();
+    OnLoadError.Broadcast();
 }
 bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& NewBrowserWindow)
 {
-	OnCloseWindow.Broadcast();
-	return true;
+    OnCloseWindow.Broadcast();
+    return true;
 }
 
 void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
 {
-	TSharedPtr<FJsonValue> transactionJsonObj;
-	FString content = Response->GetContentAsString();
-	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(*content);
+    TSharedPtr<FJsonValue> transactionJsonObj;
+    FString content = Response->GetContentAsString();
+    TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(*content);
 
-	if (FJsonSerializer::Deserialize(JsonReader, transactionJsonObj))
-	{
-		if (transactionJsonObj->AsArray().Num() != 0)
-		{
-			TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
+    if (FJsonSerializer::Deserialize(JsonReader, transactionJsonObj))
+    {
+        if (transactionJsonObj->AsArray().Num() != 0)
+        {
+            TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
 
-			FTransactionDetails transactionDetails;
+            FTransactionDetails transactionDetails;
 
-			transactionDetails.TransactionStatus                = root->GetObjectField("transaction")->GetStringField("status");
-			transactionDetails.TransactionId                    = root->GetObjectField("transaction")->GetNumberField("id");
-			transactionDetails.TransactionProjectId             = root->GetObjectField("project")->GetStringField("id");
-			transactionDetails.PaymentMethodId                  = root->GetObjectField("payment_method")->GetNumberField("id");
-			transactionDetails.PaymentMethodName                = root->GetObjectField("payment_method")->GetStringField("name");
-			transactionDetails.UserId                           = root->GetObjectField("user")->GetIntegerField("id");
-			transactionDetails.UserEmail                        = root->GetObjectField("user")->GetStringField("email");
-			transactionDetails.UserCountry                      = root->GetObjectField("user")->GetStringField("country");
-			transactionDetails.PaymentCurrency                  = root->GetObjectField("payment_details")->GetObjectField("payment")->GetStringField("currency");
-			transactionDetails.PaymentAmount                    = root->GetObjectField("payment_details")->GetObjectField("payment")->GetIntegerField("amount");
-			transactionDetails.PaymentSalesTaxAmount            = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("amount");
-			transactionDetails.PaymentSalesTaxPercent           = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("percent");
-			transactionDetails.PurchaseVirtualItems             = root->GetObjectField("purchase")->GetStringField("virtual_items");
-			transactionDetails.PurchaseVirtualCurrencyAmount    = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetIntegerField("amount");
-			transactionDetails.PurchaseVirtualCurrencyName      = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetStringField("name");
-			transactionDetails.PurchaseSimpleCheckoutAmount     = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetIntegerField("amount");
-			transactionDetails.PurchaseSimpleCheckoutCurrency   = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetStringField("currency");
-			transactionDetails.PurchaseSubscriptionName         = root->GetObjectField("purchase")->GetObjectField("subscription")->GetStringField("name");
+            transactionDetails.TransactionStatus                = root->GetObjectField("transaction")->GetStringField("status");
+            transactionDetails.TransactionId                    = root->GetObjectField("transaction")->GetNumberField("id");
+            transactionDetails.TransactionProjectId             = root->GetObjectField("project")->GetStringField("id");
+            transactionDetails.PaymentMethodId                  = root->GetObjectField("payment_method")->GetNumberField("id");
+            transactionDetails.PaymentMethodName                = root->GetObjectField("payment_method")->GetStringField("name");
+            transactionDetails.UserId                           = root->GetObjectField("user")->GetIntegerField("id");
+            transactionDetails.UserEmail                        = root->GetObjectField("user")->GetStringField("email");
+            transactionDetails.UserCountry                      = root->GetObjectField("user")->GetStringField("country");
+            transactionDetails.PaymentCurrency                  = root->GetObjectField("payment_details")->GetObjectField("payment")->GetStringField("currency");
+            transactionDetails.PaymentAmount                    = root->GetObjectField("payment_details")->GetObjectField("payment")->GetIntegerField("amount");
+            transactionDetails.PaymentSalesTaxAmount            = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("amount");
+            transactionDetails.PaymentSalesTaxPercent           = root->GetObjectField("payment_details")->GetObjectField("sales_tax")->GetIntegerField("percent");
+            transactionDetails.PurchaseVirtualItems             = root->GetObjectField("purchase")->GetStringField("virtual_items");
+            transactionDetails.PurchaseVirtualCurrencyAmount    = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetIntegerField("amount");
+            transactionDetails.PurchaseVirtualCurrencyName      = root->GetObjectField("purchase")->GetObjectField("virtual_currency")->GetStringField("name");
+            transactionDetails.PurchaseSimpleCheckoutAmount     = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetIntegerField("amount");
+            transactionDetails.PurchaseSimpleCheckoutCurrency   = root->GetObjectField("purchase")->GetObjectField("simple_checkout")->GetStringField("currency");
+            transactionDetails.PurchaseSubscriptionName         = root->GetObjectField("purchase")->GetObjectField("subscription")->GetStringField("name");
 
-			//FJsonObjectConverter::JsonObjectToUStruct<FTransactionDetails>(root.ToSharedRef(), &transactionDetails, 0, 0);
+            //FJsonObjectConverter::JsonObjectToUStruct<FTransactionDetails>(root.ToSharedRef(), &transactionDetails, 0, 0);
 
-			if (transactionDetails.TransactionStatus == "done")
-			{
-				this->OnSucceeded.Execute(0, transactionDetails);
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No transactions"));
-		}
-	}
+            if (transactionDetails.TransactionStatus == "done")
+            {
+                this->OnSucceeded.Execute(0, transactionDetails);
+            }
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No transactions"));
+        }
+    }
 }
 
 #undef LOCTEXT_NAMESPACE
