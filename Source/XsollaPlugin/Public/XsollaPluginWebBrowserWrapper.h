@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Runtime/UMG/Public/UMG.h"
+#include "Slate/SlateGameResources.h"
 #include "XsollaPluginHttpTool.h"
 #include "XsollaPluginTransactionDetails.h"
 
@@ -53,6 +54,8 @@ public:
     FOnPaymantFailed OnFailed;
 
 private:
+    void LoadSlateResources();
+    void ComposeShopWrapper();
     void CloseShop();
 
     void HandleOnUrlChanged(const FText& Text);
@@ -69,6 +72,10 @@ private:
     TSharedPtr<class SButton>			CloseButton;
     TSharedPtr<class SButton>			HomeButton;
     TSharedPtr<class SVerticalBox>		Background;
+
+    const FSlateBrush*                  SlateCloseBrush;
+    const FSlateBrush*                  SlateBackBrush;
+    const FSlateBrush*                  SlateSpinnerBrush;
 
     SHorizontalBox::FSlot& BrowserSlot				= SHorizontalBox::Slot();
     SHorizontalBox::FSlot& BrowserSlotMarginLeft	= SHorizontalBox::Slot();

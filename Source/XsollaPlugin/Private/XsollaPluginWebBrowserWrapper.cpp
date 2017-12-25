@@ -4,7 +4,6 @@
 #include "XsollaPluginSettings.h"
 #include "SWebBrowser.h"
 #include "Widgets/Layout/SBox.h"
-#include "Slate/SlateGameResources.h"
 #include "Misc/Base64.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
@@ -21,25 +20,9 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 	Super::NativeConstruct();
 
 	ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-
 	ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
 
-	TSharedRef<FSlateGameResources> SlateButtonResources = FSlateGameResources::New(
-		FName("ButtonStyle"), 
-		"/XsollaPlugin/Buttons", 
-		"/XsollaPlugin/Buttons"
-	);
-	FSlateGameResources& ButtonStyle = SlateButtonResources.Get();
-	const FSlateBrush* slate_close_red = ButtonStyle.GetBrush(FName("close_red_brush"));
-	const FSlateBrush* slate_back = ButtonStyle.GetBrush(FName("back_brush"));
-
-	TSharedRef<FSlateGameResources> SlateSpinnerResources = FSlateGameResources::New(
-		FName("SpinnerStyle"),
-		"/XsollaPlugin/LoadingSpinner",
-		"/XsollaPlugin/LoadingSpinner"
-	);
-	FSlateGameResources& SpinnerStyle = SlateSpinnerResources.Get();
-	const FSlateBrush* slate_spinner = SpinnerStyle.GetBrush(FName("spinner_brush"));
+    LoadSlateResources();
 
 	SAssignNew(WebBrowserWidget, SWebBrowser)
 		.InitialURL(InitialURL)
@@ -52,88 +35,7 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 		.OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
         .OnSuppressContextMenu_Lambda([]() { return true; });
 
-	BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(slate_spinner).Period(3.0f));
-	BrowserSlot.FillWidth(ContentSize.Y);
-
-	BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.Y) / 2);
-	BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.Y) / 2 - ButtonSize);
-
-	MainContent = SNew(SVerticalBox)
-			+ SVerticalBox::Slot()
-			.FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
-			+ SVerticalBox::Slot()
-			.FillHeight(ContentSize.Y)
-		    [
-				SNew(SHorizontalBox)
-				+ BrowserSlotMarginLeft
-				+ BrowserSlot
-				+ SHorizontalBox::Slot()
-					.FillWidth(ButtonSize)
-					[
-						SNew(SVerticalBox)
-						+ SVerticalBox::Slot()
-						.FillHeight(ButtonSize)
-						[
-							SNew(SVerticalBox)
-							+ SVerticalBox::Slot()
-							.FillHeight(ButtonSize)
-							[
-								SAssignNew(CloseButton, SButton)
-								.Visibility(EVisibility::Hidden)
-								.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-								.OnClicked_Lambda([this]()
-								{
-									this->CloseShop();
-
-									return FReply::Handled();
-								})
-								.Content()
-								[
-									SNew(SImage)
-									.Image(slate_close_red)
-								]
-							]
-							+ SVerticalBox::Slot()
-							.FillHeight(ButtonSize)
-							[
-								SAssignNew(HomeButton, SButton)
-								.Visibility(EVisibility::Hidden)
-								.ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-								.OnClicked_Lambda([this]()
-								{
-									LoadURL(ShopUrl);
-
-									return FReply::Handled();
-								})
-								.Content()
-								[
-									SNew(SImage)
-									.Image(slate_back)
-								]
-							]
-						]
-						+ SVerticalBox::Slot()
-						.FillHeight(ContentSize.Y - ButtonSize)
-					]
-				+ BrowserSlotMarginRight
-			]
-			+ SVerticalBox::Slot()
-			.FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
-
-	Background = SNew(SVerticalBox)
-			+ SVerticalBox::Slot()
-			 .FillHeight(ViewportSize.Y)
-			[
-				SNew(SHorizontalBox)
-				+ SHorizontalBox::Slot()
-				 .FillWidth(ViewportSize.X)
-				[
-					SNew(SColorBlock).Color(FLinearColor(0.0f, 0.0f, 0.0f, 0.5f))
-				]
-			];
-		
-	GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 10);
-	GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
+    ComposeShopWrapper();
 
 	FInputModeUIOnly inputModeUIOnly;
 	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
@@ -147,6 +49,123 @@ void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
 	}
 }
 
+void UXsollaPluginWebBrowserWrapper::LoadSlateResources()
+{
+    TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
+        FName("ButtonStyle"),
+        "/XsollaPlugin/Buttons",
+        "/XsollaPlugin/Buttons"
+    );
+    FSlateGameResources& buttonStyle = slateButtonResources.Get();
+    SlateCloseBrush = buttonStyle.GetBrush(FName("close_red_brush"));
+    SlateBackBrush = buttonStyle.GetBrush(FName("back_brush"));
+
+    TSharedRef<FSlateGameResources> slateSpinnerResources = FSlateGameResources::New(
+        FName("SpinnerStyle"),
+        "/XsollaPlugin/LoadingSpinner",
+        "/XsollaPlugin/LoadingSpinner"
+    );
+    FSlateGameResources& spinnerStyle = slateSpinnerResources.Get();
+    SlateSpinnerBrush = spinnerStyle.GetBrush(FName("spinner_brush"));
+}
+
+void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
+{
+    BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
+    BrowserSlot.FillWidth(ContentSize.Y);
+
+    BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.Y) / 2);
+    BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.Y) / 2 - ButtonSize);
+
+    MainContent = 
+        SNew(SVerticalBox)
+        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
+        + SVerticalBox::Slot().FillHeight(ContentSize.Y)
+        [
+            SNew(SHorizontalBox)
+            + BrowserSlotMarginLeft
+            + BrowserSlot
+            + SHorizontalBox::Slot().FillWidth(ButtonSize)
+            [
+                SNew(SVerticalBox)
+                + SVerticalBox::Slot().FillHeight(ButtonSize)
+                [
+                    SNew(SVerticalBox)
+                    + SVerticalBox::Slot().FillHeight(ButtonSize)
+                    [
+                        SAssignNew(CloseButton, SButton)
+                        .Visibility(EVisibility::Hidden)
+                        .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                        .OnClicked_Lambda([this]() { this->CloseShop(); return FReply::Handled(); })
+                        .Content()
+                        [
+                            SNew(SImage)
+                            .Image(SlateCloseBrush)
+                        ]
+                    ]
+                    + SVerticalBox::Slot()
+                    .FillHeight(ButtonSize)
+                    [
+                        SAssignNew(HomeButton, SButton)
+                        .Visibility(EVisibility::Hidden)
+                        .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                        .OnClicked_Lambda([this]() { LoadURL(ShopUrl); return FReply::Handled(); })
+                        .Content()
+                        [
+                            SNew(SImage)
+                            .Image(SlateBackBrush)
+                        ]
+                    ]
+                ]
+                + SVerticalBox::Slot().FillHeight(ContentSize.Y - ButtonSize)
+            ]   
+            + BrowserSlotMarginRight
+        ]
+        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
+
+    Background = 
+        SNew(SVerticalBox)
+        + SVerticalBox::Slot().FillHeight(ViewportSize.Y)
+        [
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot().FillWidth(ViewportSize.X)
+            [
+                SNew(SColorBlock).Color(FLinearColor(0.0f, 0.0f, 0.0f, 0.5f))
+            ]
+        ];
+
+    GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 10);
+    GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
+}
+
+void UXsollaPluginWebBrowserWrapper::CloseShop()
+{
+    GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
+    GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
+
+    FInputModeGameAndUI inputModeGameAndUI;
+    GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
+
+    XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
+
+    FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
+    FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+    FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
+
+    FString route = "https://api.xsolla.com/merchant/v2/merchants/";
+    route += MerchantId;
+    route += "/reports/transactions/search.json";
+    route += "?external_id=";
+    route += ExternalId;
+    route += "&type=all";
+
+    TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
+
+    Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
+    httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
+
+    httpTool->Send(Request);
+}
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
@@ -253,35 +272,6 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
 			UE_LOG(LogTemp, Warning, TEXT("No transactions"));
 		}
 	}
-}
-
-void UXsollaPluginWebBrowserWrapper::CloseShop()
-{
-	GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
-	GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
-
-	FInputModeGameAndUI inputModeGameAndUI;
-	GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
-
-	XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
-
-	FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
-	FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
-	FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
-
-	FString route = "https://api.xsolla.com/merchant/v2/merchants/";
-	route += MerchantId;
-	route += "/reports/transactions/search.json";
-	route += "?external_id=";
-	route += ExternalId;
-	route += "&type=all";
-
-	TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
-
-	Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
-	httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
-
-	httpTool->Send(Request);
 }
 
 #undef LOCTEXT_NAMESPACE
