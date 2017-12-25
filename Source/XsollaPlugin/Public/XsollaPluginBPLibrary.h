@@ -28,6 +28,12 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
     GENERATED_UCLASS_BODY()
 
 public:
+
+    /**
+    * Returns default object of Xsolla Shop. 
+    *
+    * @return Xsolla Shop instance
+    */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-    static class UXsollaPluginShop* GetXsollaPlugin();
+    static class UXsollaPluginShop* GetXsollaPluginShop();
 };

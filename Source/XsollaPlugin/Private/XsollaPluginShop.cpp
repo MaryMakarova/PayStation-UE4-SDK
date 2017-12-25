@@ -25,7 +25,7 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
     GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), ApiKey, GGameIni);
 }
 
-void UXsollaPluginShop::CreateShop(
+void UXsollaPluginShop::Create(
     EShopSizeEnum shopSize,
     FOnPaymantSucceeded OnSucceeded, 
     FOnPaymantCanceled OnCanceled,
@@ -136,7 +136,7 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
     }
 }
 
-bool UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
+void UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -170,11 +170,9 @@ bool UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverrid
 
         currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
     }
-
-    return true;
 }
 
-bool UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride/*= true */)
+void UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -208,11 +206,9 @@ bool UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride
 
         currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
     }
-
-    return true;
 }
 
-bool UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOverride/*= true */)
+void UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -246,6 +242,4 @@ bool UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOve
 
         currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
     }
-
-    return true;
 }

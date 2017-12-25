@@ -5,7 +5,7 @@ UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectI
 {
 }
 
-UXsollaPluginShop* UXsollaPluginBPLibrary::GetXsollaPlugin()
+UXsollaPluginShop* UXsollaPluginBPLibrary::GetXsollaPluginShop()
 {
     return (UXsollaPluginShop*)UXsollaPluginShop::StaticClass()->GetDefaultObject();
 }

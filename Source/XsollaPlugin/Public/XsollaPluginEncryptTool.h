@@ -11,6 +11,13 @@ public:
 
     }
 
+    /**
+    * Encrypt string with AES.
+    *
+    * @param str - String to encrypt.
+    *
+    * @return Encrypted string
+    */
     static FString EncryptString(FString& str)
     {
         if (str.IsEmpty())
@@ -31,6 +38,13 @@ public:
         return encryptedStr;
     }
 
+    /**
+    * Decrypt string with AES.
+    *
+    * @param str - String to decrypt.
+    *
+    * @return Decrypted string
+    */
     static FString DecryptString(FString& str)
     {
         if (str.IsEmpty())
@@ -51,6 +65,13 @@ public:
         return decryptedStr;
     }
 
+    /**
+    * Convert wchar string to array of chars.
+    *
+    * @param Input - String to convert.
+    *
+    * @return Array of chars
+    */
     static TArray<uint8> FStringToBinaryArray(const FString& Input)
     {
         // We found that FSting char has 4 bytes on ios and 2 bytes on Windows
@@ -68,6 +89,14 @@ public:
         return Output;
     }
 
+    /**
+    * Convert charr array to wchar string.
+    *
+    * @param Input - Array of uint8
+    * @param Len - Size of array
+    *
+    * @return Converted string
+    */
     static FString BinaryArrayToFString(const TArray<uint8>& Input, int32 Len /*= -1*/)
     {
         if (Len < 0)

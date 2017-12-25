@@ -274,4 +274,20 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
     }
 }
 
+void UXsollaPluginWebBrowserWrapper::SetExternalId(FString str) 
+{ 
+    ExternalId = str;
+}
+
+void UXsollaPluginWebBrowserWrapper::SetShopUrl(FString str) 
+{
+    ShopUrl = str;
+}
+
+void UXsollaPluginWebBrowserWrapper::SetBrowserSize(float w, float h)
+{
+    ContentSize.X = w;
+    ContentSize.Y = h;
+}
+
 #undef LOCTEXT_NAMESPACE

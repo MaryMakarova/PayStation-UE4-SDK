@@ -24,16 +24,39 @@ public:
     DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadError);
     DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCloseWindow);
 
+    /**
+    * Calls on widget create.
+    */
     virtual void NativeConstruct() override;
 
+    /**
+    * Loads new url.
+    *
+    * @param NewURL - Url to load.
+    */
     void LoadURL(FString NewURL);
-    void SetExternalId(FString str) { ExternalId = str; }
-    void SetShopUrl(FString str) { ShopUrl = str; }
-    void SetBrowserSize(float w, float h) 
-    { 
-        ContentSize.X = w;
-        ContentSize.Y = h;
-    }
+
+    /**
+    * Set external id.
+    *
+    * @param str - External id string.
+    */
+    void SetExternalId(FString str);
+
+    /**
+    * Set shop url.
+    *
+    * @param str - Shop url string.
+    */
+    void SetShopUrl(FString str);
+
+    /**
+    * Set browser wrapper size.
+    *
+    * @param w - Width.
+    * @param h - Height.
+    */
+    void SetBrowserSize(float w, float h);
 
 public:
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
