@@ -7,11 +7,9 @@ Clone or download and unpack plugin to `{YourProject}/Plugins/`
 Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, then set `merchant id`, `project id` and `api key`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
 ### How to use in blueprint
-`Xsolla Plugin BP Library` has 1 blueprint function.
-* `Get Xsolla Plugin Shop` - returns `Xsolla Plugin Shop` reference.
-
-`Xsolla Plugin Shop` has 2 available blueprint functions:
-* `Create` - Gets shop token, set default properties and creates widget with shop content. Takes shop size and delegates for payment succeeded|canceled|failed as parameters. 
+`Xsolla Plugin BP Library` has 5 blueprint function.
+* `CreateXsollaShop` - Gets shop token, set default properties and creates widget with shop content. Takes shop size and delegates for payment succeeded|canceled|failed as parameters. 
+* `CreateXsollaShopWithToken` - Creates shop widget content based on token. Takes shop size, external id, token and delegates for payment succeeded|canceled|failed as parameters. 
 * `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `Create` function.
 
 ### Example
