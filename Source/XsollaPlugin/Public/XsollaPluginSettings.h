@@ -48,7 +48,7 @@ public:
             ApiKey = encryptedString;
 
             GConfig->SetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), *encryptedString, GGameIni);
-            GConfig->Flush(true);
+            GConfig->Flush(false);
         }
     }
 };
