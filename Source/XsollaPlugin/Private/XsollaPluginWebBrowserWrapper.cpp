@@ -45,7 +45,7 @@ void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
 {
     if (WebBrowserWidget.IsValid())
     {
-        return WebBrowserWidget->LoadURL(NewURL);
+        WebBrowserWidget->LoadURL(NewURL);
     }
 }
 

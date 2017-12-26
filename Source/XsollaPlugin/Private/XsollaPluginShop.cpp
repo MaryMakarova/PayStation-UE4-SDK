@@ -86,10 +86,57 @@ void UXsollaPluginShop::Create(
     TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
     FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
-    UE_LOG(LogTemp, Warning, TEXT("JSON: %s"), *outputString);
-
     // load shop
     OpenShop(outputString);
+}
+
+void UXsollaPluginShop::CreateWithToken(
+    FString token,
+    FString externalId,
+    EShopSizeEnum shopSize,
+    FOnPaymantSucceeded OnSucceeded,
+    FOnPaymantCanceled OnCanceled,
+    FOnPaymantFailed OnFailed)
+{
+    this->OnSucceeded = OnSucceeded;
+    this->OnCanceled = OnCanceled;
+    this->OnFailed = OnFailed;
+
+    ExternalId = externalId;
+
+    // show browser wrapper
+    BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+
+    // set shop interface size
+    if (shopSize == EShopSizeEnum::VE_Small)
+    {
+        BrowserWrapper->SetBrowserSize(620, 630);
+    }
+    else if (shopSize == EShopSizeEnum::VE_Medium)
+    {
+        BrowserWrapper->SetBrowserSize(740, 760);
+    }
+    else if (shopSize == EShopSizeEnum::VE_Large)
+    {
+        BrowserWrapper->SetBrowserSize(820, 840);
+    }
+
+    BrowserWrapper->AddToViewport(9999);
+
+    if (!ShopUrl.EndsWith("="))
+    {
+        ShopUrl.Replace(*XsollaToken, *token);
+    }
+    else
+    {
+        ShopUrl += token;
+    }
+
+    XsollaToken = token;
+
+    BrowserWrapper->SetExternalId(ExternalId);
+    BrowserWrapper->SetShopUrl(ShopUrl);
+    BrowserWrapper->LoadURL(ShopUrl);
 }
 
 void UXsollaPluginShop::OpenShop(FString tokenRequestJson)

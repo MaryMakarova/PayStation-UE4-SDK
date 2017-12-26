@@ -1,26 +1,9 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "XsollaPluginShop.h"
 
 #include "XsollaPluginBPLibrary.generated.h"
-
-/* 
-*	Function library class.
-*	Each function in it is expected to be static and represents blueprint node that can be called in any blueprint.
-*
-*	When declaring function you can define metadata for the node. Key function specifiers will be BlueprintPure and BlueprintCallable.
-*	BlueprintPure - means the function does not affect the owning object in any way and thus creates a node without Exec pins.
-*	BlueprintCallable - makes a function which can be executed in Blueprints - Thus it has Exec pins.
-*	DisplayName - full name of the node, shown when you mouse over the node and in the blueprint drop down menu.
-*				Its lets you name the node using characters not allowed in C++ function names.
-*	CompactNodeTitle - the word(s) that appear on the node.
-*	Keywords -	the list of keywords that helps you to find node when you search for it using Blueprint drop-down menu. 
-*				Good example is "Print String" node which you can find also by using keyword "log".
-*	Category -	the category your node will be under in the Blueprint drop-down menu.
-*
-*	For more info on custom blueprint nodes visit documentation:
-*	https://wiki.unrealengine.com/Custom_Blueprint_Node_Creation
-*/
 
 UCLASS()
 class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
@@ -30,10 +13,67 @@ class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
 public:
 
     /**
-    * Returns default object of Xsolla Shop. 
+    * Creates shop wrapper, set default properties and delegates.
     *
-    * @return Xsolla Shop instance
+    * @param shopSize - Size of shop page and wrapper.
+    * @param OnSucceeded - On payment succeeded delegate.
+    * @param OnCanceled - On payment canceled delegate.
+    * @param OnFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
-    static class UXsollaPluginShop* GetXsollaPluginShop();
+        static void CreateXsollaShop(
+            EShopSizeEnum shopSize,
+            FOnPaymantSucceeded OnSucceeded,
+            FOnPaymantCanceled OnCanceled,
+            FOnPaymantFailed OnFailed);
+
+    /**
+    * Creates shop wrapper, set default properties and delegates.
+    *
+    * @param token - Xsolla shop token.
+    * @param OnSucceeded - On payment succeeded delegate.
+    * @param OnCanceled - On payment canceled delegate.
+    * @param OnFailed - On payment failed delegate.
+    */
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static void CreateXsollaShopWithToken(
+            FString token,
+            FString externalId,
+            EShopSizeEnum shopSize,
+            FOnPaymantSucceeded OnSucceeded,
+            FOnPaymantCanceled OnCanceled,
+            FOnPaymantFailed OnFailed);
+
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static void SetNumberProperty(FString prop, int value, bool bOverride = true);
+
+    /**
+    * Set bool property in token json.
+    *
+    * @param prop - Property name.
+    * @param value - Bool value to set.
+    * @param bOverride - Can the method overrides property value if exists.
+    */
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static void SetBoolProperty(FString prop, bool value, bool bOverride = true);
+
+    /**
+    * Set string property in token json.
+    *
+    * @param prop - Property name.
+    * @param value - String value to set.
+    * @param bOverride - Can the method overrides property value if exists.
+    */
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static void SetStringProperty(FString prop, FString value, bool bOverride = true);
+
+    /**
+    * Returns transaction history for user to callback on succeed.
+    *
+    * @param userId - User ID.
+    * @param onSucceeded - On succeded delegate.
+    * @param onFailed - On failed delegate.
+    */
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        static void GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed);
 };

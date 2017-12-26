@@ -37,6 +37,25 @@ public:
         FOnPaymantCanceled OnCanceled, 
         FOnPaymantFailed OnFailed);
 
+    /**
+    * Open shop with token.
+    *
+    * @param token - Xsolla shop token.
+    * @param externalId - external id for transaction.
+    * @param shopSize - Size of shop page and wrapper.
+    * @param OnSucceeded - On payment succeeded delegate.
+    * @param OnCanceled - On payment canceled delegate.
+    * @param OnFailed - On payment failed delegate.
+    */
+    UFUNCTION(BlueprintCallable, Category = "Xsolla")
+        void CreateWithToken(
+            FString token, 
+            FString externalId,
+            EShopSizeEnum shopSize, 
+            FOnPaymantSucceeded OnSucceeded,
+            FOnPaymantCanceled OnCanceled,
+            FOnPaymantFailed OnFailed);
+
     
     /**
      * Set number property in token json.
