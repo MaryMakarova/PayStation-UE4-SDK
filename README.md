@@ -23,24 +23,59 @@ Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, the
 2. Add `XsollaPlugin` to the `ExtraModuleNames` in `YourProject.Target.cs` and `YourProjectEditor.Target.cs`.
 3. Add `XsollaPlugin` to the `PublicDependencyModuleNames` or `PrivateDependencyModuleNames` in `YourModule.Build.cs`*(module where you want to use the plugin)*.
 3. Include `XsollaPlugin.h`.
-4. Call `XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large|VE_Medium|VE_Small, OnSucceeded, OnCanceled, OnFailed);`
+4. Call `XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, OnSucceeded, OnCanceled, OnFailed);` 
+Shop size can be `EShopSizeEnum::VE_Large`, `EShopSizeEnum::VE_Medium`, `EShopSizeEnum::VE_Small`.
 
 Code example
 ```c++
-#include "XsollaPlugin.h"
+---------------- HEADER FILE -----------------
 
-...
+    UFUNCTION(BlueprintCallable)
+        void OnSucceededCallback(int32 code, FTransactionDetails transactionDetails);
+
+    UFUNCTION(BlueprintCallable)
+        void OnCanceledCallback();
+
+    UFUNCTION(BlueprintCallable)
+        void OnFailedCallback(FText errorText, int32 code);
+
+protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
+```
+
+```c++
+---------------- SOURCE FILE -----------------
 
 // Called when the game starts or when spawned
 void AMyActor::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
-    // delegates are not binded, bind it before shop creating
     FOnPaymantSucceeded OnSucceeded;
     FOnPaymantCanceled OnCanceled;
     FOnPaymantFailed OnFailed;
 
+    OnSucceeded.BindUFunction(this, "OnSucceededCallback");
+    OnCanceled.BindUFunction(this, "OnCanceledCallback");
+    OnFailed.BindUFunction(this, "OnFailedCallback");
+
     XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, OnSucceeded, OnCanceled, OnFailed);
+    
+}
+
+void AMyActor::OnSucceededCallback(int32 code, FTransactionDetails transactionDetails)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Payment succeded. Transaction id: %d"), transactionDetails.TransactionId);
+}
+
+void AMyActor::OnCanceledCallback()
+{
+    UE_LOG(LogTemp, Warning, TEXT("Payment canceled"));
+}
+
+void AMyActor::OnFailedCallback(FText errorText, int32 code)
+{
+    UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *(errorText.ToString()));
 }
 ```
