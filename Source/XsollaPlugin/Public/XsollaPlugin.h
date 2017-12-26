@@ -3,6 +3,21 @@
 #include "ModuleManager.h"
 #include "XsollaPluginShop.h"
 
+namespace XsollaPlugin
+{
+    /**
+    * Returns default Xsolla Shop object.
+    *
+    * @return Xsolla Shop
+    */
+    inline UXsollaPluginShop* GetShop()
+    {
+        UXsollaPluginShop* shop = (UXsollaPluginShop*)UXsollaPluginShop::StaticClass()->GetDefaultObject();
+
+        return shop;
+    }
+}
+
 class IXsollaPluginModule : public IModuleInterface
 {
 public:
@@ -26,17 +41,5 @@ public:
     static inline bool IsAvailable()
     {
         return FModuleManager::Get().IsModuleLoaded("XsollaPlugin");
-    }
-
-    /**
-    * Returns default Xsolla Shop object.
-    *
-    * @return Xsolla Shop
-    */
-    static inline UXsollaPluginShop* GetShop()
-    {
-        UXsollaPluginShop* shop = (UXsollaPluginShop*)UXsollaPluginShop::StaticClass()->GetDefaultObject();
-
-        return shop;
     }
 };
