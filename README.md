@@ -32,13 +32,13 @@ Code example
 ...
 
     UFUNCTION(BlueprintCallable)
-        void OnSucceededCallback(int32 code, FTransactionDetails transactionDetails);
+    void OnSucceededCallback(FTransactionDetails transactionDetails);
 
     UFUNCTION(BlueprintCallable)
-        void OnCanceledCallback();
+    void OnCanceledCallback();
 
     UFUNCTION(BlueprintCallable)
-        void OnFailedCallback(FString errorText, int32 code);
+    void OnFailedCallback(FString errorText, int32 errorCode);
 
 protected:
     // Called when the game starts or when spawned
@@ -68,7 +68,7 @@ void AMyActor::BeginPlay()
     
 }
 
-void AMyActor::OnSucceededCallback(int32 code, FTransactionDetails transactionDetails)
+void AMyActor::OnSucceededCallback(FTransactionDetails transactionDetails)
 {
     UE_LOG(LogTemp, Warning, TEXT("Payment succeded. Transaction id: %d"), transactionDetails.TransactionId);
 }
@@ -78,7 +78,7 @@ void AMyActor::OnCanceledCallback()
     UE_LOG(LogTemp, Warning, TEXT("Payment canceled"));
 }
 
-void AMyActor::OnFailedCallback(FString errorText, int32 code)
+void AMyActor::OnFailedCallback(FString errorText, int32 errorCode)
 {
     UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *errorText);
 }
