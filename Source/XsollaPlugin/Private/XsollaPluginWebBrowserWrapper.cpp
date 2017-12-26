@@ -269,7 +269,7 @@ void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Reque
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("No transactions"));
+            this->OnCanceled.Execute();
         }
     }
 }
