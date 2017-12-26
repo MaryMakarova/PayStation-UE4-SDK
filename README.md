@@ -38,7 +38,7 @@ Code example
         void OnCanceledCallback();
 
     UFUNCTION(BlueprintCallable)
-        void OnFailedCallback(FText errorText, int32 code);
+        void OnFailedCallback(FString errorText, int32 code);
 
 protected:
     // Called when the game starts or when spawned
@@ -78,9 +78,9 @@ void AMyActor::OnCanceledCallback()
     UE_LOG(LogTemp, Warning, TEXT("Payment canceled"));
 }
 
-void AMyActor::OnFailedCallback(FText errorText, int32 code)
+void AMyActor::OnFailedCallback(FString errorText, int32 code)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *(errorText.ToString()));
+    UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *errorText);
 }
 
 ...
