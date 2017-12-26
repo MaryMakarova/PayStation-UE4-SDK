@@ -8,6 +8,17 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 {
     HttpTool = new XsollaPluginHttpTool();
     TokenRequestJson = MakeShareable(new FJsonObject);
+}
+
+void UXsollaPluginShop::Create(
+    EShopSizeEnum shopSize,
+    FOnPaymantSucceeded OnSucceeded, 
+    FOnPaymantCanceled OnCanceled,
+    FOnPaymantFailed OnFailed)
+{
+    this->OnSucceeded = OnSucceeded;
+    this->OnCanceled = OnCanceled;
+    this->OnFailed = OnFailed;
 
     // load properties drom global game config
     GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
@@ -23,17 +34,6 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
     GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("MerchantId"), MerchantId, GGameIni);
     GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ProjectId"), ProjectId, GGameIni);
     GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), ApiKey, GGameIni);
-}
-
-void UXsollaPluginShop::Create(
-    EShopSizeEnum shopSize,
-    FOnPaymantSucceeded OnSucceeded, 
-    FOnPaymantCanceled OnCanceled,
-    FOnPaymantFailed OnFailed)
-{
-    this->OnSucceeded = OnSucceeded;
-    this->OnCanceled = OnCanceled;
-    this->OnFailed = OnFailed;
 
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
@@ -110,7 +110,7 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 {
     if (!HttpTool->ResponseIsValid(Response, bWasSuccessful))
     {
-        OnCanceled.Execute(Response->GetResponseCode());
+        OnFailed.Execute(FString("Response is invalid"), Response->GetResponseCode());
         return;
     }
 
