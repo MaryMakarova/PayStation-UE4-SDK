@@ -28,7 +28,8 @@ Shop size can be `EShopSizeEnum::VE_Large`, `EShopSizeEnum::VE_Medium`, `EShopSi
 
 Code example
 ```c++
----------------- HEADER FILE -----------------
+---------------- HEADER -----------------
+...
 
     UFUNCTION(BlueprintCallable)
         void OnSucceededCallback(int32 code, FTransactionDetails transactionDetails);
@@ -42,10 +43,13 @@ Code example
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
+    
+...
 ```
 
 ```c++
----------------- SOURCE FILE -----------------
+---------------- SOURCE -----------------
+...
 
 // Called when the game starts or when spawned
 void AMyActor::BeginPlay()
@@ -78,4 +82,6 @@ void AMyActor::OnFailedCallback(FText errorText, int32 code)
 {
     UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *(errorText.ToString()));
 }
+
+...
 ```
