@@ -7,9 +7,9 @@
 
 #include "XsollaPluginWebBrowserWrapper.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, FTransactionDetails, transactionDetails);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, errorText, int32, ErrorCode);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, errorText, int32, errorCode);
 
 class IWebBrowserWindow;
 
