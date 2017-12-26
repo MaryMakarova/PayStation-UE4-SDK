@@ -52,15 +52,15 @@ void FXsollaPluginModule::RegisterSettings()
     if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
     {
         // Create the new category
-        ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer("Project");
+        //ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer("Project");
 
-        SettingsContainer->DescribeCategory("Xsolla",
-            LOCTEXT("RuntimeWDCategoryName", "Xsolla Plugin"),
-            LOCTEXT("RuntimeWDCategoryDescription", "Xsolla plugin settings"));
+        //SettingsContainer->DescribeCategory("Xsolla",
+        //    LOCTEXT("RuntimeWDCategoryName", "Plugins"),
+        //    LOCTEXT("RuntimeWDCategoryDescription", "Xsolla plugin settings"));
 
         // Register the settings
-        ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Xsolla", "General",
-            LOCTEXT("RuntimeGeneralSettingsName", "General"),
+        ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Plugins", "Xsolla",
+            LOCTEXT("RuntimeGeneralSettingsName", "Xsolla"),
             LOCTEXT("RuntimeGeneralSettingsDescription", "Base configuration"),
             GetMutableDefault<UXsollaPluginSettings>()
         );
