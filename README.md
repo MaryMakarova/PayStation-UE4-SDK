@@ -10,7 +10,7 @@ Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, the
 `Xsolla Plugin BP Library` has 5 blueprint function.
 * `CreateXsollaShop` - Gets shop token, set default properties and creates widget with shop content. Takes shop size and delegates for payment succeeded|canceled|failed as parameters. 
 * `CreateXsollaShopWithToken` - Creates shop widget content based on token. Takes shop size, external id, token and delegates for payment succeeded|canceled|failed as parameters. 
-* `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `Create` function.
+* `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `CreateXsollaShop` or `CreateXsollaShopWithToken` function.
 
 ### Example
 ![Blueprint example](https://github.com/SomeInc/XsollaUE4Plugin/blob/master/blueprint_example.png)
