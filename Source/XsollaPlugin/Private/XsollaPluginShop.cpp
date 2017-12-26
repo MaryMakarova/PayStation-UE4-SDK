@@ -110,7 +110,8 @@ void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttp
 {
     if (!HttpTool->ResponseIsValid(Response, bWasSuccessful))
     {
-        OnFailed.Execute(FString("Response is invalid"), Response->GetResponseCode());
+        OnFailed.Execute(FString("Wrong Merchant Id or Api key"), Response->GetResponseCode());
+        BrowserWrapper->CloseShop(false);
         return;
     }
 
