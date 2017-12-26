@@ -30,15 +30,6 @@ public class XsollaPlugin : ModuleRules
 			new string[]
 			{
 				"Core",
-				
-				// ... add other public dependencies that you statically link with here ...
-			}
-			);
-			
-		
-		PrivateDependencyModuleNames.AddRange(
-			new string[]
-			{
                 "CoreUObject",
                 "Engine",
                 "Slate",
@@ -48,7 +39,15 @@ public class XsollaPlugin : ModuleRules
                 "Json",
                 "JsonUtilities",
                 "WebBrowser"
-
+				
+				// ... add other public dependencies that you statically link with here ...
+			}
+			);
+			
+		
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);
