@@ -9,7 +9,7 @@
 
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantSucceeded, int32, Num, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, ErrorText, int32, ErrorCode);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, errorText, int32, ErrorCode);
 
 class IWebBrowserWindow;
 
@@ -58,6 +58,13 @@ public:
     */
     void SetBrowserSize(float w, float h);
 
+    /**
+    * Remove widget from viewport
+    *
+    * @param bCheckTransactionResult - Check transaction result after shop close or not
+    */
+    void CloseShop(bool bCheckTransactionResult);
+
 public:
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
         FOnUrlChanged OnUrlChanged;
@@ -79,7 +86,6 @@ public:
 private:
     void LoadSlateResources();
     void ComposeShopWrapper();
-    void CloseShop();
 
     void HandleOnUrlChanged(const FText& Text);
     void HandleOnLoadCompleted();

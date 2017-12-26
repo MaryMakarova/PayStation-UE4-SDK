@@ -96,7 +96,7 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
                         SAssignNew(CloseButton, SButton)
                         .Visibility(EVisibility::Hidden)
                         .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                        .OnClicked_Lambda([this]() { this->CloseShop(); return FReply::Handled(); })
+                        .OnClicked_Lambda([this]() { this->CloseShop(true); return FReply::Handled(); })
                         .Content()
                         [
                             SNew(SImage)
@@ -138,7 +138,7 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
     GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
 }
 
-void UXsollaPluginWebBrowserWrapper::CloseShop()
+void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 {
     GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
     GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
@@ -146,32 +146,35 @@ void UXsollaPluginWebBrowserWrapper::CloseShop()
     FInputModeGameAndUI inputModeGameAndUI;
     GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
 
-    XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
+    if (bCheckTransactionResult)
+    {
+        XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
 
-    FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
-    FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
-    FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
+        FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
+        FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+        FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
 
-    FString route = "https://api.xsolla.com/merchant/v2/merchants/";
-    route += MerchantId;
-    route += "/reports/transactions/search.json";
-    route += "?external_id=";
-    route += ExternalId;
-    route += "&type=all";
+        FString route = "https://api.xsolla.com/merchant/v2/merchants/";
+        route += MerchantId;
+        route += "/reports/transactions/search.json";
+        route += "?external_id=";
+        route += ExternalId;
+        route += "&type=all";
 
-    TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
+        TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
 
-    Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
-    httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
+        Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
+        httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
 
-    httpTool->Send(Request);
+        httpTool->Send(Request);
+    }
 }
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
     if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
     {
-        CloseShop();
+        CloseShop(true);
     }
 
     if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
