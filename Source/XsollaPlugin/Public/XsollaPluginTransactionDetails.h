@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Engine.h"
+#include "CoreMinimal.h"
 
 #include "XsollaPluginTransactionDetails.generated.h"
 
