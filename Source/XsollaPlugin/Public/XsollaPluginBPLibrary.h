@@ -74,6 +74,6 @@ public:
     * @param onSucceeded - On succeded delegate.
     * @param onFailed - On failed delegate.
     */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
-        static void GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed);
+    //UFUNCTION(BlueprintCallable, Category = "Xsolla")
+    //    static void GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed);
 };

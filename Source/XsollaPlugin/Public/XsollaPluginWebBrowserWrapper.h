@@ -11,6 +11,9 @@ DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, tran
 DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, errorText, int32, errorCode);
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetFailed, FString, errorText);
+
 class IWebBrowserWindow;
 
 UCLASS()

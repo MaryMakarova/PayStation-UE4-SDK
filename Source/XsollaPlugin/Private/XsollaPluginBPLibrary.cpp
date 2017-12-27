@@ -42,7 +42,7 @@ void UXsollaPluginBPLibrary::SetStringProperty(FString prop, FString value, bool
     XsollaPlugin::GetShop()->SetStringProperty(prop, value, bOverride);
 }
 
-void UXsollaPluginBPLibrary::GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed)
-{
-
-}
+//void UXsollaPluginBPLibrary::GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed)
+//{
+//
+//}
