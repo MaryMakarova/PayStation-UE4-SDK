@@ -18,13 +18,12 @@ void UXsollaPluginBPLibrary::CreateXsollaShop(
 
 void UXsollaPluginBPLibrary::CreateXsollaShopWithToken(
     FString token,
-    FString externalId,
     EShopSizeEnum shopSize,
     FOnPaymantSucceeded OnSucceeded,
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
 {
-    XsollaPlugin::GetShop()->CreateWithToken(token, externalId, shopSize, OnSucceeded, OnCanceled, OnFailed);
+    XsollaPlugin::GetShop()->CreateWithToken(token, shopSize, OnSucceeded, OnCanceled, OnFailed);
 }
 
 void UXsollaPluginBPLibrary::SetNumberProperty(FString prop, int value, bool bOverride/*= true*/)

@@ -96,7 +96,7 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
                         SAssignNew(CloseButton, SButton)
                         .Visibility(EVisibility::Hidden)
                         .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                        .OnClicked_Lambda([this]() { this->CloseShop(true); return FReply::Handled(); })
+                        .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
                         .Content()
                         [
                             SNew(SImage)
@@ -145,36 +145,13 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 
     FInputModeGameAndUI inputModeGameAndUI;
     GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
-
-    if (bCheckTransactionResult)
-    {
-        XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
-
-        FString MerchantId = GetDefault<UXsollaPluginSettings>()->MerchantId;
-        FString ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
-        FString ApiKey = GetDefault<UXsollaPluginSettings>()->ApiKey;
-
-        FString route = "https://api.xsolla.com/merchant/v2/merchants/";
-        route += MerchantId;
-        route += "/reports/transactions/search.json";
-        route += "?external_id=";
-        route += ExternalId;
-        route += "&type=all";
-
-        TSharedRef<IHttpRequest> Request = httpTool->GetRequest(route);
-
-        Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginWebBrowserWrapper::OnTransactionResponse);
-        httpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
-
-        httpTool->Send(Request);
-    }
 }
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
     if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
     {
-        CloseShop(true);
+        CloseShop(false);
     }
 
     if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
@@ -228,111 +205,6 @@ bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrow
 {
     OnCloseWindow.Broadcast();
     return true;
-}
-
-void UXsollaPluginWebBrowserWrapper::OnTransactionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-{
-    TSharedPtr<FJsonValue> transactionJsonObj;
-    FString content = Response->GetContentAsString();
-    TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create(*content);
-
-    if (FJsonSerializer::Deserialize(JsonReader, transactionJsonObj))
-    {
-        if (transactionJsonObj->AsArray().Num() != 0)
-        {
-            TSharedPtr<FJsonObject> root = transactionJsonObj->AsArray()[0]->AsObject();
-
-            FTransactionDetails transactionDetails;
-
-            if (root->HasField("transaction"))
-            {
-                root->GetObjectField("transaction")->TryGetStringField("status", transactionDetails.TransactionStatus);
-                root->GetObjectField("transaction")->TryGetNumberField("id", transactionDetails.TransactionId);
-            }
-
-            if (root->HasField("project"))
-            {
-                root->GetObjectField("project")->TryGetStringField("id", transactionDetails.TransactionProjectId);
-            }
-            
-            if (root->HasField("payment_method"))
-            {
-                root->GetObjectField("payment_method")->TryGetNumberField("id", transactionDetails.PaymentMethodId);
-                root->GetObjectField("payment_method")->TryGetStringField("name", transactionDetails.PaymentMethodName);
-            }
-
-            if (root->HasField("user"))
-            {
-                root->GetObjectField("user")->TryGetNumberField("id", transactionDetails.UserId);
-                root->GetObjectField("user")->TryGetStringField("email", transactionDetails.UserEmail);
-                root->GetObjectField("user")->TryGetStringField("country", transactionDetails.UserCountry);
-            }
-
-            if (root->HasField("payment_details"))
-            {
-                if (root->GetObjectField("payment_details")->HasField("payment"))
-                {
-                    root->GetObjectField("payment_details")->GetObjectField("payment")->TryGetStringField("currency", transactionDetails.PaymentCurrency);
-                    root->GetObjectField("payment_details")->GetObjectField("payment")->TryGetNumberField("amount", transactionDetails.PaymentAmount);
-                }
-
-                if (root->GetObjectField("payment_details")->HasField("sales_tax"))
-                {
-                    root->GetObjectField("payment_details")->GetObjectField("sales_tax")->TryGetNumberField("amount", transactionDetails.PaymentSalesTaxAmount);
-                    root->GetObjectField("payment_details")->GetObjectField("sales_tax")->TryGetNumberField("percent", transactionDetails.PaymentSalesTaxPercent);
-                }
-            }
-
-            if (root->HasField("purchase"))
-            {
-                if (root->GetObjectField("purchase")->HasField("virtual_items"))
-                {
-                    root->GetObjectField("purchase")->TryGetStringField("virtual_items", transactionDetails.PurchaseVirtualItems);
-                }
-                
-                if (root->GetObjectField("purchase")->HasField("virtual_currency"))
-                {
-                    root->GetObjectField("purchase")->GetObjectField("virtual_currency")->TryGetNumberField("amount", transactionDetails.PurchaseVirtualCurrencyAmount);
-                    root->GetObjectField("purchase")->GetObjectField("virtual_currency")->TryGetStringField("name", transactionDetails.PurchaseVirtualCurrencyName);
-                }
-
-                if (root->GetObjectField("purchase")->HasField("simple_checkout"))
-                {
-                    root->GetObjectField("purchase")->GetObjectField("simple_checkout")->TryGetNumberField("amount", transactionDetails.PurchaseSimpleCheckoutAmount);
-                    root->GetObjectField("purchase")->GetObjectField("simple_checkout")->TryGetStringField("currency", transactionDetails.PurchaseSimpleCheckoutCurrency);
-                }
-
-                if (root->GetObjectField("purchase")->HasField("subscription"))
-                {
-                    root->GetObjectField("purchase")->GetObjectField("subscription")->TryGetStringField("name", transactionDetails.PurchaseSubscriptionName);
-                }
-            }
-
-            if (transactionDetails.TransactionStatus == "done")
-            {
-                this->OnSucceeded.Execute(transactionDetails);
-            }
-
-            if (transactionDetails.TransactionStatus == "canceled")
-            {
-                this->OnCanceled.Execute();
-            }
-
-            if (transactionDetails.TransactionStatus == "error")
-            {
-                this->OnFailed.Execute(FString("Transaction failed"), 0);
-            }
-        }
-        else
-        {
-            this->OnCanceled.Execute();
-        }
-    }
-}
-
-void UXsollaPluginWebBrowserWrapper::SetExternalId(FString str) 
-{ 
-    ExternalId = str;
 }
 
 void UXsollaPluginWebBrowserWrapper::SetShopUrl(FString str) 

@@ -50,7 +50,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         void CreateWithToken(
             FString token, 
-            FString externalId,
             EShopSizeEnum shopSize, 
             FOnPaymantSucceeded OnSucceeded,
             FOnPaymantCanceled OnCanceled,
@@ -88,16 +87,11 @@ public:
     void SetStringProperty(FString prop, FString value, bool bOverride = true);
 
 private:
-    void OpenShop(FString tokenRequestJson);
-    void OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
-private:
     XsollaPluginHttpTool * HttpTool;
 
-    FString XsollaToken;
     FString ShopUrl;
-    FString MerchantId;
-    FString ApiKey;
+    FString XsollaToken;
+    FString XsollaAccessString;
     FString ProjectId;
     bool bIsSandbox;
 
@@ -106,8 +100,6 @@ private:
     FOnPaymantSucceeded		OnSucceeded;
     FOnPaymantCanceled		OnCanceled;
     FOnPaymantFailed		OnFailed;
-
-    FString					ExternalId;
 
     TSharedPtr<FJsonObject> TokenRequestJson;
 };

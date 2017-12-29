@@ -24,35 +24,38 @@ void UXsollaPluginShop::Create(
     GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
     if (bIsSandbox)
     {
-        ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
+        ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_data=";
     }
     else
     {
-        ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
+        ShopUrl = "https://secure.xsolla.com/paystation2/?access_data=";
     }
 
-    GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("MerchantId"), MerchantId, GGameIni);
-    GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ProjectId"), ProjectId, GGameIni);
-    GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ApiKey"), ApiKey, GGameIni);
+    ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
 
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 
     // set shop interface size
-    if (shopSize == EShopSizeEnum::VE_Small)
+    switch (shopSize)
     {
-        SetStringProperty("settings.ui.size", FString("small"), false);
-        BrowserWrapper->SetBrowserSize(620, 630);
+        case EShopSizeEnum::VE_Small:
+        {
+            SetStringProperty("settings.ui.size", FString("medium"), false);
+            BrowserWrapper->SetBrowserSize(620, 630);
+        }
+
+        case EShopSizeEnum::VE_Medium:
+        {
+            SetStringProperty("settings.ui.size", FString("medium"), false);
+            BrowserWrapper->SetBrowserSize(740, 760);
+        }
+
+        case EShopSizeEnum::VE_Large:
+        {
+            BrowserWrapper->SetBrowserSize(820, 840);
+            SetStringProperty("settings.ui.size", FString("large"), false);
     }
-    else if (shopSize == EShopSizeEnum::VE_Medium)
-    {
-        SetStringProperty("settings.ui.size", FString("medium"), false);
-        BrowserWrapper->SetBrowserSize(740, 760);
-    }
-    else if (shopSize == EShopSizeEnum::VE_Large)
-    {
-        SetStringProperty("settings.ui.size", FString("large"), false);
-        BrowserWrapper->SetBrowserSize(820, 840);
     }
 
     BrowserWrapper->AddToViewport(9999);
@@ -63,17 +66,13 @@ void UXsollaPluginShop::Create(
     BrowserWrapper->OnCanceled = OnCanceled;
 
     // set token properties
-    SetStringProperty("user.id.value", FString("12345678"), false);
-    SetBoolProperty("user.id.hidden", true);
+    SetStringProperty("user.id.value", FString("12345"), false);
+    //SetBoolProperty("user.id.hidden", true);
 
     SetStringProperty("user.email.value", FString("example@example.com"), false);
-    SetBoolProperty("user.email.allow_modify", true);
-    SetBoolProperty("user.email.hidden", false);
+    //SetBoolProperty("user.email.hidden", false);
 
-    ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
-
-    SetStringProperty("settings.external_id", ExternalId);
-    SetStringProperty("settings.return_url", FString("https://www.unrealengine.com"));
+    //SetStringProperty("settings.return_url", FString("https://www.unrealengine.com"));
     SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
     if (bIsSandbox) 
         SetStringProperty("settings.mode", FString("sandbox"), false);
@@ -86,13 +85,25 @@ void UXsollaPluginShop::Create(
     TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
     FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
-    // load shop
-    OpenShop(outputString);
+    if (!ShopUrl.EndsWith("="))
+    {
+        ShopUrl.Replace(*XsollaAccessString, *outputString);
+    }
+    else
+    {
+        ShopUrl += outputString;
+    }
+
+    XsollaAccessString = outputString;
+
+    UE_LOG(LogTemp, Warning, TEXT("Link: %s"), *ShopUrl);
+
+    BrowserWrapper->SetShopUrl(ShopUrl);
+    BrowserWrapper->LoadURL(ShopUrl);
 }
 
 void UXsollaPluginShop::CreateWithToken(
     FString token,
-    FString externalId,
     EShopSizeEnum shopSize,
     FOnPaymantSucceeded OnSucceeded,
     FOnPaymantCanceled OnCanceled,
@@ -102,23 +113,31 @@ void UXsollaPluginShop::CreateWithToken(
     this->OnCanceled = OnCanceled;
     this->OnFailed = OnFailed;
 
-    ExternalId = externalId;
+    // load properties drom global game config
+    GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
+    if (bIsSandbox)
+    {
+        ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
+    }
+    else
+    {
+        ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
+    }
+
+    GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ProjectId"), ProjectId, GGameIni);
 
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 
     // set shop interface size
-    if (shopSize == EShopSizeEnum::VE_Small)
+    switch (shopSize)
     {
-        BrowserWrapper->SetBrowserSize(620, 630);
-    }
-    else if (shopSize == EShopSizeEnum::VE_Medium)
-    {
-        BrowserWrapper->SetBrowserSize(740, 760);
-    }
-    else if (shopSize == EShopSizeEnum::VE_Large)
-    {
-        BrowserWrapper->SetBrowserSize(820, 840);
+        case EShopSizeEnum::VE_Small:
+            BrowserWrapper->SetBrowserSize(620, 630);
+        case EShopSizeEnum::VE_Medium:
+            BrowserWrapper->SetBrowserSize(740, 760);
+        case EShopSizeEnum::VE_Large:
+            BrowserWrapper->SetBrowserSize(820, 840);
     }
 
     BrowserWrapper->AddToViewport(9999);
@@ -134,54 +153,8 @@ void UXsollaPluginShop::CreateWithToken(
 
     XsollaToken = token;
 
-    BrowserWrapper->SetExternalId(ExternalId);
     BrowserWrapper->SetShopUrl(ShopUrl);
     BrowserWrapper->LoadURL(ShopUrl);
-}
-
-void UXsollaPluginShop::OpenShop(FString tokenRequestJson)
-{
-    FString route = "https://api.xsolla.com/merchant/merchants/";
-    route += MerchantId;
-    route += "/token";
-
-    TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, tokenRequestJson);
-
-    Request->OnProcessRequestComplete().BindUObject(this, &UXsollaPluginShop::OnGetTokenRequestComplete);
-    HttpTool->SetAuthorizationHash(FString("Basic ") + FBase64::Encode(MerchantId + FString(":") + XsollaPluginEncryptTool::DecryptString(ApiKey)), Request);
-
-    HttpTool->Send(Request);
-}
-
-void UXsollaPluginShop::OnGetTokenRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful)
-{
-    if (!HttpTool->ResponseIsValid(Response, bWasSuccessful))
-    {
-        OnFailed.Execute(FString("Wrong Merchant Id or Api key"), Response->GetResponseCode());
-        BrowserWrapper->CloseShop(false);
-        return;
-    }
-
-    TSharedPtr<FJsonObject> JsonParsed;
-    TSharedRef<TJsonReader<TCHAR>> JsonReader = TJsonReaderFactory<TCHAR>::Create(Response->GetContentAsString());
-
-    if (FJsonSerializer::Deserialize(JsonReader, JsonParsed))
-    {
-        if ( !ShopUrl.EndsWith("=") )
-        {
-            ShopUrl.Replace(*XsollaToken, *(JsonParsed->GetStringField("token")));
-        }
-        else
-        {
-            ShopUrl += JsonParsed->GetStringField("token");
-        }
-
-        XsollaToken = JsonParsed->GetStringField("token");
-
-        BrowserWrapper->SetExternalId(ExternalId);
-        BrowserWrapper->SetShopUrl(ShopUrl);
-        BrowserWrapper->LoadURL(ShopUrl);
-    }
 }
 
 void UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)

@@ -38,7 +38,6 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void CreateXsollaShopWithToken(
             FString token,
-            FString externalId,
             EShopSizeEnum shopSize,
             FOnPaymantSucceeded OnSucceeded,
             FOnPaymantCanceled OnCanceled,

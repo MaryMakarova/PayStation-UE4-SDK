@@ -40,13 +40,6 @@ public:
     void LoadURL(FString NewURL);
 
     /**
-    * Set external id.
-    *
-    * @param str - External id string.
-    */
-    void SetExternalId(FString str);
-
-    /**
     * Set shop url.
     *
     * @param str - Shop url string.
@@ -95,8 +88,6 @@ private:
     void HandleOnLoadError();
     bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
 
-    void OnTransactionResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
-
 private:
     TSharedPtr<class SVerticalBox>		MainContent;
     TSharedPtr<class SWebBrowser>		WebBrowserWidget;
@@ -121,6 +112,4 @@ private:
     FString		InitialURL = "";
     FString		ShopUrl;
     bool		bSupportsTransparency = true;
-
-    FString		ExternalId;
 };
