@@ -16,6 +16,12 @@ enum class EShopSizeEnum : uint8
     VE_Large	UMETA(DisplayName = "Large")
 };
 
+enum class IntegrationType : uint8
+{
+    SERVER,
+    SERVELESS
+};
+
 UCLASS()
 class XSOLLAPLUGIN_API UXsollaPluginShop : public UObject
 {
@@ -85,6 +91,12 @@ public:
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void SetStringProperty(FString prop, FString value, bool bOverride = true);
+
+private:
+    void LoadConfig(IntegrationType type);
+    void SetToken(FString token);
+    void SetAccessData(FString data);
+    void SetDefaultTokenProperties();
 
 private:
     XsollaPluginHttpTool * HttpTool;

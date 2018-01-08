@@ -20,18 +20,8 @@ void UXsollaPluginShop::Create(
     this->OnCanceled = OnCanceled;
     this->OnFailed = OnFailed;
 
-    // load properties drom global game config
-    GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
-    if (bIsSandbox)
-    {
-        ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_data=";
-    }
-    else
-    {
-        ShopUrl = "https://secure.xsolla.com/paystation2/?access_data=";
-    }
-
-    ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+    // load data from config
+    LoadConfig(IntegrationType::SERVELESS);
 
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
@@ -65,38 +55,14 @@ void UXsollaPluginShop::Create(
     BrowserWrapper->OnFailed = OnFailed;
     BrowserWrapper->OnCanceled = OnCanceled;
 
-    // set token properties
-    SetStringProperty("user.id.value", FString("12345"), false);
-    //SetBoolProperty("user.id.hidden", true);
-
-    SetStringProperty("user.email.value", FString("example@example.com"), false);
-    //SetBoolProperty("user.email.hidden", false);
-
-    //SetStringProperty("settings.return_url", FString("https://www.unrealengine.com"));
-    SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
-    if (bIsSandbox) 
-        SetStringProperty("settings.mode", FString("sandbox"), false);
-
-    SetStringProperty("settings.ui.version", FString("desktop"), false);
-    SetStringProperty("settings.ui.theme", FString("default"), false);
+    SetDefaultTokenProperties();
 
     // get string from json
     FString outputString;
     TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
     FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
-    if (!ShopUrl.EndsWith("="))
-    {
-        ShopUrl.Replace(*XsollaAccessString, *outputString);
-    }
-    else
-    {
-        ShopUrl += outputString;
-    }
-
-    XsollaAccessString = outputString;
-
-    UE_LOG(LogTemp, Warning, TEXT("Link: %s"), *ShopUrl);
+    SetAccessData(outputString);
 
     BrowserWrapper->SetShopUrl(ShopUrl);
     BrowserWrapper->LoadURL(ShopUrl);
@@ -113,18 +79,8 @@ void UXsollaPluginShop::CreateWithToken(
     this->OnCanceled = OnCanceled;
     this->OnFailed = OnFailed;
 
-    // load properties drom global game config
-    GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
-    if (bIsSandbox)
-    {
-        ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
-    }
-    else
-    {
-        ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
-    }
-
-    GConfig->GetString(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("ProjectId"), ProjectId, GGameIni);
+    // load data from config
+    LoadConfig(IntegrationType::SERVER);
 
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
@@ -140,18 +96,11 @@ void UXsollaPluginShop::CreateWithToken(
             BrowserWrapper->SetBrowserSize(820, 840);
     }
 
+    // add wrapper to viewport
     BrowserWrapper->AddToViewport(9999);
 
-    if (!ShopUrl.EndsWith("="))
-    {
-        ShopUrl.Replace(*XsollaToken, *token);
-    }
-    else
-    {
-        ShopUrl += token;
-    }
-
-    XsollaToken = token;
+    // join token to shop url
+    SetToken(token);
 
     BrowserWrapper->SetShopUrl(ShopUrl);
     BrowserWrapper->LoadURL(ShopUrl);
@@ -263,4 +212,68 @@ void UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOve
 
         currentObj = currentObj->GetObjectField(subStrings[i]).ToSharedRef();
     }
+}
+
+void UXsollaPluginShop::LoadConfig(IntegrationType type)
+{
+    // load properties drom global game config
+    GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
+    if (bIsSandbox)
+    {
+        if (type == IntegrationType::SERVELESS)
+            ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_data=";
+        else 
+            ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
+    }
+    else
+    {
+        if (type == IntegrationType::SERVELESS)
+            ShopUrl = "https://secure.xsolla.com/paystation2/?access_data=";
+        else
+            ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
+    }
+
+    ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+
+    // show browser wrapper
+    BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+}
+
+void UXsollaPluginShop::SetToken(FString token)
+{
+    if (!ShopUrl.EndsWith("="))
+    {
+        ShopUrl.Replace(*XsollaToken, *token);
+    }
+    else
+    {
+        ShopUrl += token;
+    }
+
+    XsollaToken = token;
+}
+
+void UXsollaPluginShop::SetAccessData(FString data)
+{
+    if (!ShopUrl.EndsWith("="))
+    {
+        ShopUrl.Replace(*XsollaAccessString, *data);
+    }
+    else
+    {
+        ShopUrl += data;
+    }
+
+    XsollaAccessString = data;
+}
+
+void UXsollaPluginShop::SetDefaultTokenProperties()
+{
+    SetStringProperty("user.id.value", FString("12345"), false);
+    SetStringProperty("user.email.value", FString("example@example.com"), false);
+    SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
+    if (bIsSandbox)
+        SetStringProperty("settings.mode", FString("sandbox"), false);
+    SetStringProperty("settings.ui.version", FString("desktop"), false);
+    SetStringProperty("settings.ui.theme", FString("default"), false);
 }
