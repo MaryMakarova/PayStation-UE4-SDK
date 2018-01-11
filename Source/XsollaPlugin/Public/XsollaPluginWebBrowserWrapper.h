@@ -79,6 +79,8 @@ public:
     FOnPaymantCanceled OnCanceled;
     FOnPaymantFailed OnFailed;
 
+    FString ExternalId;
+
 private:
     void LoadSlateResources();
     void ComposeShopWrapper();

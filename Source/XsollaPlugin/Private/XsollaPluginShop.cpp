@@ -12,6 +12,7 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 
 void UXsollaPluginShop::Create(
     EShopSizeEnum shopSize,
+    FString userId,
     FOnPaymantSucceeded OnSucceeded, 
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
@@ -48,6 +49,12 @@ void UXsollaPluginShop::Create(
     }
     }
 
+    ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
+    SetStringProperty("settings.external_id", ExternalId);
+    BrowserWrapper->ExternalId = ExternalId;
+
+    SetStringProperty("user.id.value", userId);
+
     BrowserWrapper->AddToViewport(9999);
 
     // shop delegates
@@ -63,6 +70,8 @@ void UXsollaPluginShop::Create(
     FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
     SetAccessData(outputString);
+
+    //UE_LOG(LogTemp, Warning, TEXT("%s"), *ShopUrl);
 
     BrowserWrapper->SetShopUrl(ShopUrl);
     BrowserWrapper->LoadURL(ShopUrl);
@@ -269,11 +278,9 @@ void UXsollaPluginShop::SetAccessData(FString data)
 
 void UXsollaPluginShop::SetDefaultTokenProperties()
 {
-    SetStringProperty("user.id.value", FString("12345"), false);
-    SetStringProperty("user.email.value", FString("example@example.com"), false);
+    //SetStringProperty("user.email.value", FString("example@example.com"), false);
     SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
     if (bIsSandbox)
         SetStringProperty("settings.mode", FString("sandbox"), false);
     SetStringProperty("settings.ui.version", FString("desktop"), false);
-    SetStringProperty("settings.ui.theme", FString("default"), false);
 }

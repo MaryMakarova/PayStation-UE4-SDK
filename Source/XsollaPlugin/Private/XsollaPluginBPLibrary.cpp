@@ -9,11 +9,12 @@ UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectI
 
 void UXsollaPluginBPLibrary::CreateXsollaShop(
     EShopSizeEnum shopSize,
+    FString userId,
     FOnPaymantSucceeded OnSucceeded,
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
 {
-    XsollaPlugin::GetShop()->Create(shopSize, OnSucceeded, OnCanceled, OnFailed);
+    XsollaPlugin::GetShop()->Create(shopSize, userId, OnSucceeded, OnCanceled, OnFailed);
 }
 
 void UXsollaPluginBPLibrary::CreateXsollaShopWithToken(

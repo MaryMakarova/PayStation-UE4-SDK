@@ -32,6 +32,7 @@ public:
     * Creates shop wrapper, set default properties and delegates.
     *
     * @param shopSize - Size of shop page and wrapper.
+    * @param userId - user ID
     * @param OnSucceeded - On payment succeeded delegate.
     * @param OnCanceled - On payment canceled delegate.
     * @param OnFailed - On payment failed delegate.
@@ -39,6 +40,7 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void Create(
         EShopSizeEnum shopSize,
+        FString userId, 
         FOnPaymantSucceeded OnSucceeded,
         FOnPaymantCanceled OnCanceled, 
         FOnPaymantFailed OnFailed);
@@ -105,6 +107,7 @@ private:
     FString XsollaToken;
     FString XsollaAccessString;
     FString ProjectId;
+    FString ExternalId;
     bool bIsSandbox;
 
     UXsollaPluginWebBrowserWrapper* BrowserWrapper;

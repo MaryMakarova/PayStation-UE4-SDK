@@ -145,6 +145,30 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 
     FInputModeGameAndUI inputModeGameAndUI;
     GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
+
+    XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
+
+
+    FString route = "http://52.59.15.45:3000/payment";
+
+    TSharedRef<IHttpRequest> Request = httpTool->PostRequest(route, ExternalId);
+
+    Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+        if (bWasSuccessful) {
+            FTransactionDetails transactionDetails;
+
+            if (Response->GetResponseCode() == 200) {
+                transactionDetails.TransactionStatus = "DONE";
+                OnSucceeded.Execute(transactionDetails);
+            }
+            else {
+                transactionDetails.TransactionStatus = "FAILED";
+                OnFailed.Execute(FString("Transaction failed"), 0);
+            }
+        }
+    });
+
+    httpTool->Send(Request);
 }
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
