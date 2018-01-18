@@ -40,7 +40,6 @@ public:
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void Create(
-        EIntegrationType integrationType,
         EShopSizeEnum shopSize,
         FString userId, 
         FOnPaymantSucceeded OnSucceeded,
@@ -106,6 +105,8 @@ private:
     XsollaPluginHttpTool * HttpTool;
 
     FString ShopUrl;
+    FString ServerUrl;
+    
     FString XsollaToken;
     FString XsollaAccessString;
     FString ProjectId;

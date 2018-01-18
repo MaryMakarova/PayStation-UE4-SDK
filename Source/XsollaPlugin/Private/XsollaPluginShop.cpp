@@ -11,7 +11,6 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 }
 
 void UXsollaPluginShop::Create(
-    EIntegrationType integrationType,
     EShopSizeEnum shopSize,
     FString userId,
     FOnPaymantSucceeded OnSucceeded, 
@@ -27,7 +26,7 @@ void UXsollaPluginShop::Create(
     BrowserWrapper->OnFailed = OnFailed;
 
     // load data from config
-    LoadConfig(integrationType);
+    LoadConfig(GetDefault<UXsollaPluginSettings>()->IntegrationType);
 
     // generate external_id
     ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
@@ -62,14 +61,14 @@ void UXsollaPluginShop::Create(
 
     BrowserWrapper->AddToViewport(9999);
 
-    if (integrationType == EIntegrationType::VE_SERVER)
+    if (GetDefault<UXsollaPluginSettings>()->IntegrationType == EIntegrationType::VE_SERVER)
     {
         // get string from json
         FString outputString;
         TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
         FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
-        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(FString("http://52.59.15.45:3333/token"), outputString);
+        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
         request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
             if (bWasSuccessful) {
                 SetToken(Response->GetContentAsString());
@@ -85,7 +84,7 @@ void UXsollaPluginShop::Create(
     else
     {
         // add user id 
-        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(FString("http://52.59.15.45:3333/user/add"), userId);
+        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/user/add"), userId);
         HttpTool->Send(request);
 
         // get string from json
@@ -271,6 +270,7 @@ void UXsollaPluginShop::LoadConfig(EIntegrationType type)
     }
 
     ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
+    ServerUrl = GetDefault<UXsollaPluginSettings>()->ServerUrl;
 }
 
 void UXsollaPluginShop::SetToken(FString token)

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "XsollaPluginShop.h"
 
 #include "XsollaPluginSettings.generated.h"
 
@@ -14,9 +15,15 @@ class UXsollaPluginSettings : public UObject
 public:
     UXsollaPluginSettings(const FObjectInitializer& ObjectInitializer);
 
-    UPROPERTY(config, EditAnywhere, Category = API)
+    UPROPERTY(config, EditAnywhere)
+        FString ServerUrl;
+
+    UPROPERTY(config, EditAnywhere)
+        EIntegrationType IntegrationType;
+
+    UPROPERTY(config, EditAnywhere)
         FString ProjectId;
 
-    UPROPERTY(config, EditAnywhere, Category = API)
+    UPROPERTY(config, EditAnywhere)
         bool bSandboxMode;
 };
