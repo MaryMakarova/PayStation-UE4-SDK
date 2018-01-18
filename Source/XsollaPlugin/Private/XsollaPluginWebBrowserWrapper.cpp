@@ -149,7 +149,13 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
     XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
 
 
-    FString route = "http://52.59.15.45:3000/payment";
+    FString route = "http://52.59.15.45:3333/payment";
+
+    if (ExternalId.IsEmpty())
+    {
+        OnFailed.Execute(FString("External id is not setted"), 0);
+        return;
+    }
 
     TSharedRef<IHttpRequest> Request = httpTool->PostRequest(route, ExternalId);
 
