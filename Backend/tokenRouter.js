@@ -21,23 +21,30 @@ module.exports = class TokenRouter {
             + this.globals.merchantId 
             + '/token';
 
+            // remove terminated symbols
+            let requestJson = JSON.parse('' + req.rawBody + '');
+
             let options = {
                 url: url,
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Content-Length': req.body.length
+                    'Content-Length': requestJson.length
                 },
-                json: JSON.parse(req.rawBody)
+                json: requestJson
             };
 
             makeRequest(options, (err, tokenRes, body) => {
                 if (err) throw err;
 
-                if (tokenRes) {
-                    this.globals.userIdList.push( JSON.parse(req.rawBody).user.id.value );
+                if (tokenRes && body.token) {
+                    this.globals.userIdList.add( JSON.parse(req.rawBody).user.id.value );
 
+                    res.statusCode = this.globals.successStatusCode;
                     res.end(body.token);
+                } else {
+                    res.statusCode = this.globals.errorStatusCode;
+                    res.end();
                 }
             });
         });

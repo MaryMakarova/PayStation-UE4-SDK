@@ -18,18 +18,22 @@ module.exports = class NotificationsRouter {
             res.statusCode = this.globals.errorStatusCode;
 
             if (this._handleSignatureVerify(req, res)) {
-                switch(JSON.parse(req.rawBody).notification_type) {
-                    case 'user_validation': 
-                        this._handleUserValidation(req, res); 
-                        break;
-                    case 'payment':
-                        this._handlePayment(req, res);
-                        break;
-                }
+                _handleNotifications(req, res, JSON.parse(req.rawBody).notification_type);
             }
 
             res.end();
         });
+    }
+
+    _handleNotifications(req, res, notifyType) {
+        switch(notifyType) {
+            case 'user_validation': 
+                this._handleUserValidation(req, res); 
+                break;
+            case 'payment':
+                this._handlePayment(req, res);
+                break;
+        }
     }
 
     _handleSignatureVerify(req, res) {
