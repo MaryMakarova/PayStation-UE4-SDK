@@ -23,6 +23,7 @@ public:
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void CreateXsollaShop(
+            EIntegrationType integrationType,
             EShopSizeEnum shopSize,
             FString userId,
             FOnPaymantSucceeded OnSucceeded,

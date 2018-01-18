@@ -16,10 +16,11 @@ enum class EShopSizeEnum : uint8
     VE_Large	UMETA(DisplayName = "Large")
 };
 
-enum class IntegrationType : uint8
+UENUM(BlueprintType)
+enum class EIntegrationType : uint8
 {
-    SERVER,
-    SERVELESS
+    VE_SERVER      UMETA(DisplayName = "Server"),
+    VE_SERVELESS   UMETA(DisplayName = "Serveless")
 };
 
 UCLASS()
@@ -39,6 +40,7 @@ public:
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void Create(
+        EIntegrationType integrationType,
         EShopSizeEnum shopSize,
         FString userId, 
         FOnPaymantSucceeded OnSucceeded,
@@ -95,7 +97,7 @@ public:
     void SetStringProperty(FString prop, FString value, bool bOverride = true);
 
 private:
-    void LoadConfig(IntegrationType type);
+    void LoadConfig(EIntegrationType type);
     void SetToken(FString token);
     void SetAccessData(FString data);
     void SetDefaultTokenProperties();

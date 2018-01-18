@@ -8,13 +8,14 @@ UXsollaPluginBPLibrary::UXsollaPluginBPLibrary(const FObjectInitializer& ObjectI
 }
 
 void UXsollaPluginBPLibrary::CreateXsollaShop(
+    EIntegrationType integrationType,
     EShopSizeEnum shopSize,
     FString userId,
     FOnPaymantSucceeded OnSucceeded,
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
 {
-    XsollaPlugin::GetShop()->Create(shopSize, userId, OnSucceeded, OnCanceled, OnFailed);
+    XsollaPlugin::GetShop()->Create(integrationType, shopSize, userId, OnSucceeded, OnCanceled, OnFailed);
 }
 
 void UXsollaPluginBPLibrary::CreateXsollaShopWithToken(
