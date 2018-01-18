@@ -11,21 +11,28 @@ UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer
 }
 
 void UXsollaPluginShop::Create(
+    EIntegrationType integrationType,
     EShopSizeEnum shopSize,
     FString userId,
     FOnPaymantSucceeded OnSucceeded, 
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
 {
-    this->OnSucceeded = OnSucceeded;
-    this->OnCanceled = OnCanceled;
-    this->OnFailed = OnFailed;
-
-    // load data from config
-    LoadConfig(IntegrationType::SERVELESS);
-
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+
+    // set delegates
+    BrowserWrapper->OnSucceeded = OnSucceeded;
+    BrowserWrapper->OnCanceled = OnCanceled;
+    BrowserWrapper->OnFailed = OnFailed;
+
+    // load data from config
+    LoadConfig(integrationType);
+
+    // generate external_id
+    ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
+    SetStringProperty("settings.external_id", ExternalId);
+    BrowserWrapper->ExternalId = ExternalId;
 
     // set shop interface size
     switch (shopSize)
@@ -46,35 +53,53 @@ void UXsollaPluginShop::Create(
         {
             BrowserWrapper->SetBrowserSize(820, 840);
             SetStringProperty("settings.ui.size", FString("large"), false);
+        }
     }
-    }
-
-    ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
-    SetStringProperty("settings.external_id", ExternalId);
-    BrowserWrapper->ExternalId = ExternalId;
 
     SetStringProperty("user.id.value", userId);
 
-    BrowserWrapper->AddToViewport(9999);
-
-    // shop delegates
-    BrowserWrapper->OnSucceeded = OnSucceeded;
-    BrowserWrapper->OnFailed = OnFailed;
-    BrowserWrapper->OnCanceled = OnCanceled;
-
     SetDefaultTokenProperties();
 
-    // get string from json
-    FString outputString;
-    TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
-    FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
+    BrowserWrapper->AddToViewport(9999);
 
-    SetAccessData(outputString);
+    if (integrationType == EIntegrationType::VE_SERVER)
+    {
+        // get string from json
+        FString outputString;
+        TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
+        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
-    //UE_LOG(LogTemp, Warning, TEXT("%s"), *ShopUrl);
+        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(FString("http://52.59.15.45:3333/token"), outputString);
+        request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+            if (bWasSuccessful) {
+                SetToken(Response->GetContentAsString());
+                BrowserWrapper->SetShopUrl(ShopUrl);
+                BrowserWrapper->LoadURL(ShopUrl);
+            }
+            else
+            {
+            }
+        });
+        HttpTool->Send(request);
+    }
+    else
+    {
+        // add user id 
+        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(FString("http://52.59.15.45:3333/user/add"), userId);
+        HttpTool->Send(request);
 
-    BrowserWrapper->SetShopUrl(ShopUrl);
-    BrowserWrapper->LoadURL(ShopUrl);
+        // get string from json
+        FString outputString;
+        TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
+        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
+
+        SetAccessData(outputString);
+
+        //UE_LOG(LogTemp, Warning, TEXT("%s"), *ShopUrl);
+
+        BrowserWrapper->SetShopUrl(ShopUrl);
+        BrowserWrapper->LoadURL(ShopUrl);
+    }
 }
 
 void UXsollaPluginShop::CreateWithToken(
@@ -84,15 +109,18 @@ void UXsollaPluginShop::CreateWithToken(
     FOnPaymantCanceled OnCanceled,
     FOnPaymantFailed OnFailed)
 {
-    this->OnSucceeded = OnSucceeded;
-    this->OnCanceled = OnCanceled;
-    this->OnFailed = OnFailed;
-
-    // load data from config
-    LoadConfig(IntegrationType::SERVER);
-
     // show browser wrapper
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+
+    // set delegates
+    BrowserWrapper->OnSucceeded = OnSucceeded;
+    BrowserWrapper->OnCanceled = OnCanceled;
+    BrowserWrapper->OnFailed = OnFailed;
+
+    BrowserWrapper->ExternalId = ExternalId;
+
+    // load data from config
+    LoadConfig(EIntegrationType::VE_SERVER);
 
     // set shop interface size
     switch (shopSize)
@@ -223,29 +251,26 @@ void UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOve
     }
 }
 
-void UXsollaPluginShop::LoadConfig(IntegrationType type)
+void UXsollaPluginShop::LoadConfig(EIntegrationType type)
 {
     // load properties drom global game config
     GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
     if (bIsSandbox)
     {
-        if (type == IntegrationType::SERVELESS)
+        if (type == EIntegrationType::VE_SERVELESS)
             ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_data=";
         else 
             ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
     }
     else
     {
-        if (type == IntegrationType::SERVELESS)
+        if (type == EIntegrationType::VE_SERVELESS)
             ShopUrl = "https://secure.xsolla.com/paystation2/?access_data=";
         else
             ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
     }
 
     ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
-
-    // show browser wrapper
-    BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 }
 
 void UXsollaPluginShop::SetToken(FString token)
