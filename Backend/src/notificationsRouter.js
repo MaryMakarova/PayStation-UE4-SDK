@@ -18,7 +18,7 @@ module.exports = class NotificationsRouter {
             res.statusCode = this.globals.errorStatusCode;
 
             if (this._handleSignatureVerify(req, res)) {
-                _handleNotifications(req, res, JSON.parse(req.rawBody).notification_type);
+                this._handleNotifications(req, res, JSON.parse(req.rawBody).notification_type);
             }
 
             res.end();
