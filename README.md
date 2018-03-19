@@ -6,6 +6,23 @@ Clone or download and unpack plugin to `{YourProject}/Plugins/`
 ### Setting up
 Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
+### Setting up server
+#### Dependencies
+NodeJS - [8.10.0](https://nodejs.org/dist/v8.10.0/node-v8.10.0-x64.msi)
+
+#### Configure
+Go to the `Server` folder. Execute the following in console:
+
+`$ npm init`
+
+`# npm install pm2 -g` - needed for start server as daemon
+
+#### Start
+`$ npm run-script start`
+
+#### Stop
+`$ npm run-script stop`
+
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
 * `CreateXsollaShop` - Gets shop token, set default properties and creates widget with shop content. Takes shop size and delegates for payment succeeded|canceled|failed as parameters. 
@@ -21,7 +38,7 @@ Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url
 2. Add `XsollaPlugin` to the `ExtraModuleNames` in `YourProject.Target.cs` and `YourProjectEditor.Target.cs`.
 3. Add `XsollaPlugin` to the `PublicDependencyModuleNames` or `PrivateDependencyModuleNames` in `YourModule.Build.cs`*(module where you want to use the plugin)*.
 3. Include `XsollaPlugin.h`.
-4. Call `XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, OnSucceeded, OnCanceled, OnFailed);` 
+4. Call `XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, FString("userid"), OnSucceeded, OnCanceled, OnFailed);` 
 Shop size can be `EShopSizeEnum::VE_Large`, `EShopSizeEnum::VE_Medium`, `EShopSizeEnum::VE_Small`.
 
 Code example
