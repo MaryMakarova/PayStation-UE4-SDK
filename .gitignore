@@ -1,5 +1,5 @@
 
 Binaries/*
 Intermediate/*
-Backend/node_modules/*
-Backend/package-lock.json
+*/node_modules/*
+*/package-lock.json
