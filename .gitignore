@@ -2,3 +2,4 @@
 Binaries/*
 Intermediate/*
 Backend/node_modules/*
+Backend/package-lock.json
