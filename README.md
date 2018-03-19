@@ -8,7 +8,7 @@ Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url
 
 ### Setting up server
 #### Dependencies
-NodeJS - [8.10.0](https://nodejs.org/dist/v8.10.0/node-v8.10.0-x64.msi)
+NodeJS 8
 
 #### Configure
 Go to the `Server` folder. Execute the following in console:
