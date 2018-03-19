@@ -4,7 +4,7 @@
 Clone or download and unpack plugin to `{YourProject}/Plugins/`
 
 ### Setting up
-Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
+Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
