@@ -2,14 +2,15 @@
   "name": "xsollaserver",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "./node_modules/pm2/bin/pm2 start ./src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
+    "pm2": "^2.10.1",
     "request": "^2.83.0",
     "sha1": "^1.1.1"
   }
