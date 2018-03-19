@@ -153,13 +153,14 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 
     if (ExternalId.IsEmpty())
     {
-        OnFailed.Execute(FString("External id is not setted"), 0);
+        OnFailed.Execute(FString("External id is not setted"));
         return;
     }
 
     TSharedRef<IHttpRequest> Request = httpTool->PostRequest(route, ExternalId);
 
     Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+        UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment response recieved with code: %d"), Response->GetResponseCode());
         if (bWasSuccessful) {
             FTransactionDetails transactionDetails;
 
@@ -169,12 +170,13 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
             }
             else {
                 transactionDetails.TransactionStatus = "FAILED";
-                OnFailed.Execute(FString("Transaction failed"), 0);
+                OnFailed.Execute(FString("Transaction failed"));
             }
         }
     });
 
     httpTool->Send(Request);
+    UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment post request sent"));
 }
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)

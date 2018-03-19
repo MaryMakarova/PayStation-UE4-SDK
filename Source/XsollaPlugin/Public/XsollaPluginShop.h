@@ -115,9 +115,5 @@ private:
 
     UXsollaPluginWebBrowserWrapper* BrowserWrapper;
 
-    FOnPaymantSucceeded		OnSucceeded;
-    FOnPaymantCanceled		OnCanceled;
-    FOnPaymantFailed		OnFailed;
-
     TSharedPtr<FJsonObject> TokenRequestJson;
 };

@@ -70,6 +70,7 @@ void UXsollaPluginShop::Create(
 
         TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
         request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+            UE_LOG(LogTemp, Warning, TEXT("Http tool: response from /token recieved with content: %s"), *(Response->GetContentAsString()));
             if (bWasSuccessful) {
                 SetToken(Response->GetContentAsString());
                 BrowserWrapper->SetShopUrl(ShopUrl);
@@ -80,12 +81,14 @@ void UXsollaPluginShop::Create(
             }
         });
         HttpTool->Send(request);
+        UE_LOG(LogTemp, Warning, TEXT("Http tool: /token post request sent"));
     }
     else
     {
         // add user id 
         TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/user/add"), userId);
         HttpTool->Send(request);
+        UE_LOG(LogTemp, Warning, TEXT("Http tool: /user/add post request sent"));
 
         // get string from json
         FString outputString;

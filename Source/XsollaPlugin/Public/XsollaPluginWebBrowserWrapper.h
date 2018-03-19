@@ -9,7 +9,7 @@
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FOnPaymantFailed, FString, errorText, int32, errorCode);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantFailed, FString, errorText);
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetFailed, FString, errorText);
@@ -28,12 +28,12 @@ public:
     DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCloseWindow);
 
     /**
-    * Calls on widget create.
+    * Called when widget create.
     */
     virtual void NativeConstruct() override;
 
     /**
-    * Loads new url.
+    * Load new url.
     *
     * @param NewURL - Url to load.
     */
