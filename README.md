@@ -4,7 +4,7 @@
 Clone or download and unpack plugin to `{YourProject}/Plugins/`
 
 ### Setting up
-Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, then set `merchant id`, `project id` and `api key`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
+Open plugin settings `Setting > Project Settings > Xsolla Plugin > General`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
@@ -36,7 +36,7 @@ Code example
     void OnCanceledCallback();
 
     UFUNCTION(BlueprintCallable)
-    void OnFailedCallback(FString errorText, int32 errorCode);
+    void OnFailedCallback(FString errorText);
 
 protected:
     // Called when the game starts or when spawned
@@ -62,7 +62,7 @@ void AMyActor::BeginPlay()
     OnCanceled.BindUFunction(this, "OnCanceledCallback");
     OnFailed.BindUFunction(this, "OnFailedCallback");
 
-    XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, OnSucceeded, OnCanceled, OnFailed);
+    XsollaPlugin::GetShop()->Create(EShopSizeEnum::VE_Large, FString("exampleid"), OnSucceeded, OnCanceled, OnFailed);
     
 }
 
@@ -76,7 +76,7 @@ void AMyActor::OnCanceledCallback()
     UE_LOG(LogTemp, Warning, TEXT("Payment canceled"));
 }
 
-void AMyActor::OnFailedCallback(FString errorText, int32 errorCode)
+void AMyActor::OnFailedCallback(FString errorText)
 {
     UE_LOG(LogTemp, Warning, TEXT("Payment failed. Error text: %s"), *errorText);
 }
