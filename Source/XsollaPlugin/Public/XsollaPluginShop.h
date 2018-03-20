@@ -5,6 +5,10 @@
 
 #include "XsollaPluginShop.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
+DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantFailed, FString, errorText);
+
 /**
 * Shop size enum. Available sizes - Small, Medium, Large. 
 */
@@ -100,6 +104,7 @@ private:
     void SetToken(FString token);
     void SetAccessData(FString data);
     void SetDefaultTokenProperties();
+    void OnShopClosed();
 
 private:
     XsollaPluginHttpTool * HttpTool;
@@ -116,4 +121,8 @@ private:
     UXsollaPluginWebBrowserWrapper* BrowserWrapper;
 
     TSharedPtr<FJsonObject> TokenRequestJson;
+
+    FOnPaymantSucceeded OnSucceeded;
+    FOnPaymantCanceled OnCanceled;
+    FOnPaymantFailed OnFailed;
 };

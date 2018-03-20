@@ -140,43 +140,10 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
 
 void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 {
-    GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
-    GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
-
-    FInputModeGameAndUI inputModeGameAndUI;
-    GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
-
-    XsollaPluginHttpTool * httpTool = new XsollaPluginHttpTool;
-
-
-    FString route = "http://52.59.15.45:3333/payment";
-
-    if (ExternalId.IsEmpty())
+    if (OnShopClosed.IsBound())
     {
-        OnFailed.Execute(FString("External id is not setted"));
-        return;
+        OnShopClosed.Execute();
     }
-
-    TSharedRef<IHttpRequest> Request = httpTool->PostRequest(route, ExternalId);
-
-    Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
-        UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment response recieved with code: %d"), Response->GetResponseCode());
-        if (bWasSuccessful) {
-            FTransactionDetails transactionDetails;
-
-            if (Response->GetResponseCode() == 200) {
-                transactionDetails.TransactionStatus = "DONE";
-                OnSucceeded.Execute(transactionDetails);
-            }
-            else {
-                transactionDetails.TransactionStatus = "FAILED";
-                OnFailed.Execute(FString("Transaction failed"));
-            }
-        }
-    });
-
-    httpTool->Send(Request);
-    UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment post request sent"));
 }
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
@@ -248,6 +215,12 @@ void UXsollaPluginWebBrowserWrapper::SetBrowserSize(float w, float h)
 {
     ContentSize.X = w;
     ContentSize.Y = h;
+}
+
+void UXsollaPluginWebBrowserWrapper::Clear()
+{
+    GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
+    GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
 }
 
 #undef LOCTEXT_NAMESPACE

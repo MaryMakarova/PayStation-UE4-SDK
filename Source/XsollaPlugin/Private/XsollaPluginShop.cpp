@@ -21,9 +21,11 @@ void UXsollaPluginShop::Create(
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 
     // set delegates
-    BrowserWrapper->OnSucceeded = OnSucceeded;
-    BrowserWrapper->OnCanceled = OnCanceled;
-    BrowserWrapper->OnFailed = OnFailed;
+    this->OnSucceeded = OnSucceeded;
+    this->OnCanceled = OnCanceled;
+    this->OnFailed = OnFailed;
+
+    BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
 
     // load data from config
     LoadConfig(GetDefault<UXsollaPluginSettings>()->IntegrationType);
@@ -31,7 +33,6 @@ void UXsollaPluginShop::Create(
     // generate external_id
     ExternalId = FBase64::Encode(FString::SanitizeFloat(GEngine->GameViewport->GetWorld()->GetRealTimeSeconds() + FMath::Rand()));
     SetStringProperty("settings.external_id", ExternalId);
-    BrowserWrapper->ExternalId = ExternalId;
 
     // set shop interface size
     switch (shopSize)
@@ -115,11 +116,11 @@ void UXsollaPluginShop::CreateWithToken(
     BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
 
     // set delegates
-    BrowserWrapper->OnSucceeded = OnSucceeded;
-    BrowserWrapper->OnCanceled = OnCanceled;
-    BrowserWrapper->OnFailed = OnFailed;
+    this->OnSucceeded = OnSucceeded;
+    this->OnCanceled = OnCanceled;
+    this->OnFailed = OnFailed;
 
-    BrowserWrapper->ExternalId = ExternalId;
+    BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
 
     // load data from config
     LoadConfig(EIntegrationType::VE_SERVER);
@@ -311,4 +312,44 @@ void UXsollaPluginShop::SetDefaultTokenProperties()
     if (bIsSandbox)
         SetStringProperty("settings.mode", FString("sandbox"), false);
     SetStringProperty("settings.ui.version", FString("desktop"), false);
+}
+
+void UXsollaPluginShop::OnShopClosed()
+{
+    BrowserWrapper->Clear();
+
+    FInputModeGameAndUI inputModeGameAndUI;
+    //GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
+
+    FString route = "http://52.59.15.45:3333/payment";
+
+    if (ExternalId.IsEmpty())
+    {
+        OnFailed.Execute(FString("External id is not setted"));
+        return;
+    }
+
+    TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, ExternalId);
+
+    Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+        UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment response recieved with code: %d"), Response->GetResponseCode());
+        if (bWasSuccessful)
+        {
+            FTransactionDetails transactionDetails;
+
+            if (Response->GetResponseCode() == 200)
+            {
+                transactionDetails.TransactionStatus = "DONE";
+                OnSucceeded.Execute(transactionDetails);
+            }
+            else
+            {
+                transactionDetails.TransactionStatus = "FAILED";
+                OnFailed.Execute(FString("Transaction failed"));
+            }
+        }
+    });
+
+    HttpTool->Send(Request);
+    UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment post request sent"));
 }

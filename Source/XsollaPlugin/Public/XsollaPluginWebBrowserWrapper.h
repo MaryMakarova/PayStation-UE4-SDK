@@ -7,12 +7,10 @@
 
 #include "XsollaPluginWebBrowserWrapper.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
-DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantFailed, FString, errorText);
-
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetFailed, FString, errorText);
+
+DECLARE_DELEGATE(FOnShopClosed);
 
 class IWebBrowserWindow;
 
@@ -61,6 +59,11 @@ public:
     */
     void CloseShop(bool bCheckTransactionResult);
 
+    /**
+     * Removes all widgets
+     */
+    void Clear();
+
 public:
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
         FOnUrlChanged OnUrlChanged;
@@ -74,12 +77,7 @@ public:
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
         FOnCloseWindow OnCloseWindow;
 
-    // shop delegates
-    FOnPaymantSucceeded OnSucceeded;
-    FOnPaymantCanceled OnCanceled;
-    FOnPaymantFailed OnFailed;
-
-    FString ExternalId;
+    FOnShopClosed OnShopClosed;
 
 private:
     void LoadSlateResources();
