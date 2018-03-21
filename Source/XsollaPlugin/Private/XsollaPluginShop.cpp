@@ -72,10 +72,12 @@ void UXsollaPluginShop::Create(
         TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
         FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
 
+        UE_LOG(LogTemp, Warning, TEXT("Token JSON: %s"), *outputString);
+
         TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
         request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
             if (bWasSuccessful) {
-                UE_LOG(LogTemp, Warning, TEXT("Http tool: response from /token recieved with content: %s"), *(Response->GetContentAsString()));
+                UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(Response->GetContentAsString()));
 
                 SetToken(Response->GetContentAsString());
                 BrowserWrapper->SetShopUrl(ShopUrl);
@@ -83,6 +85,8 @@ void UXsollaPluginShop::Create(
             }
             else
             {
+                UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token."));
+
                 BrowserWrapper->Clear();
             }
         });
@@ -341,9 +345,10 @@ void UXsollaPluginShop::OnShopClosed()
     TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, ExternalId);
 
     Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
-        UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment response recieved with code: %d"), Response->GetResponseCode());
         if (bWasSuccessful)
         {
+            UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment payment verified"));
+
             FTransactionDetails transactionDetails;
 
             if (Response->GetResponseCode() == 200)
@@ -357,6 +362,8 @@ void UXsollaPluginShop::OnShopClosed()
             }
             else
             {
+                UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment failed to verify payment."));
+
                 transactionDetails.TransactionStatus = "FAILED";
 
                 if (OnFailed.IsBound())
@@ -369,4 +376,7 @@ void UXsollaPluginShop::OnShopClosed()
 
     HttpTool->Send(Request);
     UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment post request sent"));
+
+    // clear token json
+    TokenRequestJson = MakeShareable(new FJsonObject);
 }
