@@ -331,7 +331,10 @@ void UXsollaPluginShop::OnShopClosed()
 
     if (ExternalId.IsEmpty())
     {
-        OnFailed.Execute(FString("External id is not setted"));
+        if (OnFailed.IsBound())
+        {
+            OnFailed.Execute(FString("External id is not setted"));
+        }
         return;
     }
 
@@ -346,12 +349,20 @@ void UXsollaPluginShop::OnShopClosed()
             if (Response->GetResponseCode() == 200)
             {
                 transactionDetails.TransactionStatus = "DONE";
-                OnSucceeded.Execute(transactionDetails);
+
+                if (OnSucceeded.IsBound())
+                {
+                    OnSucceeded.Execute(transactionDetails);
+                }
             }
             else
             {
                 transactionDetails.TransactionStatus = "FAILED";
-                OnFailed.Execute(FString("Transaction failed"));
+
+                if (OnFailed.IsBound())
+                {
+                    OnFailed.Execute(FString("Transaction failed"));
+                }
             }
         }
     });
