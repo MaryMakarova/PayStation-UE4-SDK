@@ -1,5 +1,8 @@
 # Xsolla Plugin
 
+### Download with prebuilt binaries
+Engine version: [4.19](https://github.com/SomeInc/XsollaUE4Plugin/releases/download/v0.1/XsollaPlugin-4.19.zip)
+
 ### Install 
 Clone or download and unpack plugin to `{YourProject}/Plugins/`
 
