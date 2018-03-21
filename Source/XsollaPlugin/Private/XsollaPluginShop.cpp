@@ -56,6 +56,7 @@ void UXsollaPluginShop::Create(
         }
     }
 
+    // set user id
     SetStringProperty("user.id.value", userId);
 
     SetDefaultTokenProperties();
@@ -75,9 +76,19 @@ void UXsollaPluginShop::Create(
         UE_LOG(LogTemp, Warning, TEXT("Token JSON: %s"), *outputString);
 
         TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
-        request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
-            if (bWasSuccessful) {
-                UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(Response->GetContentAsString()));
+        request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) 
+        {
+            if (bWasSuccessful) 
+            {
+                if (!Response->GetContentAsString().IsEmpty())
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(Response->GetContentAsString()));
+                }
+                else
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token, probably wrong Project Id"));
+                }
+                
 
                 SetToken(Response->GetContentAsString());
                 BrowserWrapper->SetShopUrl(ShopUrl);
@@ -344,7 +355,8 @@ void UXsollaPluginShop::OnShopClosed()
 
     TSharedRef<IHttpRequest> Request = HttpTool->PostRequest(route, ExternalId);
 
-    Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) {
+    Request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) 
+    {
         if (bWasSuccessful)
         {
             UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment payment verified"));
