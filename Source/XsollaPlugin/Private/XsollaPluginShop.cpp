@@ -99,6 +99,13 @@ void UXsollaPluginShop::Create(
                 UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token."));
 
                 BrowserWrapper->Clear();
+
+                // clear token json
+                TokenRequestJson = MakeShareable(new FJsonObject);
+
+                // reset input mode
+                FInputModeGameOnly inputModeGame;
+                GEngine->GetFirstLocalPlayerController(BrowserWrapper->GetWorld())->SetInputMode(inputModeGame);
             }
         });
         HttpTool->Send(request);
@@ -339,8 +346,8 @@ void UXsollaPluginShop::OnShopClosed()
 {
     BrowserWrapper->Clear();
 
-    FInputModeGameAndUI inputModeGameAndUI;
-    //GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeGameAndUI);
+    FInputModeGameOnly inputModeGame;
+    GEngine->GetFirstLocalPlayerController(BrowserWrapper->GetWorld())->SetInputMode(inputModeGame);
 
     FString route = "http://52.59.15.45:3333/payment";
 
