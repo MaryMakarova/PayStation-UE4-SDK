@@ -4,7 +4,7 @@
 Engine version: [4.19](https://github.com/SomeInc/XsollaUE4Plugin/releases/download/v0.1/XsollaPlugin-4.19.zip)
 
 ### Install 
-Clone or download and unpack plugin to `{YourProject}/Plugins/`
+Unpack downloaded archive to `{YourProject}/Plugins/`. Create folder, if not exists.
 
 ### Setting up
 Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
