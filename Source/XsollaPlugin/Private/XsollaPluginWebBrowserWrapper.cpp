@@ -37,8 +37,12 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 
     ComposeShopWrapper();
 
-    GEngine->GameViewport->SetIgnoreInput(true);
     PrevFocusedWidget = FSlateApplication::Get().GetUserFocusedWidget(0);
+    bPrevGameViewportInputIgnoring = GEngine->GameViewport->IgnoreInput();
+
+    GEngine->GameViewport->SetIgnoreInput(true);
+
+    ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
@@ -193,8 +197,8 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 
         if (player != NULL)
         {
-            player->GetSlateOperations().SetUserFocus(MainContent.ToSharedRef());
-            player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
+            player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
+            player->GetSlateOperations().LockMouseToWidget(WebBrowserWidget.ToSharedRef());
             player->GetSlateOperations().ReleaseMouseCapture();
         }
     }
@@ -228,7 +232,7 @@ void UXsollaPluginWebBrowserWrapper::Clear()
 
     if (player != NULL)
     {
-        GEngine->GameViewport->SetIgnoreInput(false);
+        GEngine->GameViewport->SetIgnoreInput(bPrevGameViewportInputIgnoring);
 
         player->GetSlateOperations().SetUserFocus(PrevFocusedWidget.ToSharedRef());
         // player->GetSlateOperations().LockMouseToWidget(PrevFocusedWidget.ToSharedRef());
