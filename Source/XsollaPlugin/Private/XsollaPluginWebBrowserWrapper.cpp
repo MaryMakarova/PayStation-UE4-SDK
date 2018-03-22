@@ -37,8 +37,8 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
 
     ComposeShopWrapper();
 
-    FInputModeUIOnly inputModeUIOnly;
-    GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+    GEngine->GameViewport->SetIgnoreInput(true);
+    PrevFocusedWidget = FSlateApplication::Get().GetUserFocusedWidget(0);
 }
 
 void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
@@ -189,9 +189,14 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
             BrowserSlotMarginRight.FillWidth(0);
         }
 
-        FInputModeUIOnly inputModeUIOnly;
-        inputModeUIOnly.SetWidgetToFocus(WebBrowserWidget.ToSharedRef());
-        GEngine->GetFirstLocalPlayerController(GetWorld())->SetInputMode(inputModeUIOnly);
+        ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
+
+        if (player != NULL)
+        {
+            player->GetSlateOperations().SetUserFocus(MainContent.ToSharedRef());
+            player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
+            player->GetSlateOperations().ReleaseMouseCapture();
+        }
     }
 
     OnLoadCompleted.Broadcast();
@@ -219,8 +224,23 @@ void UXsollaPluginWebBrowserWrapper::SetBrowserSize(float w, float h)
 
 void UXsollaPluginWebBrowserWrapper::Clear()
 {
-    GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
-    GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
+    ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
+
+    if (player != NULL)
+    {
+        GEngine->GameViewport->SetIgnoreInput(false);
+
+        player->GetSlateOperations().SetUserFocus(PrevFocusedWidget.ToSharedRef());
+        // player->GetSlateOperations().LockMouseToWidget(PrevFocusedWidget.ToSharedRef());
+        player->GetSlateOperations().ReleaseMouseCapture();
+        player->GetSlateOperations().ReleaseMouseLock();
+    }
+
+    if (MainContent.IsValid() && Background.IsValid())
+    {
+        GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
+        GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
+    }
 }
 
 #undef LOCTEXT_NAMESPACE

@@ -102,10 +102,6 @@ void UXsollaPluginShop::Create(
 
                 // clear token json
                 TokenRequestJson = MakeShareable(new FJsonObject);
-
-                // reset input mode
-                FInputModeGameOnly inputModeGame;
-                GEngine->GetFirstLocalPlayerController(BrowserWrapper->GetWorld())->SetInputMode(inputModeGame);
             }
         });
         HttpTool->Send(request);
@@ -345,9 +341,6 @@ void UXsollaPluginShop::SetDefaultTokenProperties()
 void UXsollaPluginShop::OnShopClosed()
 {
     BrowserWrapper->Clear();
-
-    FInputModeGameOnly inputModeGame;
-    GEngine->GetFirstLocalPlayerController(BrowserWrapper->GetWorld())->SetInputMode(inputModeGame);
 
     FString route = "http://52.59.15.45:3333/payment";
 

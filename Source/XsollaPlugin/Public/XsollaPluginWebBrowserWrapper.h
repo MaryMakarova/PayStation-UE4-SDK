@@ -112,4 +112,8 @@ private:
     FString		InitialURL = "";
     FString		ShopUrl;
     bool		bSupportsTransparency = true;
+
+    TSharedPtr<SWidget> PrevFocusedWidget;
+    bool                bPrevGameViewportInputIgnoring;
+    bool                bPrevShouldUseHighPresCapture = true;
 };
