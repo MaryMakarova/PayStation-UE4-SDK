@@ -112,7 +112,7 @@ void AMyActor::OnFailedCallback(FString errorText)
 ```
 
 ### How to create Unreal Engine project
-1. Sign up and download launcher from [off site](https://www.unrealengine.com).
+1. Sign up and download launcher from [here](https://www.unrealengine.com).
 2. Install and launch engine at UNREAL ENGINE -> Library.
 ![launcher](launcher.png)
 3. In opened project browser you can create code (c++) or non-code (blueprint) project.
