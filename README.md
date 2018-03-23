@@ -113,4 +113,4 @@ void AMyActor::OnFailedCallback(FString errorText)
 2. Install and launch engine at UNREAL ENGINE -> Library
 ![launcher](launcher.png)
 3. In opened project browser you can create code (c++) or non-code (blueprint) project
-![project browser](project-browser.png)
+![project browser](project_browser.png)
