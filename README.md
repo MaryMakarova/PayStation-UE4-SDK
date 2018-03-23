@@ -32,8 +32,11 @@ Go to the `Server` folder. Execute the following in console:
 
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
+
 * `CreateXsollaShop` - Gets shop token, set default properties and creates widget with shop content. Takes shop size and delegates for payment succeeded|canceled|failed as parameters. 
+
 * `CreateXsollaShopWithToken` - Creates shop widget content based on token. Takes shop size, external id, token and delegates for payment succeeded|canceled|failed as parameters. 
+
 * `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `CreateXsollaShop` or `CreateXsollaShopWithToken` function.
 
 ### Example
@@ -109,8 +112,8 @@ void AMyActor::OnFailedCallback(FString errorText)
 ```
 
 ### How to create Unreal Engine project
-1. Sign up and download launcher from [off site](https://www.unrealengine.com) 
-2. Install and launch engine at UNREAL ENGINE -> Library
+1. Sign up and download launcher from [off site](https://www.unrealengine.com).
+2. Install and launch engine at UNREAL ENGINE -> Library.
 ![launcher](launcher.png)
-3. In opened project browser you can create code (c++) or non-code (blueprint) project
+3. In opened project browser you can create code (c++) or non-code (blueprint) project.
 ![project browser](project_browser.png)
