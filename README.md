@@ -2,7 +2,9 @@
 
 ### Download with prebuilt binaries
 Engine version: 
+
 * [4.18 Win64](https://github.com/SomeInc/XsollaUE4Plugin/releases/download/v0.0.1/XsollaPlugin-4.18.zip)
+
 * [4.19 Win64](https://github.com/SomeInc/XsollaUE4Plugin/releases/download/v0.0.1/XsollaPlugin-4.19.zip)
 
 ### Install 
@@ -35,7 +37,7 @@ Go to the `Server` folder. Execute the following in console:
 * `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `CreateXsollaShop` or `CreateXsollaShopWithToken` function.
 
 ### Example
-![Blueprint example](https://github.com/SomeInc/XsollaUE4Plugin/blob/master/blueprint_example.png)
+![Blueprint example](https://bytebucket.org/sirykvt/xsollaplugin/raw/72706653290758ecfb30384b79433b99ff9a0aff/blueprint_example.png)
 
 ### How to use in c++
 #### Visual Studio
