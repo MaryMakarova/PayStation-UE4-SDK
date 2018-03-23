@@ -37,7 +37,7 @@ Go to the `Server` folder. Execute the following in console:
 * `Set(Num|Bool|String)Property` - Set properties in json, which is sent as token parameters, see [token](https://developers.xsolla.com/ru/api_v2.html#token). Should be called before `CreateXsollaShop` or `CreateXsollaShopWithToken` function.
 
 ### Example
-![Blueprint example](https://bytebucket.org/sirykvt/xsollaplugin/raw/72706653290758ecfb30384b79433b99ff9a0aff/blueprint_example.png)
+![Blueprint example](blueprint_example.png)
 
 ### How to use in c++
 #### Visual Studio
