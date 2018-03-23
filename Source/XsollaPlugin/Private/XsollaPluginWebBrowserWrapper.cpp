@@ -197,7 +197,7 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 
         if (player != NULL)
         {
-            player->GetSlateOperations().SetUserFocus(MainContent.ToSharedRef());
+            player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
             player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
             player->GetSlateOperations().ReleaseMouseCapture();
         }
