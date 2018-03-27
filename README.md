@@ -3,9 +3,9 @@
 ### Download with prebuilt binaries
 Engine version: 
 
-* [4.18 Win64](https://bitbucket.org/sirykvt/xsollaplugin/downloads/XsollaPlugin-4.18.zip)
+* [4.18.3 Win64](https://bitbucket.org/sirykvt/xsollaplugin/downloads/XsollaPlugin-4.18.3.zip)
 
-* [4.19 Win64](https://bitbucket.org/sirykvt/xsollaplugin/downloads/XsollaPlugin-4.19.zip)
+* [4.19.0 Win64](https://bitbucket.org/sirykvt/xsollaplugin/downloads/XsollaPlugin-4.19.0.zip)
 
 ### Install 
 Unpack downloaded archive to `{YourProject}/Plugins/`. Create folder, if not exists.
