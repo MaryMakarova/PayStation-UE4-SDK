@@ -356,12 +356,12 @@ void UXsollaPluginShop::OnShopClosed()
     {
         if (bWasSuccessful)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment payment verified"));
-
             FTransactionDetails transactionDetails;
 
             if (Response->GetResponseCode() == 200)
             {
+                UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment payment verified"));
+
                 transactionDetails.TransactionStatus = "DONE";
 
                 if (OnSucceeded.IsBound())
