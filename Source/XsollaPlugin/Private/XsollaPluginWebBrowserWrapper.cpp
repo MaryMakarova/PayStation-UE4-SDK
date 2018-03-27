@@ -33,7 +33,8 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
         .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
         .OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
         .OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
-        .OnSuppressContextMenu_Lambda([]() { return true; });
+        .OnSuppressContextMenu_Lambda([]() { return true; })
+        .OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforeNewWindow));
 
     ComposeShopWrapper();
 
@@ -75,64 +76,56 @@ void UXsollaPluginWebBrowserWrapper::LoadSlateResources()
 
 void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
 {
-    BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
-    BrowserSlot.FillWidth(ContentSize.Y);
+    //BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
 
-    BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.Y) / 2);
-    BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.Y) / 2 - ButtonSize);
+    BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
 
     MainContent = 
-        SNew(SVerticalBox)
-        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
-        + SVerticalBox::Slot().FillHeight(ContentSize.Y)
+        SNew(SHorizontalBox)
+        + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2)
+        + BrowserSlot.FillWidth(ContentSize.X)
+        + SHorizontalBox::Slot().AutoWidth()
         [
-            SNew(SHorizontalBox)
-            + BrowserSlotMarginLeft
-            + BrowserSlot
-            + SHorizontalBox::Slot().FillWidth(ButtonSize)
+            SNew(SVerticalBox)
+            + SVerticalBox::Slot().AutoHeight()
             [
-                SNew(SVerticalBox)
-                + SVerticalBox::Slot().FillHeight(ButtonSize)
+                SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
                 [
-                    SNew(SVerticalBox)
-                    + SVerticalBox::Slot().FillHeight(ButtonSize)
+                    SAssignNew(CloseButton, SButton)
+                    .Visibility(EVisibility::Hidden)
+                    .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                    .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
+                    .Content()
                     [
-                        SAssignNew(CloseButton, SButton)
-                        .Visibility(EVisibility::Hidden)
-                        .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                        .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
-                        .Content()
-                        [
-                            SNew(SImage)
-                            .Image(SlateCloseBrush)
-                        ]
-                    ]
-                    + SVerticalBox::Slot()
-                    .FillHeight(ButtonSize)
-                    [
-                        SAssignNew(HomeButton, SButton)
-                        .Visibility(EVisibility::Hidden)
-                        .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                        .OnClicked_Lambda([this]() { LoadURL(ShopUrl); return FReply::Handled(); })
-                        .Content()
-                        [
-                            SNew(SImage)
-                            .Image(SlateBackBrush)
-                        ]
+                        SNew(SImage)
+                        .Image(SlateCloseBrush)
                     ]
                 ]
-                + SVerticalBox::Slot().FillHeight(ContentSize.Y - ButtonSize)
-            ]   
-            + BrowserSlotMarginRight
+            ]
+            + SVerticalBox::Slot().AutoHeight()
+            [
+                SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                [
+                    SAssignNew(HomeButton, SButton)
+                    .Visibility(EVisibility::Hidden)
+                    .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                    .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked();; return FReply::Handled(); })
+                    .Content()
+                    [
+                        SNew(SImage)
+                        .Image(SlateBackBrush)
+                    ]
+                ]
+            ]
         ]
-        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
+        + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
 
     Background = 
         SNew(SVerticalBox)
-        + SVerticalBox::Slot().FillHeight(ViewportSize.Y)
+        + SVerticalBox::Slot().FillHeight(1.0f)
         [
             SNew(SHorizontalBox)
-            + SHorizontalBox::Slot().FillWidth(ViewportSize.X)
+            + SHorizontalBox::Slot().FillWidth(1.0f)
             [
                 SNew(SColorBlock).Color(FLinearColor(0.0f, 0.0f, 0.0f, 0.5f))
             ]
@@ -152,6 +145,8 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 
 void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
 {
+    UE_LOG(LogTemp, Warning, TEXT("URL: %s"), *(WebBrowserWidget->GetUrl()));
+
     if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
     {
         CloseShop(false);
@@ -173,22 +168,11 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 {
     if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
-        BrowserSlot.DetachWidget();
-        BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-        BrowserSlot.FillWidth(ContentSize.X - ButtonSize);
+        //BrowserSlot.DetachWidget();
+        //BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+        //BrowserSlot.Padding((ViewportSize.X - ContentSize.X) / 2, (ViewportSize.Y - ContentSize.Y) / 2);
 
         CloseButton->SetVisibility(EVisibility::Visible);
-
-        if ((ViewportSize.X - ContentSize.X) / 2 > 0)
-        {
-            BrowserSlotMarginLeft.FillWidth((ViewportSize.X - ContentSize.X) / 2);
-            BrowserSlotMarginRight.FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
-        }
-        else
-        {
-            BrowserSlotMarginLeft.FillWidth(0);
-            BrowserSlotMarginRight.FillWidth(0);
-        }
 
         ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 
@@ -208,6 +192,8 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadError()
 }
 bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& NewBrowserWindow)
 {
+    UE_LOG(LogTemp, Warning, TEXT("Window closed."));
+
     OnCloseWindow.Broadcast();
     return true;
 }
@@ -236,6 +222,55 @@ void UXsollaPluginWebBrowserWrapper::Clear()
     {
         GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
         GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
+    }
+}
+
+bool UXsollaPluginWebBrowserWrapper::HandleOnBeforeNewWindow(FString Url, FString param)
+{
+    AsyncTask(ENamedThreads::GameThread, [=]() 
+    {
+        PopupWidgets.push_back(
+            SNew(SWebBrowser)
+            .InitialURL(Url)
+            .ShowControls(false)
+            .ViewportSize(ContentSize)
+            .SupportsTransparency(bSupportsTransparency)
+        );
+
+        BrowserSlot.DetachWidget();
+        BrowserSlot.AttachWidget(PopupWidgets.back().ToSharedRef());
+
+        HomeButton->SetVisibility(EVisibility::Visible);
+
+        UE_LOG(LogTemp, Warning, TEXT("New popup with url: %s"), *Url);
+    });
+    
+    return false;
+}
+
+void UXsollaPluginWebBrowserWrapper::HandleOnHomeButtonClicked()
+{
+    if (!PopupWidgets.empty())
+    {
+        PopupWidgets.pop_back();
+
+        if (PopupWidgets.empty())
+        {
+            BrowserSlot.DetachWidget();
+            BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+
+            if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
+            {
+                HomeButton->SetVisibility(EVisibility::Hidden);
+            }
+        }
+        else
+        {
+            BrowserSlot.DetachWidget();
+            BrowserSlot.AttachWidget(PopupWidgets.back().ToSharedRef());
+        }
+
+        UE_LOG(LogTemp, Warning, TEXT("Popup closed"));
     }
 }
 
