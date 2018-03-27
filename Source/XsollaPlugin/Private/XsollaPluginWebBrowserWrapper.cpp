@@ -10,7 +10,7 @@
 
 UXsollaPluginWebBrowserWrapper::UXsollaPluginWebBrowserWrapper(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer),
-    ButtonSize(50.0f)
+    ButtonSize(100.0f) // close and home buttons size in Slate units
 {
     bIsVariable = true;
 }
