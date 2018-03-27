@@ -10,7 +10,7 @@
 
 UXsollaPluginWebBrowserWrapper::UXsollaPluginWebBrowserWrapper(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer),
-    ButtonSize(100.0f) // close and home buttons size in Slate units
+    ButtonSize(70.0f) // close and home buttons size in Slate units
 {
     bIsVariable = true;
 }
@@ -81,44 +81,54 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
     BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
 
     MainContent = 
-        SNew(SHorizontalBox)
-        + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2)
-        + BrowserSlot.FillWidth(ContentSize.X)
-        + SHorizontalBox::Slot().AutoWidth()
+        SNew(SVerticalBox)
+        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
+        + SVerticalBox::Slot().FillHeight(ContentSize.Y)
         [
-            SNew(SVerticalBox)
-            + SVerticalBox::Slot().AutoHeight()
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2)
+            + SHorizontalBox::Slot().FillWidth(ContentSize.X + ButtonSize)
             [
-                SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                SNew(SHorizontalBox)
+                + BrowserSlot.FillWidth(ContentSize.X)
+                + SHorizontalBox::Slot().FillWidth(ButtonSize)
                 [
-                    SAssignNew(CloseButton, SButton)
-                    .Visibility(EVisibility::Hidden)
-                    .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                    .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
-                    .Content()
+                    SNew(SVerticalBox)
+                    + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
                     [
-                        SNew(SImage)
-                        .Image(SlateCloseBrush)
+                        SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                        [
+                            SAssignNew(CloseButton, SButton)
+                            .Visibility(EVisibility::Hidden)
+                            .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                            .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
+                            .Content()
+                            [
+                                SNew(SImage)
+                                .Image(SlateCloseBrush)
+                            ]
+                        ]
+                    ]
+                    + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
+                    [
+                        SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                        [
+                            SAssignNew(HomeButton, SButton)
+                            .Visibility(EVisibility::Hidden)
+                            .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                            .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked();; return FReply::Handled(); })
+                            .Content()
+                            [
+                                SNew(SImage)
+                                .Image(SlateBackBrush)
+                            ]
+                        ]
                     ]
                 ]
             ]
-            + SVerticalBox::Slot().AutoHeight()
-            [
-                SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
-                [
-                    SAssignNew(HomeButton, SButton)
-                    .Visibility(EVisibility::Hidden)
-                    .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                    .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked();; return FReply::Handled(); })
-                    .Content()
-                    [
-                        SNew(SImage)
-                        .Image(SlateBackBrush)
-                    ]
-                ]
-            ]
+            + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize)
         ]
-        + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize);
+        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
 
     Background = 
         SNew(SVerticalBox)

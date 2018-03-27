@@ -86,7 +86,7 @@ private:
     void HandleOnHomeButtonClicked();
 
 private:
-    TSharedPtr<class SHorizontalBox>    MainContent;
+    TSharedPtr<class SVerticalBox>    MainContent;
     TSharedPtr<class SWebBrowser>       WebBrowserWidget;
     TSharedPtr<class SSpinningImage>    SpinnerImage;
     TSharedPtr<class SButton>           CloseButton;
