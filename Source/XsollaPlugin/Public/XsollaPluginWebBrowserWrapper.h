@@ -38,13 +38,6 @@ public:
     void LoadURL(FString NewURL);
 
     /**
-    * Set shop url.
-    *
-    * @param str - Shop url string.
-    */
-    void SetShopUrl(FString str);
-
-    /**
     * Set browser wrapper size.
     *
     * @param w - Width.
@@ -110,7 +103,6 @@ private:
     FString		ShopSize;
 
     FString		InitialURL = "";
-    FString		ShopUrl;
     bool		bSupportsTransparency = true;
 
     TSharedPtr<SWidget> PrevFocusedWidget;

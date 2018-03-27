@@ -91,7 +91,6 @@ void UXsollaPluginShop::Create(
                 
 
                 SetToken(Response->GetContentAsString());
-                BrowserWrapper->SetShopUrl(ShopUrl);
                 BrowserWrapper->LoadURL(ShopUrl);
             }
             else
@@ -124,7 +123,6 @@ void UXsollaPluginShop::Create(
 
         //UE_LOG(LogTemp, Warning, TEXT("%s"), *ShopUrl);
 
-        BrowserWrapper->SetShopUrl(ShopUrl);
         BrowserWrapper->LoadURL(ShopUrl);
     }
 }
@@ -166,7 +164,6 @@ void UXsollaPluginShop::CreateWithToken(
     // join token to shop url
     SetToken(token);
 
-    BrowserWrapper->SetShopUrl(ShopUrl);
     BrowserWrapper->LoadURL(ShopUrl);
 }
 
@@ -285,16 +282,16 @@ void UXsollaPluginShop::LoadConfig(EIntegrationType type)
     if (bIsSandbox)
     {
         if (type == EIntegrationType::VE_SERVELESS)
-            ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_data=";
+            ShopUrl = SandboxApiUrl + "/?access_data=";
         else 
-            ShopUrl = "https://sandbox-secure.xsolla.com/paystation2/?access_token=";
+            ShopUrl = SandboxApiUrl + "/?access_token=";
     }
     else
     {
         if (type == EIntegrationType::VE_SERVELESS)
-            ShopUrl = "https://secure.xsolla.com/paystation2/?access_data=";
+            ShopUrl = ApiUrl + "/?access_data=";
         else
-            ShopUrl = "https://secure.xsolla.com/paystation2/?access_token=";
+            ShopUrl = ApiUrl + "/?access_token=";
     }
 
     ProjectId = GetDefault<UXsollaPluginSettings>()->ProjectId;
@@ -342,7 +339,7 @@ void UXsollaPluginShop::OnShopClosed()
 {
     BrowserWrapper->Clear();
 
-    FString route = "http://52.59.15.45:3333/payment";
+    FString route = ServerUrl + "/payment";
 
     if (ExternalId.IsEmpty())
     {

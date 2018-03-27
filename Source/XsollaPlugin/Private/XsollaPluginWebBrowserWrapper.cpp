@@ -157,24 +157,21 @@ void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
         CloseShop(false);
     }
 
-    if (!WebBrowserWidget->GetUrl().Contains("xsolla"))
+    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) && !WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
         HomeButton->SetVisibility(EVisibility::Visible);
-        CloseButton->SetVisibility(EVisibility::Collapsed);
     }
 
-    if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
-        HomeButton->SetVisibility(EVisibility::Collapsed);
-        if (CloseButton->GetVisibility() == EVisibility::Collapsed)
-            CloseButton->SetVisibility(EVisibility::Visible);
+        HomeButton->SetVisibility(EVisibility::Hidden);
     }
 
     OnUrlChanged.Broadcast(InText);
 }
 void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 {
-    if (WebBrowserWidget->GetUrl().Contains("xsolla"))
+    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
         BrowserSlot.DetachWidget();
         BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
@@ -213,11 +210,6 @@ bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrow
 {
     OnCloseWindow.Broadcast();
     return true;
-}
-
-void UXsollaPluginWebBrowserWrapper::SetShopUrl(FString str) 
-{
-    ShopUrl = str;
 }
 
 void UXsollaPluginWebBrowserWrapper::SetBrowserSize(float w, float h)

@@ -30,6 +30,8 @@ enum class EIntegrationType : uint8
 UCLASS()
 class XSOLLAPLUGIN_API UXsollaPluginShop : public UObject
 {
+    friend class UXsollaPluginWebBrowserWrapper;
+
     GENERATED_UCLASS_BODY()
 
 public:
@@ -108,6 +110,9 @@ private:
 
 private:
     XsollaPluginHttpTool * HttpTool;
+
+    FString ApiUrl          = "https://secure.xsolla.com/paystation3";
+    FString SandboxApiUrl   = "https://sandbox-secure.xsolla.com/paystation3";
 
     FString ShopUrl;
     FString ServerUrl;
