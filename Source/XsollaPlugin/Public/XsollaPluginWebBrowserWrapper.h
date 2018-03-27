@@ -5,6 +5,8 @@
 #include "XsollaPluginHttpTool.h"
 #include "XsollaPluginTransactionDetails.h"
 
+#include <vector>
+
 #include "XsollaPluginWebBrowserWrapper.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
@@ -53,8 +55,8 @@ public:
     void CloseShop(bool bCheckTransactionResult);
 
     /**
-     * Removes all widgets
-     */
+    * Removes all widgets
+    */
     void Clear();
 
 public:
@@ -80,30 +82,34 @@ private:
     void HandleOnLoadCompleted();
     void HandleOnLoadError();
     bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
+    bool HandleOnBeforeNewWindow(FString Url, FString param);
+    void HandleOnHomeButtonClicked();
 
 private:
-    TSharedPtr<class SVerticalBox>		MainContent;
-    TSharedPtr<class SWebBrowser>		WebBrowserWidget;
-    TSharedPtr<class SSpinningImage>	SpinnerImage;
-    TSharedPtr<class SButton>			CloseButton;
-    TSharedPtr<class SButton>			HomeButton;
-    TSharedPtr<class SVerticalBox>		Background;
+    TSharedPtr<class SHorizontalBox>    MainContent;
+    TSharedPtr<class SWebBrowser>       WebBrowserWidget;
+    TSharedPtr<class SSpinningImage>    SpinnerImage;
+    TSharedPtr<class SButton>           CloseButton;
+    TSharedPtr<class SButton>           HomeButton;
+    TSharedPtr<class SVerticalBox>      Background;
 
     const FSlateBrush*                  SlateCloseBrush;
     const FSlateBrush*                  SlateBackBrush;
     const FSlateBrush*                  SlateSpinnerBrush;
 
-    SHorizontalBox::FSlot& BrowserSlot				= SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginLeft	= SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginRight	= SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlot = SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlotMarginLeft = SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();
 
-    float		ButtonSize;
-    FVector2D	ViewportSize;
-    FVector2D	ContentSize;
-    FString		ShopSize;
+    float       ButtonSize;
+    FVector2D   ViewportSize;
+    FVector2D   ContentSize;
+    FString     ShopSize;
 
-    FString		InitialURL = "";
-    bool		bSupportsTransparency = true;
+    FString     InitialURL = "";
+    bool        bSupportsTransparency = true;
+
+    std::vector<TSharedPtr<class SWebBrowser>> PopupWidgets;
 
     TSharedPtr<SWidget> PrevFocusedWidget;
     bool                bPrevGameViewportInputIgnoring;
