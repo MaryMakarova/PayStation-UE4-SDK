@@ -82,16 +82,20 @@ private:
     void HandleOnLoadCompleted();
     void HandleOnLoadError();
     bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
-    bool HandleOnBeforeNewWindow(FString Url, FString param);
+    bool HandleOnBeforePopup(FString Url, FString param);
     void HandleOnHomeButtonClicked();
 
+    bool HandleOnPopupCreate(const TWeakPtr<class IWebBrowserWindow>& window, const TWeakPtr<class IWebBrowserPopupFeatures>& feat);
+
 private:
-    TSharedPtr<class SVerticalBox>    MainContent;
+    TSharedPtr<class SVerticalBox>      MainContent;
     TSharedPtr<class SWebBrowser>       WebBrowserWidget;
     TSharedPtr<class SSpinningImage>    SpinnerImage;
     TSharedPtr<class SButton>           CloseButton;
     TSharedPtr<class SButton>           HomeButton;
     TSharedPtr<class SVerticalBox>      Background;
+
+    TSharedPtr<class SOverlay>          BrowserOverlay;
 
     const FSlateBrush*                  SlateCloseBrush;
     const FSlateBrush*                  SlateBackBrush;
@@ -99,7 +103,7 @@ private:
 
     SHorizontalBox::FSlot& BrowserSlot = SHorizontalBox::Slot();
     SHorizontalBox::FSlot& BrowserSlotMarginLeft = SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();      
 
     float       ButtonSize;
     FVector2D   ViewportSize;
@@ -107,7 +111,7 @@ private:
     FString     ShopSize;
 
     FString     InitialURL = "";
-    bool        bSupportsTransparency = true;
+    bool        bSupportsTransparency = false;
 
     std::vector<TSharedPtr<class SWebBrowser>> PopupWidgets;
 

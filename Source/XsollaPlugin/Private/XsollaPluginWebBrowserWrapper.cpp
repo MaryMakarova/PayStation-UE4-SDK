@@ -5,6 +5,9 @@
 #include "SWebBrowser.h"
 #include "Widgets/Layout/SBox.h"
 #include "Misc/Base64.h"
+#include "IWebBrowserWindow.h"
+#include "WebBrowserModule.h"
+#include "IWebBrowserDialog.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
@@ -33,8 +36,8 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
         .OnLoadCompleted(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadCompleted))
         .OnLoadError(BIND_UOBJECT_DELEGATE(FSimpleDelegate, HandleOnLoadError))
         .OnCloseWindow(BIND_UOBJECT_DELEGATE(FOnCloseWindowDelegate, HandleOnCloseWindow))
-        .OnSuppressContextMenu_Lambda([]() { return true; })
-        .OnBeforePopup(BIND_UOBJECT_DELEGATE(FOnBeforePopupDelegate, HandleOnBeforeNewWindow));
+        .OnCreateWindow(BIND_UOBJECT_DELEGATE(FOnCreateWindowDelegate, HandleOnPopupCreate))
+        .OnSuppressContextMenu_Lambda([]() { return true; });
 
     ComposeShopWrapper();
 
@@ -78,7 +81,9 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
 {
     //BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
 
-    BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
+    BrowserSlot.AttachWidget(SAssignNew(BrowserOverlay, SOverlay));
+
+    BrowserOverlay->AddSlot(0).AttachWidget(WebBrowserWidget.ToSharedRef());
 
     MainContent = 
         SNew(SVerticalBox)
@@ -235,53 +240,59 @@ void UXsollaPluginWebBrowserWrapper::Clear()
     }
 }
 
-bool UXsollaPluginWebBrowserWrapper::HandleOnBeforeNewWindow(FString Url, FString param)
-{
-    AsyncTask(ENamedThreads::GameThread, [=]() 
-    {
-        PopupWidgets.push_back(
-            SNew(SWebBrowser)
-            .InitialURL(Url)
-            .ShowControls(false)
-            .ViewportSize(ContentSize)
-            .SupportsTransparency(bSupportsTransparency)
-        );
-
-        BrowserSlot.DetachWidget();
-        BrowserSlot.AttachWidget(PopupWidgets.back().ToSharedRef());
-
-        HomeButton->SetVisibility(EVisibility::Visible);
-
-        UE_LOG(LogTemp, Warning, TEXT("New popup with url: %s"), *Url);
-    });
-    
-    return false;
-}
-
 void UXsollaPluginWebBrowserWrapper::HandleOnHomeButtonClicked()
 {
     if (!PopupWidgets.empty())
     {
+        BrowserOverlay->RemoveSlot(PopupWidgets.size());
         PopupWidgets.pop_back();
 
         if (PopupWidgets.empty())
         {
-            BrowserSlot.DetachWidget();
-            BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-
             if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
             {
                 HomeButton->SetVisibility(EVisibility::Hidden);
             }
         }
-        else
-        {
-            BrowserSlot.DetachWidget();
-            BrowserSlot.AttachWidget(PopupWidgets.back().ToSharedRef());
-        }
 
         UE_LOG(LogTemp, Warning, TEXT("Popup closed"));
     }
+}
+
+bool UXsollaPluginWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
+{
+    UE_LOG(LogTemp, Warning, TEXT("HandleOnPopupCreate()"));
+
+    TSharedPtr<IWebBrowserWindow> popupWindow = window.Pin();
+    TSharedPtr<SWebBrowser> popupBrowser = SNew(SWebBrowser);
+
+    SWebBrowser::FArguments args;
+    args.ViewportSize(ContentSize);
+    args.SupportsTransparency(bSupportsTransparency);
+    args.ShowControls(false);
+    //args.OnShowDialog_Lambda([](const TWeakPtr<IWebBrowserDialog>& dial) { return EWebBrowserDialogEventResponse::Ignore; });
+    args.OnCloseWindow_Lambda([=](const TWeakPtr<IWebBrowserWindow>& win)
+    { 
+        BrowserOverlay->RemoveSlot(PopupWidgets.size());
+        win.Pin()->CloseBrowser(true);
+        PopupWidgets.pop_back();
+
+        if (PopupWidgets.empty())
+        {
+            HomeButton->SetVisibility(EVisibility::Hidden);
+        }
+
+        return false; 
+    });
+
+    popupBrowser->Construct(args, popupWindow);
+
+    PopupWidgets.push_back(popupBrowser);
+    BrowserOverlay->AddSlot(PopupWidgets.size()).AttachWidget(popupBrowser.ToSharedRef());
+
+    HomeButton->SetVisibility(EVisibility::Visible);
+
+    return true;
 }
 
 #undef LOCTEXT_NAMESPACE
