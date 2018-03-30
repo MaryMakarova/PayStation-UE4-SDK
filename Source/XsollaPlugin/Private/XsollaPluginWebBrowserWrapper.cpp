@@ -8,6 +8,109 @@
 #include "IWebBrowserWindow.h"
 #include "WebBrowserModule.h"
 #include "IWebBrowserDialog.h"
+#include "IWebBrowserSchemeHandler.h"
+#include "WebBrowserModule.h"
+
+#if PLATFORM_WINDOWS
+#include <windows.h>
+#include <winreg.h>
+#endif
+
+class TelegramSchemeHandler : public IWebBrowserSchemeHandler
+{
+public:
+    class TelegramHeaders : public IWebBrowserSchemeHandler::IHeaders
+    {
+    public:
+        virtual void SetMimeType(const TCHAR* MimeType) {}
+        virtual void SetStatusCode(int32 StatusCode) {}
+        virtual void SetContentLength(int32 ContentLength) {}
+        virtual void SetRedirect(const TCHAR* Url) {}
+        virtual void SetHeader(const TCHAR* Key, const TCHAR* Value) {}
+    };
+
+public:
+    TelegramSchemeHandler(FString Verb, FString Url) {}
+
+    /**
+    * Process an incoming request.
+    * @param   Verb            This is the verb used for the request (GET, PUT, POST, etc).
+    * @param   Url             This is the full url for the request being made.
+    * @param   OnHeadersReady  You must execute this delegate once the response headers are ready to be retrieved with GetResponseHeaders.
+    *                            You may execute it during this call to state headers are available now.
+    * @return You should return true if the request has been accepted and will be processed, otherwise false to cancel this request.
+    */
+    virtual bool ProcessRequest(const FString& Verb, const FString& Url, const FSimpleDelegate& OnHeadersReady) 
+    {
+#if PLATFORM_WINDOWS
+        HKEY hKey;
+
+        RegOpenKey(HKEY_CLASSES_ROOT, _T("tdesktop.tg\\shell\\open\\command"), &hKey);
+
+        TCHAR regValue[1024];
+        DWORD regValueLen = sizeof(regValue);
+
+        RegQueryValueEx(hKey, _T(""), NULL, NULL, reinterpret_cast<LPBYTE>(&regValue), &regValueLen);
+
+        FString telegramCommand(regValue);
+        FString binaryPath;
+        FString params = FString("-- ") + Url;
+
+        telegramCommand.RemoveFromStart(TEXT("\""));
+        telegramCommand.Split(TEXT("\""), &binaryPath, NULL);
+
+        FPlatformProcess::CreateProc(*binaryPath, *params, true, false, false, nullptr, 0, nullptr, nullptr);
+#endif
+
+        return false;
+    }
+
+    /**
+    * Retrieves the headers for this request.
+    * @param   OutHeaders      The interface to use to set headers.
+    */
+    virtual void GetResponseHeaders(IHeaders& OutHeaders) 
+    {
+
+    }
+
+    /**
+    * Retrieves the headers for this request.
+    * @param   OutBytes            You should copy up to BytesToRead of data to this ptr.
+    * @param   BytesToRead         The maximum number of bytes that can be copied to OutBytes.
+    * @param   BytesRead           You should set this to the number of bytes that were copied.
+    *                                This can be set to zero, to indicate more data is not ready yet, and OnMoreDataReady must then be
+    *                                executed when there is.
+    * @param   OnMoreDataReady     You should execute this delegate when more data is available to read.
+    * @return You should return true if more data needs to be read, otherwise false if this is the end of the response data.
+    */
+    virtual bool ReadResponse(uint8* OutBytes, int32 BytesToRead, int32& BytesRead, const FSimpleDelegate& OnMoreDataReady) 
+    {
+        return false;
+    }
+
+    /**
+    * Called if the request should be canceled.
+    */
+    virtual void Cancel() 
+    {
+
+    }
+};
+
+class TelegramSchemeHandlerFactory : public IWebBrowserSchemeHandlerFactory
+{
+public:
+    TelegramSchemeHandlerFactory()
+    {
+
+    }
+
+    virtual TUniquePtr<IWebBrowserSchemeHandler> Create(FString Verb, FString Url)
+    {
+        return TUniquePtr<TelegramSchemeHandler>(new TelegramSchemeHandler(Verb, Url));
+    }
+};
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
@@ -40,6 +143,9 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
         .OnSuppressContextMenu_Lambda([]() { return true; });
 
     ComposeShopWrapper();
+
+    // telegram protocol 
+    IWebBrowserModule::Get().GetSingleton()->RegisterSchemeHandlerFactory("tg", "", new TelegramSchemeHandlerFactory());
 
     PrevFocusedWidget = FSlateApplication::Get().GetUserFocusedWidget(0);
     bPrevGameViewportInputIgnoring = GEngine->GameViewport->IgnoreInput();
