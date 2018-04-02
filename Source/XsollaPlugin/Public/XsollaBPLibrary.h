@@ -11,7 +11,6 @@ class UXsollaBPLibrary : public UBlueprintFunctionLibrary
     GENERATED_UCLASS_BODY()
 
 public:
-
     /**
     * Creates shop wrapper, set default properties and delegates.
     *
