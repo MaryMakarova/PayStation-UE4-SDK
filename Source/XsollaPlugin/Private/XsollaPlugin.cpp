@@ -1,7 +1,7 @@
 #include "XsollaPlugin.h"
 
-#include "XsollaPluginSettings.h"
-#include "XsollaPluginShop.h"
+#include "XsollaSettings.h"
+#include "XsollaShop.h"
 #include "Developer/Settings/Public/ISettingsModule.h"
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "Developer/Settings/Public/ISettingsSection.h"
@@ -29,7 +29,7 @@ void FXsollaPluginModule::StartupModule()
 
     RegisterSettings();
 
-    UXsollaPluginShop* Shop = NewObject<UXsollaPluginShop>(UXsollaPluginShop::StaticClass());
+    UXsollaShop* shop = NewObject<UXsollaShop>(UXsollaShop::StaticClass());
 }
 
 void FXsollaPluginModule::ShutdownModule()
@@ -49,17 +49,10 @@ void FXsollaPluginModule::RegisterSettings()
     // your desired class, feel free to add here all those settings you want to expose
     // to your LDs or artists.
 
-    if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+    if (ISettingsModule* settingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
     {
-        // Create the new category
-        //ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer("Project");
-
-        //SettingsContainer->DescribeCategory("Xsolla",
-        //    LOCTEXT("RuntimeWDCategoryName", "Plugins"),
-        //    LOCTEXT("RuntimeWDCategoryDescription", "Xsolla plugin settings"));
-
         // Register the settings
-        ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings("Project", "Plugins", "Xsolla",
+        ISettingsSectionPtr settingsSection = settingsModule->RegisterSettings("Project", "Plugins", "Xsolla",
             LOCTEXT("RuntimeGeneralSettingsName", "Xsolla"),
             LOCTEXT("RuntimeGeneralSettingsDescription", "Base configuration"),
             GetMutableDefault<UXsollaPluginSettings>()
@@ -72,9 +65,9 @@ void FXsollaPluginModule::UnregisterSettings()
     // Ensure to unregister all of your registered settings here, hot-reload would
     // otherwise yield unexpected results.
 
-    if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
+    if (ISettingsModule* settingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
     {
-        SettingsModule->UnregisterSettings("Project", "Xsolla", "General");
+        settingsModule->UnregisterSettings("Project", "Xsolla", "General");
     }
 }
 

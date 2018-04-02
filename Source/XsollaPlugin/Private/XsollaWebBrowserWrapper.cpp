@@ -1,127 +1,22 @@
-#include "XsollaPluginWebBrowserWrapper.h"
+#include "XsollaWebBrowserWrapper.h"
 
-#include "XsollaPluginShop.h"
-#include "XsollaPluginSettings.h"
+#include "XsollaShop.h"
+#include "XsollaSettings.h"
 #include "SWebBrowser.h"
 #include "Widgets/Layout/SBox.h"
 #include "Misc/Base64.h"
-#include "IWebBrowserWindow.h"
-#include "WebBrowserModule.h"
-#include "IWebBrowserDialog.h"
-#include "IWebBrowserSchemeHandler.h"
-#include "WebBrowserModule.h"
-
-#if PLATFORM_WINDOWS
-#include <windows.h>
-#include <winreg.h>
-#endif
-
-class TelegramSchemeHandler : public IWebBrowserSchemeHandler
-{
-public:
-    class TelegramHeaders : public IWebBrowserSchemeHandler::IHeaders
-    {
-    public:
-        virtual void SetMimeType(const TCHAR* MimeType) {}
-        virtual void SetStatusCode(int32 StatusCode) {}
-        virtual void SetContentLength(int32 ContentLength) {}
-        virtual void SetRedirect(const TCHAR* Url) {}
-        virtual void SetHeader(const TCHAR* Key, const TCHAR* Value) {}
-    };
-
-public:
-    TelegramSchemeHandler(FString Verb, FString Url) {}
-
-    /**
-    * Process an incoming request.
-    * @param   Verb            This is the verb used for the request (GET, PUT, POST, etc).
-    * @param   Url             This is the full url for the request being made.
-    * @param   OnHeadersReady  You must execute this delegate once the response headers are ready to be retrieved with GetResponseHeaders.
-    *                            You may execute it during this call to state headers are available now.
-    * @return You should return true if the request has been accepted and will be processed, otherwise false to cancel this request.
-    */
-    virtual bool ProcessRequest(const FString& Verb, const FString& Url, const FSimpleDelegate& OnHeadersReady) 
-    {
-#if PLATFORM_WINDOWS
-        HKEY hKey;
-
-        RegOpenKey(HKEY_CLASSES_ROOT, _T("tdesktop.tg\\shell\\open\\command"), &hKey);
-
-        TCHAR regValue[1024];
-        DWORD regValueLen = sizeof(regValue);
-
-        RegQueryValueEx(hKey, _T(""), NULL, NULL, reinterpret_cast<LPBYTE>(&regValue), &regValueLen);
-
-        FString telegramCommand(regValue);
-        FString binaryPath;
-        FString params = FString("-- ") + Url;
-
-        telegramCommand.RemoveFromStart(TEXT("\""));
-        telegramCommand.Split(TEXT("\""), &binaryPath, NULL);
-
-        FPlatformProcess::CreateProc(*binaryPath, *params, true, false, false, nullptr, 0, nullptr, nullptr);
-#endif
-
-        return false;
-    }
-
-    /**
-    * Retrieves the headers for this request.
-    * @param   OutHeaders      The interface to use to set headers.
-    */
-    virtual void GetResponseHeaders(IHeaders& OutHeaders) 
-    {
-
-    }
-
-    /**
-    * Retrieves the headers for this request.
-    * @param   OutBytes            You should copy up to BytesToRead of data to this ptr.
-    * @param   BytesToRead         The maximum number of bytes that can be copied to OutBytes.
-    * @param   BytesRead           You should set this to the number of bytes that were copied.
-    *                                This can be set to zero, to indicate more data is not ready yet, and OnMoreDataReady must then be
-    *                                executed when there is.
-    * @param   OnMoreDataReady     You should execute this delegate when more data is available to read.
-    * @return You should return true if more data needs to be read, otherwise false if this is the end of the response data.
-    */
-    virtual bool ReadResponse(uint8* OutBytes, int32 BytesToRead, int32& BytesRead, const FSimpleDelegate& OnMoreDataReady) 
-    {
-        return false;
-    }
-
-    /**
-    * Called if the request should be canceled.
-    */
-    virtual void Cancel() 
-    {
-
-    }
-};
-
-class TelegramSchemeHandlerFactory : public IWebBrowserSchemeHandlerFactory
-{
-public:
-    TelegramSchemeHandlerFactory()
-    {
-
-    }
-
-    virtual TUniquePtr<IWebBrowserSchemeHandler> Create(FString Verb, FString Url)
-    {
-        return TUniquePtr<TelegramSchemeHandler>(new TelegramSchemeHandler(Verb, Url));
-    }
-};
+#include "XsollaTelegramScheme.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
-UXsollaPluginWebBrowserWrapper::UXsollaPluginWebBrowserWrapper(const FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer),
+UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
+    : Super(objectInitializer),
     ButtonSize(70.0f) // close and home buttons size in Slate units
 {
     bIsVariable = true;
 }
 
-void UXsollaPluginWebBrowserWrapper::NativeConstruct()
+void UXsollaWebBrowserWrapper::NativeConstruct()
 {
     Super::NativeConstruct();
 
@@ -155,15 +50,15 @@ void UXsollaPluginWebBrowserWrapper::NativeConstruct()
     ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 }
 
-void UXsollaPluginWebBrowserWrapper::LoadURL(FString NewURL)
+void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
 {
     if (WebBrowserWidget.IsValid())
     {
-        WebBrowserWidget->LoadURL(NewURL);
+        WebBrowserWidget->LoadURL(newURL);
     }
 }
 
-void UXsollaPluginWebBrowserWrapper::LoadSlateResources()
+void UXsollaWebBrowserWrapper::LoadSlateResources()
 {
     TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
         FName("ButtonStyle"),
@@ -183,7 +78,7 @@ void UXsollaPluginWebBrowserWrapper::LoadSlateResources()
     SlateSpinnerBrush = spinnerStyle.GetBrush(FName("spinner_brush"));
 }
 
-void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
+void UXsollaWebBrowserWrapper::ComposeShopWrapper()
 {
     //BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
 
@@ -256,7 +151,7 @@ void UXsollaPluginWebBrowserWrapper::ComposeShopWrapper()
     GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
 }
 
-void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
+void UXsollaWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 {
     if (OnShopClosed.IsBound())
     {
@@ -264,7 +159,7 @@ void UXsollaPluginWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
     }
 }
 
-void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
+void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
     UE_LOG(LogTemp, Warning, TEXT("URL: %s"), *(WebBrowserWidget->GetUrl()));
 
@@ -283,9 +178,9 @@ void UXsollaPluginWebBrowserWrapper::HandleOnUrlChanged(const FText& InText)
         HomeButton->SetVisibility(EVisibility::Hidden);
     }
 
-    OnUrlChanged.Broadcast(InText);
+    OnUrlChanged.Broadcast(inText);
 }
-void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
+void UXsollaWebBrowserWrapper::HandleOnLoadCompleted()
 {
     if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
@@ -307,11 +202,11 @@ void UXsollaPluginWebBrowserWrapper::HandleOnLoadCompleted()
 
     OnLoadCompleted.Broadcast();
 }
-void UXsollaPluginWebBrowserWrapper::HandleOnLoadError()
+void UXsollaWebBrowserWrapper::HandleOnLoadError()
 {
     OnLoadError.Broadcast();
 }
-bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& NewBrowserWindow)
+bool UXsollaWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& newBrowserWindow)
 {
     UE_LOG(LogTemp, Warning, TEXT("Window closed."));
 
@@ -319,13 +214,13 @@ bool UXsollaPluginWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrow
     return true;
 }
 
-void UXsollaPluginWebBrowserWrapper::SetBrowserSize(float w, float h)
+void UXsollaWebBrowserWrapper::SetBrowserSize(float w, float h)
 {
     ContentSize.X = w;
     ContentSize.Y = h;
 }
 
-void UXsollaPluginWebBrowserWrapper::Clear()
+void UXsollaWebBrowserWrapper::Clear()
 {
     ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 
@@ -346,7 +241,7 @@ void UXsollaPluginWebBrowserWrapper::Clear()
     }
 }
 
-void UXsollaPluginWebBrowserWrapper::HandleOnHomeButtonClicked()
+void UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
 {
     if (!PopupWidgets.empty())
     {
@@ -365,7 +260,7 @@ void UXsollaPluginWebBrowserWrapper::HandleOnHomeButtonClicked()
     }
 }
 
-bool UXsollaPluginWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
+bool UXsollaWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
 {
     UE_LOG(LogTemp, Warning, TEXT("HandleOnPopupCreate()"));
 

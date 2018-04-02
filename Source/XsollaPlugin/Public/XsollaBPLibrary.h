@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "XsollaPluginShop.h"
+#include "XsollaShop.h"
 
-#include "XsollaPluginBPLibrary.generated.h"
+#include "XsollaBPLibrary.generated.h"
 
 UCLASS()
-class UXsollaPluginBPLibrary : public UBlueprintFunctionLibrary
+class UXsollaBPLibrary : public UBlueprintFunctionLibrary
 {
     GENERATED_UCLASS_BODY()
 
@@ -17,33 +17,33 @@ public:
     *
     * @param shopSize - Size of shop page and wrapper.
     * @param userId - user ID.
-    * @param OnSucceeded - On payment succeeded delegate.
-    * @param OnCanceled - On payment canceled delegate.
-    * @param OnFailed - On payment failed delegate.
+    * @param onSucceeded - On payment succeeded delegate.
+    * @param onCanceled - On payment canceled delegate.
+    * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void CreateXsollaShop(
             EShopSizeEnum shopSize,
             FString userId,
-            FOnPaymantSucceeded OnSucceeded,
-            FOnPaymantCanceled OnCanceled,
-            FOnPaymantFailed OnFailed);
+            FOnPaymantSucceeded onSucceeded,
+            FOnPaymantCanceled onCanceled,
+            FOnPaymantFailed onFailed);
 
     /**
     * Creates shop wrapper, set default properties and delegates.
     *
     * @param token - Xsolla shop token.
-    * @param OnSucceeded - On payment succeeded delegate.
-    * @param OnCanceled - On payment canceled delegate.
-    * @param OnFailed - On payment failed delegate.
+    * @param onSucceeded - On payment succeeded delegate.
+    * @param onCanceled - On payment canceled delegate.
+    * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void CreateXsollaShopWithToken(
             FString token,
             EShopSizeEnum shopSize,
-            FOnPaymantSucceeded OnSucceeded,
-            FOnPaymantCanceled OnCanceled,
-            FOnPaymantFailed OnFailed);
+            FOnPaymantSucceeded onSucceeded,
+            FOnPaymantCanceled onCanceled,
+            FOnPaymantFailed onFailed);
 
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void SetNumberProperty(FString prop, int value, bool bOverride = true);

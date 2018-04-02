@@ -13,66 +13,65 @@ public:
     * Set request authorization header. 
     * Syntax of header is [Authorization: <type> <credentials>]
     *
-    * @param Hash - Hash based on type, username and password.
-    * @param Request - Http request object.
+    * @param hash - Hash based on type, username and password.
+    * @param request - Http request object.
     */
-    void SetAuthorizationHash(FString Hash, TSharedRef<IHttpRequest>& Request);
+    void SetAuthorizationHash(FString hash, TSharedRef<IHttpRequest>& request);
 
     /**
     * Set request URL with template [base url] + [subrout url].
     *
-    * @param Subroute - Subrout url.
+    * @param route - route url.
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> RequestWithRoute(FString Subroute);
+    TSharedRef<IHttpRequest> RequestWithRoute(FString route);
 
     /**
     * Set default request headers.
     *
-    * @param Request - Request object.
+    * @param request - Request object.
     */
-    void SetRequestHeaders(TSharedRef<IHttpRequest>& Request);
+    void SetRequestHeaders(TSharedRef<IHttpRequest>& request);
 
     /**
     * Creates GET request object.
     *
-    * @param Subroute - Subroute url.
+    * @param route - route url.
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> GetRequest(FString Subroute);
+    TSharedRef<IHttpRequest> GetRequest(FString route);
 
     /**
     * Creates POST request object.
     *
-    * @param Subroute - Subroute url.
-    * @param ContentJsonString - JSON content in string.
+    * @param route - route url.
+    * @param contentJsonString - JSON content in string.
     *
     * @return Request object
     */
-    TSharedRef<IHttpRequest> PostRequest(FString Subroute, FString ContentJsonString);
+    TSharedRef<IHttpRequest> PostRequest(FString route, FString contentJsonString);
 
     /**
     * Process request.
     *
-    * @param Request - Request object.
+    * @param request - Request object.
     */
-    void Send(TSharedRef<IHttpRequest>& Request);
+    void Send(TSharedRef<IHttpRequest>& request);
 
     /**
     * Check is response is valid. If not, log error code and response content.
     *
-    * @param Response - Response object.
+    * @param response - Response object.
     * @param bWasSuccessful - Is request was successful.
     *
     * @return Is response valid
     */
-    bool ResponseIsValid(FHttpResponsePtr Response, bool bWasSuccessful);
+    bool ResponseIsValid(FHttpResponsePtr response, bool bWasSuccessful);
 
 private:
     FHttpModule* Http;
 
     FString AuthorizationHeader = TEXT("Authorization");
-    FString ApiBaseUrl = "";
 };

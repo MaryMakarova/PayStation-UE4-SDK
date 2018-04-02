@@ -1,9 +1,9 @@
 #pragma once
 
-#include "XsollaPluginHttpTool.h"
-#include "XsollaPluginWebBrowserWrapper.h"
+#include "XsollaHttpTool.h"
+#include "XsollaWebBrowserWrapper.h"
 
-#include "XsollaPluginShop.generated.h"
+#include "XsollaShop.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
@@ -28,9 +28,9 @@ enum class EIntegrationType : uint8
 };
 
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaPluginShop : public UObject
+class XSOLLAPLUGIN_API UXsollaShop : public UObject
 {
-    friend class UXsollaPluginWebBrowserWrapper;
+    friend class UXsollaWebBrowserWrapper;
 
     GENERATED_UCLASS_BODY()
 
@@ -40,17 +40,17 @@ public:
     *
     * @param shopSize - Size of shop page and wrapper.
     * @param userId - user ID
-    * @param OnSucceeded - On payment succeeded delegate.
-    * @param OnCanceled - On payment canceled delegate.
-    * @param OnFailed - On payment failed delegate.
+    * @param onSucceeded - On payment succeeded delegate.
+    * @param onCanceled - On payment canceled delegate.
+    * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void Create(
         EShopSizeEnum shopSize,
         FString userId, 
-        FOnPaymantSucceeded OnSucceeded,
-        FOnPaymantCanceled OnCanceled, 
-        FOnPaymantFailed OnFailed);
+        FOnPaymantSucceeded onSucceeded,
+        FOnPaymantCanceled onCanceled, 
+        FOnPaymantFailed onFailed);
 
     /**
     * Open shop with token.
@@ -58,17 +58,17 @@ public:
     * @param token - Xsolla shop token.
     * @param externalId - external id for transaction.
     * @param shopSize - Size of shop page and wrapper.
-    * @param OnSucceeded - On payment succeeded delegate.
-    * @param OnCanceled - On payment canceled delegate.
-    * @param OnFailed - On payment failed delegate.
+    * @param onSucceeded - On payment succeeded delegate.
+    * @param onCanceled - On payment canceled delegate.
+    * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         void CreateWithToken(
             FString token, 
             EShopSizeEnum shopSize, 
-            FOnPaymantSucceeded OnSucceeded,
-            FOnPaymantCanceled OnCanceled,
-            FOnPaymantFailed OnFailed);
+            FOnPaymantSucceeded onSucceeded,
+            FOnPaymantCanceled onCanceled,
+            FOnPaymantFailed onFailed);
 
     
     /**
@@ -123,7 +123,7 @@ private:
     FString ExternalId;
     bool bIsSandbox;
 
-    UXsollaPluginWebBrowserWrapper* BrowserWrapper;
+    UXsollaWebBrowserWrapper* BrowserWrapper;
 
     TSharedPtr<FJsonObject> TokenRequestJson;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ModuleManager.h"
-#include "XsollaPluginShop.h"
+#include "XsollaShop.h"
 
 namespace XsollaPlugin
 {
@@ -10,9 +10,9 @@ namespace XsollaPlugin
     *
     * @return Xsolla Shop
     */
-    inline UXsollaPluginShop* GetShop()
+    inline UXsollaShop* GetShop()
     {
-        UXsollaPluginShop* shop = (UXsollaPluginShop*)UXsollaPluginShop::StaticClass()->GetDefaultObject();
+        UXsollaShop* shop = (UXsollaShop*)UXsollaShop::StaticClass()->GetDefaultObject();
 
         return shop;
     }

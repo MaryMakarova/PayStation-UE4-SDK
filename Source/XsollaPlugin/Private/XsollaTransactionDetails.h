@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 
-#include "XsollaPluginTransactionDetails.generated.h"
+#include "XsollaTransactionDetails.generated.h"
 
 USTRUCT(BlueprintType)
 struct FTransactionDetails

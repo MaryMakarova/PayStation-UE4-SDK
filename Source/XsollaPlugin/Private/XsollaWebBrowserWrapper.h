@@ -2,12 +2,12 @@
 
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate/SlateGameResources.h"
-#include "XsollaPluginHttpTool.h"
-#include "XsollaPluginTransactionDetails.h"
+#include "XsollaHttpTool.h"
+#include "XsollaTransactionDetails.h"
 
 #include <vector>
 
-#include "XsollaPluginWebBrowserWrapper.generated.h"
+#include "XsollaWebBrowserWrapper.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetFailed, FString, errorText);
@@ -17,7 +17,7 @@ DECLARE_DELEGATE(FOnShopClosed);
 class IWebBrowserWindow;
 
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaPluginWebBrowserWrapper : public UUserWidget
+class XSOLLAPLUGIN_API UXsollaWebBrowserWrapper : public UUserWidget
 {
     GENERATED_UCLASS_BODY()
 
@@ -35,9 +35,9 @@ public:
     /**
     * Load new url.
     *
-    * @param NewURL - Url to load.
+    * @param newURL - Url to load.
     */
-    void LoadURL(FString NewURL);
+    void LoadURL(FString newURL);
 
     /**
     * Set browser wrapper size.
@@ -78,10 +78,10 @@ private:
     void LoadSlateResources();
     void ComposeShopWrapper();
 
-    void HandleOnUrlChanged(const FText& Text);
+    void HandleOnUrlChanged(const FText& text);
     void HandleOnLoadCompleted();
     void HandleOnLoadError();
-    bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& BrowserWindow);
+    bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& browserWindow);
     bool HandleOnBeforePopup(FString Url, FString param);
     void HandleOnHomeButtonClicked();
 
@@ -101,9 +101,9 @@ private:
     const FSlateBrush*                  SlateBackBrush;
     const FSlateBrush*                  SlateSpinnerBrush;
 
-    SHorizontalBox::FSlot& BrowserSlot = SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginLeft = SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginRight = SHorizontalBox::Slot();      
+    SHorizontalBox::FSlot& BrowserSlot              = SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlotMarginLeft    = SHorizontalBox::Slot();
+    SHorizontalBox::FSlot& BrowserSlotMarginRight   = SHorizontalBox::Slot();      
 
     float       ButtonSize;
     FVector2D   ViewportSize;

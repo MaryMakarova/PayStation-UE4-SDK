@@ -1,29 +1,29 @@
-#include "XsollaPluginShop.h"
+#include "XsollaShop.h"
 
-#include "XsollaPluginSettings.h"
+#include "XsollaSettings.h"
 #include "Misc/Base64.h"
 
-UXsollaPluginShop::UXsollaPluginShop(const FObjectInitializer& ObjectInitializer)
-    :Super(ObjectInitializer)
+UXsollaShop::UXsollaShop(const FObjectInitializer& objectInitializer)
+    :Super(objectInitializer)
 {
     HttpTool = new XsollaPluginHttpTool();
     TokenRequestJson = MakeShareable(new FJsonObject);
 }
 
-void UXsollaPluginShop::Create(
+void UXsollaShop::Create(
     EShopSizeEnum shopSize,
     FString userId,
-    FOnPaymantSucceeded OnSucceeded, 
-    FOnPaymantCanceled OnCanceled,
-    FOnPaymantFailed OnFailed)
+    FOnPaymantSucceeded onSucceeded, 
+    FOnPaymantCanceled onCanceled,
+    FOnPaymantFailed onFailed)
 {
     // show browser wrapper
-    BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+    BrowserWrapper = CreateWidget<UXsollaWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaWebBrowserWrapper::StaticClass());
 
     // set delegates
-    this->OnSucceeded = OnSucceeded;
-    this->OnCanceled = OnCanceled;
-    this->OnFailed = OnFailed;
+    this->OnSucceeded = onSucceeded;
+    this->OnCanceled = onCanceled;
+    this->OnFailed = onFailed;
 
     BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
 
@@ -70,54 +70,55 @@ void UXsollaPluginShop::Create(
 
         // get string from json
         FString outputString;
-        TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
-        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
+        TSharedRef< TJsonWriter<> > writer = TJsonWriterFactory<>::Create(&outputString);
+        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), writer);
 
         UE_LOG(LogTemp, Warning, TEXT("Token JSON: %s"), *outputString);
 
-        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
-        request->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful) 
+        // make request to get token
+        TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(ServerUrl + FString("/token"), outputString);
+        tokenRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
         {
             if (bWasSuccessful) 
             {
-                if (!Response->GetContentAsString().IsEmpty())
+                if (!response->GetContentAsString().IsEmpty())
                 {
-                    UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(Response->GetContentAsString()));
+                    UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(response->GetContentAsString()));
                 }
                 else
                 {
                     UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token, probably wrong Project Id"));
                 }
                 
-
-                SetToken(Response->GetContentAsString());
+                SetToken(response->GetContentAsString());
                 BrowserWrapper->LoadURL(ShopUrl);
             }
             else
             {
                 UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token."));
 
+                // close browser
                 BrowserWrapper->Clear();
 
                 // clear token json
                 TokenRequestJson = MakeShareable(new FJsonObject);
             }
         });
-        HttpTool->Send(request);
+        HttpTool->Send(tokenRequest);
 
         UE_LOG(LogTemp, Warning, TEXT("Http tool: /token post request sent"));
     }
     else
     {
-        // add user id 
-        TSharedRef<IHttpRequest> request = HttpTool->PostRequest(ServerUrl + FString("/user/add"), userId);
-        HttpTool->Send(request);
+        // make request to add user on server for payment verification
+        TSharedRef<IHttpRequest> userAddRequest = HttpTool->PostRequest(ServerUrl + FString("/user/add"), userId);
+        HttpTool->Send(userAddRequest);
         UE_LOG(LogTemp, Warning, TEXT("Http tool: /user/add post request sent"));
 
         // get string from json
         FString outputString;
-        TSharedRef< TJsonWriter<> > Writer = TJsonWriterFactory<>::Create(&outputString);
-        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), Writer);
+        TSharedRef< TJsonWriter<> > writer = TJsonWriterFactory<>::Create(&outputString);
+        FJsonSerializer::Serialize(TokenRequestJson.ToSharedRef(), writer);
 
         SetAccessData(outputString);
 
@@ -127,20 +128,20 @@ void UXsollaPluginShop::Create(
     }
 }
 
-void UXsollaPluginShop::CreateWithToken(
+void UXsollaShop::CreateWithToken(
     FString token,
     EShopSizeEnum shopSize,
-    FOnPaymantSucceeded OnSucceeded,
-    FOnPaymantCanceled OnCanceled,
-    FOnPaymantFailed OnFailed)
+    FOnPaymantSucceeded onSucceeded,
+    FOnPaymantCanceled onCanceled,
+    FOnPaymantFailed onFailed)
 {
     // show browser wrapper
-    BrowserWrapper = CreateWidget<UXsollaPluginWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaPluginWebBrowserWrapper::StaticClass());
+    BrowserWrapper = CreateWidget<UXsollaWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaWebBrowserWrapper::StaticClass());
 
     // set delegates
-    this->OnSucceeded = OnSucceeded;
-    this->OnCanceled = OnCanceled;
-    this->OnFailed = OnFailed;
+    this->OnSucceeded = onSucceeded;
+    this->OnCanceled = onCanceled;
+    this->OnFailed = onFailed;
 
     BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
 
@@ -167,7 +168,7 @@ void UXsollaPluginShop::CreateWithToken(
     BrowserWrapper->LoadURL(ShopUrl);
 }
 
-void UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
+void UXsollaShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -203,7 +204,7 @@ void UXsollaPluginShop::SetNumberProperty(FString prop, int value, bool bOverrid
     }
 }
 
-void UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride/*= true */)
+void UXsollaShop::SetBoolProperty(FString prop, bool value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -239,7 +240,7 @@ void UXsollaPluginShop::SetBoolProperty(FString prop, bool value, bool bOverride
     }
 }
 
-void UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOverride/*= true */)
+void UXsollaShop::SetStringProperty(FString prop, FString value, bool bOverride/*= true */)
 {
     TArray<FString> subStrings;
     TSharedPtr<FJsonObject> currentObj = TokenRequestJson.ToSharedRef();
@@ -275,7 +276,7 @@ void UXsollaPluginShop::SetStringProperty(FString prop, FString value, bool bOve
     }
 }
 
-void UXsollaPluginShop::LoadConfig(EIntegrationType type)
+void UXsollaShop::LoadConfig(EIntegrationType type)
 {
     // load properties drom global game config
     GConfig->GetBool(TEXT("/Script/XsollaPlugin.XsollaPluginSettings"), TEXT("bSandboxMode"), bIsSandbox, GGameIni);
@@ -298,7 +299,7 @@ void UXsollaPluginShop::LoadConfig(EIntegrationType type)
     ServerUrl = GetDefault<UXsollaPluginSettings>()->ServerUrl;
 }
 
-void UXsollaPluginShop::SetToken(FString token)
+void UXsollaShop::SetToken(FString token)
 {
     if (!ShopUrl.EndsWith("="))
     {
@@ -312,7 +313,7 @@ void UXsollaPluginShop::SetToken(FString token)
     XsollaToken = token;
 }
 
-void UXsollaPluginShop::SetAccessData(FString data)
+void UXsollaShop::SetAccessData(FString data)
 {
     if (!ShopUrl.EndsWith("="))
     {
@@ -326,7 +327,7 @@ void UXsollaPluginShop::SetAccessData(FString data)
     XsollaAccessString = data;
 }
 
-void UXsollaPluginShop::SetDefaultTokenProperties()
+void UXsollaShop::SetDefaultTokenProperties()
 {
     //SetStringProperty("user.email.value", FString("example@example.com"), false);
     SetNumberProperty("settings.project_id", FCString::Atoi(*ProjectId), false);
@@ -335,7 +336,7 @@ void UXsollaPluginShop::SetDefaultTokenProperties()
     SetStringProperty("settings.ui.version", FString("desktop"), false);
 }
 
-void UXsollaPluginShop::OnShopClosed()
+void UXsollaShop::OnShopClosed()
 {
     BrowserWrapper->Clear();
 
