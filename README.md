@@ -13,23 +13,6 @@ Unpack downloaded archive to `{YourProject}/Plugins/`. Create folder, if not exi
 ### Setting up
 Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
 
-### Setting up server
-#### Dependencies
-[NodeJS 8](https://nodejs.org)
-
-#### Configure
-Go to the `Server` folder. Execute the following in console:
-
-`$ npm init`
-
-`# npm install pm2 -g` - needed for start server as daemon
-
-#### Start
-`$ npm run-script start`
-
-#### Stop
-`$ npm run-script stop`
-
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
 
@@ -110,6 +93,23 @@ void AMyActor::OnFailedCallback(FString errorText)
 
 ...
 ```
+
+### Setting up server
+#### Dependencies
+[NodeJS 8](https://nodejs.org)
+
+#### Configure
+Go to the `Server` folder. Execute the following in console:
+
+`$ npm init`
+
+`# npm install pm2 -g` - needed for start server as daemon
+
+#### Start
+`$ npm run-script start`
+
+#### Stop
+`$ npm run-script stop`
 
 ### How to create Unreal Engine project
 1. Sign up and download launcher from [here](https://www.unrealengine.com).
