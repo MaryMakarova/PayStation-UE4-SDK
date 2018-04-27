@@ -259,6 +259,10 @@ void UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
 
         UE_LOG(LogTemp, Warning, TEXT("Popup closed"));
     }
+    else
+    {
+        this->LoadURL(XsollaPlugin::GetShop()->ShopUrl);
+    }
 }
 
 bool UXsollaWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
