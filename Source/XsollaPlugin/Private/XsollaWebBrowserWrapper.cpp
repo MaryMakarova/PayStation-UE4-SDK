@@ -83,7 +83,6 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
     //BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
 
     BrowserSlot.AttachWidget(SAssignNew(BrowserOverlay, SOverlay));
-
     BrowserOverlay->AddSlot(0).AttachWidget(WebBrowserWidget.ToSharedRef());
 
     MainContent = 
@@ -122,7 +121,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                             SAssignNew(HomeButton, SButton)
                             .Visibility(EVisibility::Hidden)
                             .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                            .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked();; return FReply::Handled(); })
+                            .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked(); return FReply::Handled(); })
                             .Content()
                             [
                                 SNew(SImage)
@@ -161,7 +160,7 @@ void UXsollaWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
 
 void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
-    UE_LOG(LogTemp, Warning, TEXT("URL: %s"), *(WebBrowserWidget->GetUrl()));
+    UE_LOG(LogTemp, Warning, TEXT("New url: %s"), *(WebBrowserWidget->GetUrl()));
 
     if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
     {
