@@ -39,20 +39,23 @@ void UXsollaShop::Create(
     {
         case EShopSizeEnum::VE_Small:
         {
-            SetStringProperty("settings.ui.size", FString("medium"), false);
+            SetStringProperty("settings.ui.size", FString("small"), true);
             BrowserWrapper->SetBrowserSize(620, 630);
+            break;
         }
 
         case EShopSizeEnum::VE_Medium:
         {
-            SetStringProperty("settings.ui.size", FString("medium"), false);
+            SetStringProperty("settings.ui.size", FString("medium"), true);
             BrowserWrapper->SetBrowserSize(740, 760);
+            break;
         }
 
         case EShopSizeEnum::VE_Large:
         {
             BrowserWrapper->SetBrowserSize(820, 840);
-            SetStringProperty("settings.ui.size", FString("large"), false);
+            SetStringProperty("settings.ui.size", FString("large"), true);
+            break;
         }
     }
 
