@@ -9,6 +9,30 @@
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
+const FSlateBrush* g_SlateCloseBrush;
+const FSlateBrush* g_SlateBackBrush;
+const FSlateBrush* g_SlateSpinnerBrush;
+
+void LoadSlateResources()
+{
+    TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
+        FName("ButtonStyle"),
+        "/XsollaPlugin/Buttons",
+        "/XsollaPlugin/Buttons"
+    );
+    FSlateGameResources& buttonStyle = slateButtonResources.Get();
+    g_SlateCloseBrush = buttonStyle.GetBrush(FName("close_red_brush"));
+    g_SlateBackBrush = buttonStyle.GetBrush(FName("back_brush"));
+
+    TSharedRef<FSlateGameResources> slateSpinnerResources = FSlateGameResources::New(
+        FName("SpinnerStyle"),
+        "/XsollaPlugin/LoadingSpinner",
+        "/XsollaPlugin/LoadingSpinner"
+    );
+    FSlateGameResources& spinnerStyle = slateSpinnerResources.Get();
+    g_SlateSpinnerBrush = spinnerStyle.GetBrush(FName("spinner_brush"));
+}
+
 UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer),
     ButtonSize(70.0f) // close and home buttons size in Slate units
@@ -22,8 +46,6 @@ void UXsollaWebBrowserWrapper::NativeConstruct()
 
     ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
     ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
-
-    LoadSlateResources();
 
     SAssignNew(WebBrowserWidget, SWebBrowser)
         .InitialURL(InitialURL)
@@ -56,26 +78,6 @@ void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
     {
         WebBrowserWidget->LoadURL(newURL);
     }
-}
-
-void UXsollaWebBrowserWrapper::LoadSlateResources()
-{
-    TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
-        FName("ButtonStyle"),
-        "/XsollaPlugin/Buttons",
-        "/XsollaPlugin/Buttons"
-    );
-    FSlateGameResources& buttonStyle = slateButtonResources.Get();
-    SlateCloseBrush = buttonStyle.GetBrush(FName("close_red_brush"));
-    SlateBackBrush = buttonStyle.GetBrush(FName("back_brush"));
-
-    TSharedRef<FSlateGameResources> slateSpinnerResources = FSlateGameResources::New(
-        FName("SpinnerStyle"),
-        "/XsollaPlugin/LoadingSpinner",
-        "/XsollaPlugin/LoadingSpinner"
-    );
-    FSlateGameResources& spinnerStyle = slateSpinnerResources.Get();
-    SlateSpinnerBrush = spinnerStyle.GetBrush(FName("spinner_brush"));
 }
 
 void UXsollaWebBrowserWrapper::ComposeShopWrapper()

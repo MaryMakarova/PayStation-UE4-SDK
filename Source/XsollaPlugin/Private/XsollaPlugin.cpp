@@ -30,6 +30,8 @@ void FXsollaPluginModule::StartupModule()
     RegisterSettings();
 
     UXsollaShop* shop = NewObject<UXsollaShop>(UXsollaShop::StaticClass());
+
+    LoadSlateResources();
 }
 
 void FXsollaPluginModule::ShutdownModule()

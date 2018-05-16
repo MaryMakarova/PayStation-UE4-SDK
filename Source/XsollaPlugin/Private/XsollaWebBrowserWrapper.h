@@ -16,6 +16,11 @@ DECLARE_DELEGATE(FOnShopClosed);
 
 class IWebBrowserWindow;
 
+/**
+* Load slate resources
+*/
+void LoadSlateResources();
+
 UCLASS()
 class XSOLLAPLUGIN_API UXsollaWebBrowserWrapper : public UUserWidget
 {
@@ -75,7 +80,6 @@ public:
     FOnShopClosed OnShopClosed;
 
 private:
-    void LoadSlateResources();
     void ComposeShopWrapper();
 
     void HandleOnUrlChanged(const FText& text);
@@ -96,10 +100,6 @@ private:
     TSharedPtr<class SVerticalBox>      Background;
 
     TSharedPtr<class SOverlay>          BrowserOverlay;
-
-    const FSlateBrush*                  SlateCloseBrush;
-    const FSlateBrush*                  SlateBackBrush;
-    const FSlateBrush*                  SlateSpinnerBrush;
 
     SHorizontalBox::FSlot& BrowserSlot              = SHorizontalBox::Slot();
     SHorizontalBox::FSlot& BrowserSlotMarginLeft    = SHorizontalBox::Slot();
