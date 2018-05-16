@@ -150,8 +150,13 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
             ]
         ];
 
-    GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 10);
-    GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9);
+    GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 9999);
+    GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9998);
+
+    bPrevShowMouseCursor = UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor;
+    UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+
+    //FSlateApplication::Get().SetKeyboardFocus(WebBrowserWidget.ToSharedRef());
 }
 
 void UXsollaWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
@@ -231,10 +236,16 @@ void UXsollaWebBrowserWrapper::Clear()
     {
         GEngine->GameViewport->SetIgnoreInput(bPrevGameViewportInputIgnoring);
 
-        player->GetSlateOperations().SetUserFocus(PrevFocusedWidget.ToSharedRef());
+        if (PrevFocusedWidget.IsValid())
+        {
+            player->GetSlateOperations().SetUserFocus(PrevFocusedWidget.ToSharedRef());
+        }
+
         // player->GetSlateOperations().LockMouseToWidget(PrevFocusedWidget.ToSharedRef());
         player->GetSlateOperations().ReleaseMouseCapture();
         player->GetSlateOperations().ReleaseMouseLock();
+
+        UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = bPrevShowMouseCursor;
     }
 
     if (MainContent.IsValid() && Background.IsValid())

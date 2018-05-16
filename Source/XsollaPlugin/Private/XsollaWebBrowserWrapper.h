@@ -118,4 +118,5 @@ private:
     TSharedPtr<SWidget> PrevFocusedWidget;
     bool                bPrevGameViewportInputIgnoring;
     bool                bPrevShouldUseHighPresCapture = true;
+    bool                bPrevShowMouseCursor = false;
 };
