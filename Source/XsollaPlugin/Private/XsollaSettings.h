@@ -24,4 +24,7 @@ public:
 
     UPROPERTY(config, EditAnywhere)
         bool bSandboxMode;
+
+    UPROPERTY(config, EditAnywhere)
+        float ButtonSize = 50.0f;
 };

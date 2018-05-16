@@ -35,7 +35,7 @@ void LoadSlateResources()
 
 UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer),
-    ButtonSize(70.0f) // close and home buttons size in Slate units
+    ButtonSize(GetDefault<UXsollaPluginSettings>()->ButtonSize) // close and home buttons size in Slate units
 {
     bIsVariable = true;
 }
@@ -68,8 +68,6 @@ void UXsollaWebBrowserWrapper::NativeConstruct()
     bPrevGameViewportInputIgnoring = GEngine->GameViewport->IgnoreInput();
 
     GEngine->GameViewport->SetIgnoreInput(true);
-
-    ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 }
 
 void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
@@ -103,9 +101,10 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                     SNew(SVerticalBox)
                     + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
                     [
-                        SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                        SNew(SBox).MaxDesiredWidth(ButtonSize).MaxDesiredHeight(ButtonSize)
                         [
                             SAssignNew(CloseButton, SButton)
+                            .ContentPadding(FMargin(5.0f, 5.0f))
                             .Visibility(EVisibility::Hidden)
                             .ContentPadding(FMargin(0, 0))
                             .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
@@ -113,15 +112,16 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                             .Content()
                             [
                                 SNew(SImage)
-                                .Image(SlateCloseBrush)
+                                .Image(g_SlateCloseBrush)
                             ]
                         ]
                     ]
                     + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
                     [
-                        SNew(SBox).HeightOverride(ButtonSize).WidthOverride(ButtonSize)
+                        SNew(SBox).MaxDesiredWidth(ButtonSize).MaxDesiredHeight(ButtonSize)
                         [
                             SAssignNew(HomeButton, SButton)
+                            .ContentPadding(FMargin(5.0f, 5.0f))
                             .Visibility(EVisibility::Hidden)
                             .ContentPadding(FMargin(0, 0))
                             .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
@@ -129,7 +129,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                             .Content()
                             [
                                 SNew(SImage)
-                                .Image(SlateBackBrush)
+                                .Image(g_SlateBackBrush)
                             ]
                         ]
                     ]
