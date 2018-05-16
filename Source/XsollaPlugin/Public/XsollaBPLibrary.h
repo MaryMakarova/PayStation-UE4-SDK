@@ -66,14 +66,4 @@ public:
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
         static void SetStringProperty(FString prop, FString value, bool bOverride = true);
-
-    /**
-    * Returns transaction history for user to callback on succeed.
-    *
-    * @param userId - User ID.
-    * @param onSucceeded - On succeded delegate.
-    * @param onFailed - On failed delegate.
-    */
-    //UFUNCTION(BlueprintCallable, Category = "Xsolla")
-    //    static void GetTransactionHistoryForUser(FString userId, FOnTransactionsGetSucceeded onSucceeded, FOnTransactionsGetFailed onFailed);
 };
