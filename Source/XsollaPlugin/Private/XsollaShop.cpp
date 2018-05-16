@@ -14,15 +14,15 @@ void UXsollaShop::Create(
     EShopSizeEnum shopSize,
     FString userId,
     FOnPaymantSucceeded onSucceeded, 
-    FOnPaymantCanceled onCanceled,
+    FOnPaymantCanceled onClose,
     FOnPaymantFailed onFailed)
 {
-    // show browser wrapper
+    // create browser wrapper
     BrowserWrapper = CreateWidget<UXsollaWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaWebBrowserWrapper::StaticClass());
 
     // set delegates
     this->OnSucceeded = onSucceeded;
-    this->OnCanceled = onCanceled;
+    this->onClose = onClose;
     this->OnFailed = onFailed;
 
     BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
@@ -129,21 +129,23 @@ void UXsollaShop::Create(
 
         BrowserWrapper->LoadURL(ShopUrl);
     }
+
+    bIsShopOpen = true;
 }
 
 void UXsollaShop::CreateWithToken(
     FString token,
     EShopSizeEnum shopSize,
     FOnPaymantSucceeded onSucceeded,
-    FOnPaymantCanceled onCanceled,
+    FOnPaymantCanceled onClose,
     FOnPaymantFailed onFailed)
 {
-    // show browser wrapper
+    // create browser wrapper
     BrowserWrapper = CreateWidget<UXsollaWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaWebBrowserWrapper::StaticClass());
 
     // set delegates
     this->OnSucceeded = onSucceeded;
-    this->OnCanceled = onCanceled;
+    this->onClose = onClose;
     this->OnFailed = onFailed;
 
     BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
@@ -169,6 +171,8 @@ void UXsollaShop::CreateWithToken(
     SetToken(token);
 
     BrowserWrapper->LoadURL(ShopUrl);
+
+    bIsShopOpen = true;
 }
 
 void UXsollaShop::SetNumberProperty(FString prop, int value, bool bOverride/*= true */)
@@ -392,4 +396,13 @@ void UXsollaShop::OnShopClosed()
 
     // clear token json
     TokenRequestJson = MakeShareable(new FJsonObject);
+
+    bIsShopOpen = false;
+
+    if (onClose.IsBound())
+    {
+        onClose.Execute();
+    }
+
+    BrowserWrapper->RemoveFromViewport();
 }

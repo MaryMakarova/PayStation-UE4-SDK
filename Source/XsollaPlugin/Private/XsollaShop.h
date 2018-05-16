@@ -41,7 +41,7 @@ public:
     * @param shopSize - Size of shop page and wrapper.
     * @param userId - user ID
     * @param onSucceeded - On payment succeeded delegate.
-    * @param onCanceled - On payment canceled delegate.
+    * @param onClose - On payment canceled delegate.
     * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
@@ -49,7 +49,7 @@ public:
         EShopSizeEnum shopSize,
         FString userId, 
         FOnPaymantSucceeded onSucceeded,
-        FOnPaymantCanceled onCanceled, 
+        FOnPaymantCanceled onClose,
         FOnPaymantFailed onFailed);
 
     /**
@@ -59,7 +59,7 @@ public:
     * @param externalId - external id for transaction.
     * @param shopSize - Size of shop page and wrapper.
     * @param onSucceeded - On payment succeeded delegate.
-    * @param onCanceled - On payment canceled delegate.
+    * @param onClose - On payment canceled delegate.
     * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "Xsolla")
@@ -67,7 +67,7 @@ public:
             FString token, 
             EShopSizeEnum shopSize, 
             FOnPaymantSucceeded onSucceeded,
-            FOnPaymantCanceled onCanceled,
+            FOnPaymantCanceled onClose,
             FOnPaymantFailed onFailed);
 
     
@@ -108,6 +108,9 @@ private:
     void SetDefaultTokenProperties();
     void OnShopClosed();
 
+public:
+    bool bIsShopOpen = false;
+
 private:
     XsollaPluginHttpTool * HttpTool;
 
@@ -128,6 +131,6 @@ private:
     TSharedPtr<FJsonObject> TokenRequestJson;
 
     FOnPaymantSucceeded OnSucceeded;
-    FOnPaymantCanceled OnCanceled;
+    FOnPaymantCanceled onClose;
     FOnPaymantFailed OnFailed;
 };
