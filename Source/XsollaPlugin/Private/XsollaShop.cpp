@@ -364,13 +364,12 @@ void UXsollaShop::OnShopClosed()
     {
         if (bWasSuccessful)
         {
-            FTransactionDetails transactionDetails;
-
             if (Response->GetResponseCode() == 200)
             {
                 UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment payment verified"));
 
-                transactionDetails.TransactionStatus = "DONE";
+                FTransactionDetails transactionDetails;
+                FJsonObjectConverter::JsonObjectStringToUStruct(Response->GetContentAsString(), &transactionDetails, 0, 0);
 
                 if (OnSucceeded.IsBound())
                 {
@@ -380,8 +379,6 @@ void UXsollaShop::OnShopClosed()
             else
             {
                 UE_LOG(LogTemp, Warning, TEXT("Http tool: /payment failed to verify payment."));
-
-                transactionDetails.TransactionStatus = "FAILED";
 
                 if (OnFailed.IsBound())
                 {
