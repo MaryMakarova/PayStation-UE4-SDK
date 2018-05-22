@@ -6,6 +6,8 @@
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "Developer/Settings/Public/ISettingsSection.h"
 
+#include "WebBrowserModule.h"
+
 #define LOCTEXT_NAMESPACE "FXsollaPluginModule"
 
 class FXsollaPluginModule : public IXsollaPluginModule
@@ -32,6 +34,9 @@ void FXsollaPluginModule::StartupModule()
     UXsollaShop* shop = NewObject<UXsollaShop>(UXsollaShop::StaticClass());
 
     LoadSlateResources();
+
+    // preload web browser module to avoid freeze
+    FModuleManager::LoadModuleChecked<IWebBrowserModule>("WebBrowser").GetSingleton();
 }
 
 void FXsollaPluginModule::ShutdownModule()
