@@ -64,7 +64,7 @@ void UXsollaShop::Create(
 
     SetDefaultTokenProperties();
 
-    BrowserWrapper->AddToViewport(9999);
+    BrowserWrapper->Open();
 
     if (GetDefault<UXsollaPluginSettings>()->IntegrationType == EIntegrationType::VE_SERVER)
     {
@@ -165,7 +165,7 @@ void UXsollaShop::CreateWithToken(
     }
 
     // add wrapper to viewport
-    BrowserWrapper->AddToViewport(9999);
+    BrowserWrapper->Open();
 
     // join token to shop url
     SetToken(token);

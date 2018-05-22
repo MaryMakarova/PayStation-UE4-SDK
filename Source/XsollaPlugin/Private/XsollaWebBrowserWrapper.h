@@ -38,6 +38,11 @@ public:
     virtual void NativeConstruct() override;
 
     /**
+    * Open shop 
+    */
+    void Open();
+
+    /**
     * Load new url.
     *
     * @param newURL - Url to load.

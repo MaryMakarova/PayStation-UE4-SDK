@@ -43,7 +43,10 @@ UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& obj
 void UXsollaWebBrowserWrapper::NativeConstruct()
 {
     Super::NativeConstruct();
+}
 
+void UXsollaWebBrowserWrapper::Open()
+{
     ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
     ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
 
