@@ -14,15 +14,15 @@
 	"IsBetaVersion": false,
 	"Installed": false,
 	"Modules": [
-		{
-			"Name": "XsollaPlugin",
-			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen",
-			"WhitelistPlatforms" :
-			[
-				"Win64",
-				"Win32"
-			]
-		}
+        {
+            "Name": "XsollaPlugin",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "WhitelistPlatforms": 
+            [
+                "Win64",
+                "Win32"
+            ]
+        }
 	]
 }
