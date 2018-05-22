@@ -11,7 +11,6 @@
 
 const FSlateBrush* g_SlateCloseBrush;
 const FSlateBrush* g_SlateBackBrush;
-const FSlateBrush* g_SlateSpinnerBrush;
 
 void LoadSlateResources()
 {
@@ -23,14 +22,6 @@ void LoadSlateResources()
     FSlateGameResources& buttonStyle = slateButtonResources.Get();
     g_SlateCloseBrush = buttonStyle.GetBrush(FName("close_red_brush"));
     g_SlateBackBrush = buttonStyle.GetBrush(FName("back_brush"));
-
-    TSharedRef<FSlateGameResources> slateSpinnerResources = FSlateGameResources::New(
-        FName("SpinnerStyle"),
-        "/XsollaPlugin/LoadingSpinner",
-        "/XsollaPlugin/LoadingSpinner"
-    );
-    FSlateGameResources& spinnerStyle = slateSpinnerResources.Get();
-    g_SlateSpinnerBrush = spinnerStyle.GetBrush(FName("spinner_brush"));
 }
 
 UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
