@@ -194,11 +194,11 @@ void UXsollaWebBrowserWrapper::HandleOnLoadCompleted()
 
         ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 
-        if (player != NULL)
+        if (player != NULL && MainContent.IsValid() && WebBrowserWidget.IsValid())
         {
-            player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
-            player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
-            player->GetSlateOperations().ReleaseMouseCapture();
+            //player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
+            //player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
+            //player->GetSlateOperations().ReleaseMouseCapture();
         }
     }
 
