@@ -62,7 +62,7 @@ public:
     *
     * @param bCheckTransactionResult - Check transaction result after shop close or not
     */
-    void CloseShop(bool bCheckTransactionResult);
+    FReply CloseShop();
 
     /**
     * Removes all widgets
@@ -71,16 +71,16 @@ public:
 
 public:
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
-        FOnUrlChanged OnUrlChanged;
+    FOnUrlChanged OnUrlChanged;
 
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
-        FOnLoadCompleted OnLoadCompleted;
+    FOnLoadCompleted OnLoadCompleted;
 
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
-        FOnLoadError OnLoadError;
+    FOnLoadError OnLoadError;
 
     UPROPERTY(BlueprintAssignable, Category = "Web Browser|Event")
-        FOnCloseWindow OnCloseWindow;
+    FOnCloseWindow OnCloseWindow;
 
     FOnShopClosed OnShopClosed;
 
@@ -91,8 +91,7 @@ private:
     void HandleOnLoadCompleted();
     void HandleOnLoadError();
     bool HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& browserWindow);
-    bool HandleOnBeforePopup(FString Url, FString param);
-    void HandleOnHomeButtonClicked();
+    FReply HandleOnHomeButtonClicked();
 
     bool HandleOnPopupCreate(const TWeakPtr<class IWebBrowserWindow>& window, const TWeakPtr<class IWebBrowserPopupFeatures>& feat);
 

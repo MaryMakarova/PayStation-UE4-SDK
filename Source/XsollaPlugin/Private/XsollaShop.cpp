@@ -20,12 +20,17 @@ void UXsollaShop::Create(
     // create browser wrapper
     BrowserWrapper = CreateWidget<UXsollaWebBrowserWrapper>(GEngine->GameViewport->GetWorld(), UXsollaWebBrowserWrapper::StaticClass());
 
+    // unbind delegates
+    this->OnSucceeded.Unbind();
+    this->onClose.Unbind();
+    this->OnFailed.Unbind();
+
     // set delegates
     this->OnSucceeded = onSucceeded;
     this->onClose = onClose;
     this->OnFailed = onFailed;
 
-    BrowserWrapper->OnShopClosed.BindLambda([this]() { this->OnShopClosed(); return; });
+    BrowserWrapper->OnShopClosed.BindUObject(this, &UXsollaShop::OnShopClosed);
 
     // load data from config
     LoadConfig(GetDefault<UXsollaPluginSettings>()->IntegrationType);
@@ -400,6 +405,4 @@ void UXsollaShop::OnShopClosed()
     {
         onClose.Execute();
     }
-
-    BrowserWrapper->RemoveFromViewport();
 }

@@ -12,6 +12,8 @@
 const FSlateBrush* g_SlateCloseBrush;
 const FSlateBrush* g_SlateBackBrush;
 
+TSharedPtr<SWebBrowser> g_WebBrowserWidget;
+
 void LoadSlateResources()
 {
     TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
@@ -102,7 +104,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                             .Visibility(EVisibility::Hidden)
                             .ContentPadding(FMargin(0, 0))
                             .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                            .OnClicked_Lambda([this]() { this->CloseShop(false); return FReply::Handled(); })
+                            .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::CloseShop)
                             .Content()
                             [
                                 SNew(SImage)
@@ -119,7 +121,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                             .Visibility(EVisibility::Hidden)
                             .ContentPadding(FMargin(0, 0))
                             .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                            .OnClicked_Lambda([this]() { this->HandleOnHomeButtonClicked(); return FReply::Handled(); })
+                            .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked)
                             .Content()
                             [
                                 SNew(SImage)
@@ -151,24 +153,30 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
 
     //FSlateApplication::Get().SetKeyboardFocus(WebBrowserWidget.ToSharedRef());
+
+    ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
+
+    if (player != NULL && MainContent.IsValid() && WebBrowserWidget.IsValid())
+    {
+        player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
+        //player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
+        //player->GetSlateOperations().ReleaseMouseCapture();
+    }
 }
 
-void UXsollaWebBrowserWrapper::CloseShop(bool bCheckTransactionResult)
+FReply UXsollaWebBrowserWrapper::CloseShop()
 {
     if (OnShopClosed.IsBound())
     {
         OnShopClosed.Execute();
     }
+
+    return FReply::Handled();
 }
 
 void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
     UE_LOG(LogTemp, Warning, TEXT("New url: %s"), *(WebBrowserWidget->GetUrl()));
-
-    if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
-    {
-        CloseShop(false);
-    }
 
     if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) && !WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
     {
@@ -181,33 +189,25 @@ void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
     }
 
     OnUrlChanged.Broadcast(inText);
+
+    if (WebBrowserWidget->GetUrl().Contains("www.unrealengine"))
+    {
+        CloseShop();
+    }
 }
+
 void UXsollaWebBrowserWrapper::HandleOnLoadCompleted()
 {
-    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
-    {
-        //BrowserSlot.DetachWidget();
-        //BrowserSlot.AttachWidget(WebBrowserWidget.ToSharedRef());
-        //BrowserSlot.Padding((ViewportSize.X - ContentSize.X) / 2, (ViewportSize.Y - ContentSize.Y) / 2);
-
-        CloseButton->SetVisibility(EVisibility::Visible);
-
-        ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
-
-        if (player != NULL && MainContent.IsValid() && WebBrowserWidget.IsValid())
-        {
-            //player->GetSlateOperations().SetUserFocus(WebBrowserWidget.ToSharedRef());
-            //player->GetSlateOperations().LockMouseToWidget(MainContent.ToSharedRef());
-            //player->GetSlateOperations().ReleaseMouseCapture();
-        }
-    }
+    CloseButton->SetVisibility(EVisibility::Visible);
 
     OnLoadCompleted.Broadcast();
 }
+
 void UXsollaWebBrowserWrapper::HandleOnLoadError()
 {
     OnLoadError.Broadcast();
 }
+
 bool UXsollaWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& newBrowserWindow)
 {
     UE_LOG(LogTemp, Warning, TEXT("Window closed."));
@@ -247,9 +247,11 @@ void UXsollaWebBrowserWrapper::Clear()
         GEngine->GameViewport->RemoveViewportWidgetContent(MainContent.ToSharedRef());
         GEngine->GameViewport->RemoveViewportWidgetContent(Background.ToSharedRef());
     }
+
+    PopupWidgets.clear();
 }
 
-void UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
+FReply UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
 {
     if (!PopupWidgets.empty())
     {
@@ -270,6 +272,8 @@ void UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
     {
         this->LoadURL(XsollaPlugin::GetShop()->ShopUrl);
     }
+
+    return FReply::Handled();
 }
 
 bool UXsollaWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)

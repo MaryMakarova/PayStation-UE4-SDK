@@ -31,8 +31,6 @@ void FXsollaPluginModule::StartupModule()
 
     RegisterSettings();
 
-    UXsollaShop* shop = NewObject<UXsollaShop>(UXsollaShop::StaticClass());
-
     LoadSlateResources();
 
     // preload web browser module to avoid freeze

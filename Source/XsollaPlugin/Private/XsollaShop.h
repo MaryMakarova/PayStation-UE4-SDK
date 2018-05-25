@@ -114,6 +114,9 @@ public:
 private:
     XsollaPluginHttpTool * HttpTool;
 
+    UPROPERTY()
+    UXsollaWebBrowserWrapper* BrowserWrapper;
+
     FString ApiUrl          = "https://secure.xsolla.com/paystation3";
     FString SandboxApiUrl   = "https://sandbox-secure.xsolla.com/paystation3";
 
@@ -125,8 +128,6 @@ private:
     FString ProjectId;
     FString ExternalId;
     bool bIsSandbox;
-
-    UXsollaWebBrowserWrapper* BrowserWrapper;
 
     TSharedPtr<FJsonObject> TokenRequestJson;
 

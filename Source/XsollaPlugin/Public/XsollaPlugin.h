@@ -10,11 +10,9 @@ namespace XsollaPlugin
     *
     * @return Xsolla Shop
     */
-    inline UXsollaShop* GetShop()
+    UXsollaShop* GetShop()
     {
-        UXsollaShop* shop = (UXsollaShop*)UXsollaShop::StaticClass()->GetDefaultObject();
-
-        return shop;
+        return GetMutableDefault<UXsollaShop>();
     }
 }
 
