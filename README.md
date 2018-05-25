@@ -1,5 +1,8 @@
 # Xsolla Plugin
 
+### Example project
+* [Win64](https://bitbucket.org/sirykvt/xsollaplugin/downloads/win64.zip)
+
 ### Download with prebuilt binaries
 Engine version: 
 
