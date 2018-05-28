@@ -12,7 +12,7 @@ Engine version:
 Unpack downloaded archive to `{YourProject}/Plugins/`. Create folder, if not exists.
 
 ### Setting up
-Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. 
+Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, `Integration Type` and `Project Id`. If you want to use shop in sandbox mode, check `Sandbox Mode` checkbox. Server example for server integration located in `/Server` folder.
 
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
