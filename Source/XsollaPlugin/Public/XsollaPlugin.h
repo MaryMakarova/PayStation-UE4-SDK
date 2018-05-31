@@ -10,7 +10,7 @@ namespace XsollaPlugin
     *
     * @return Xsolla Shop
     */
-    UXsollaShop* GetShop()
+    inline UXsollaShop* GetShop()
     {
         return GetMutableDefault<UXsollaShop>();
     }
