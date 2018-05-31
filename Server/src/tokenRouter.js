@@ -23,6 +23,7 @@ module.exports = class TokenRouter {
 
             // remove terminated symbols
             let requestJson = JSON.parse('' + req.rawBody + '');
+            requestJson.settings.project_id = this.globals.project_id;
 
             let options = {
                 url: url,

@@ -9,6 +9,7 @@ const Globals = {
     port: 3333,
     apiKey: 'IntutXFyKb3HKlLt',
     merchantId: '43043',
+    projectId: 24536,
     projectSecretKey: '0HyiqVWXx4gFonSN',
     successStatusCode: 200,
     errorStatusCode: 400,
