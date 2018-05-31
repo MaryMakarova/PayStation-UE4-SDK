@@ -7,6 +7,9 @@
 #include "Misc/Base64.h"
 #include "XsollaTelegramScheme.h"
 
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
+#include "Runtime/Engine/Classes/Engine/RendererSettings.h"
+
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
 const FSlateBrush* g_SlateCloseBrush;
@@ -28,7 +31,7 @@ void LoadSlateResources()
 
 UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer),
-    ButtonSize(GetDefault<UXsollaPluginSettings>()->ButtonSize) // close and home buttons size in Slate units
+    ButtonSize(GetDefault<UXsollaPluginSettings>()->ButtonSize)
 {
     bIsVariable = true;
 }
@@ -41,7 +44,6 @@ void UXsollaWebBrowserWrapper::NativeConstruct()
 void UXsollaWebBrowserWrapper::Open()
 {
     ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
-    ContentSize.Y = ContentSize.Y > ViewportSize.Y ? ViewportSize.Y : ContentSize.Y;
 
     SAssignNew(WebBrowserWidget, SWebBrowser)
         .InitialURL(InitialURL)
@@ -76,78 +78,72 @@ void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
 
 void UXsollaWebBrowserWrapper::ComposeShopWrapper()
 {
-    //BrowserSlot.AttachWidget(SAssignNew(SpinnerImage, SSpinningImage).Image(SlateSpinnerBrush).Period(3.0f));
+    float viewportScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
+    FSlateRenderTransform renderTransform(FScale2D(viewportScale), FVector2D(0.f, 0.f));
 
-    BrowserSlot.AttachWidget(SAssignNew(BrowserOverlay, SOverlay));
-    BrowserOverlay->AddSlot(0).AttachWidget(WebBrowserWidget.ToSharedRef());
+    BrowserOverlay = SNew(SOverlay);
+    BrowserOverlay->AddSlot(0)
+    [
+        WebBrowserWidget.ToSharedRef()
+    ];
+
+    FVector2D offset = (ViewportSize - ContentSize * viewportScale) / 2 / viewportScale;
 
     MainContent = 
-        SNew(SVerticalBox)
-        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2)
-        + SVerticalBox::Slot().FillHeight(ContentSize.Y)
-        [
-            SNew(SHorizontalBox)
-            + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2)
-            + SHorizontalBox::Slot().FillWidth(ContentSize.X + ButtonSize)
+            SNew(SConstraintCanvas)
+            .RenderTransform(renderTransform)
+            .RenderTransformPivot(FVector2D(0.f, 0.f))
+            + SConstraintCanvas::Slot()
+            .Offset(FMargin(offset.X / viewportScale, offset.Y / viewportScale, ContentSize.X / viewportScale, ContentSize.Y / viewportScale))
+            .Anchors(FAnchors(0.f, 0.f))
+            .Alignment(FVector2D(0.f, 0.f))
             [
-                SNew(SHorizontalBox)
-                + BrowserSlot.FillWidth(ContentSize.X)
-                + SHorizontalBox::Slot().FillWidth(ButtonSize)
+                BrowserOverlay.ToSharedRef()
+            ]
+            + SConstraintCanvas::Slot()
+            .Anchors(FAnchors(0.f, 0.f))
+            .Offset(FMargin((ContentSize.X + offset.X) / viewportScale, offset.Y / viewportScale, ButtonSize / viewportScale, ButtonSize / viewportScale))
+            .Alignment(FVector2D(0.f, 0.f))
+            [
+                SAssignNew(CloseButton, SButton)
+                .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                .ContentPadding(FMargin(5.f, 5.f))
+                .Visibility(EVisibility::Hidden)
+                .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::CloseShop)
+                .Content()
                 [
-                    SNew(SVerticalBox)
-                    + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
-                    [
-                        SNew(SBox).MaxDesiredWidth(ButtonSize).MaxDesiredHeight(ButtonSize)
-                        [
-                            SAssignNew(CloseButton, SButton)
-                            .ContentPadding(FMargin(5.0f, 5.0f))
-                            .Visibility(EVisibility::Hidden)
-                            .ContentPadding(FMargin(0, 0))
-                            .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                            .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::CloseShop)
-                            .Content()
-                            [
-                                SNew(SImage)
-                                .Image(g_SlateCloseBrush)
-                            ]
-                        ]
-                    ]
-                    + SVerticalBox::Slot().AutoHeight().HAlign(HAlign_Left)
-                    [
-                        SNew(SBox).MaxDesiredWidth(ButtonSize).MaxDesiredHeight(ButtonSize)
-                        [
-                            SAssignNew(HomeButton, SButton)
-                            .ContentPadding(FMargin(5.0f, 5.0f))
-                            .Visibility(EVisibility::Hidden)
-                            .ContentPadding(FMargin(0, 0))
-                            .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
-                            .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked)
-                            .Content()
-                            [
-                                SNew(SImage)
-                                .Image(g_SlateBackBrush)
-                            ]
-                        ]
-                    ]
+                    SNew(SImage).Image(g_SlateCloseBrush)
                 ]
             ]
-            + SHorizontalBox::Slot().FillWidth((ViewportSize.X - ContentSize.X) / 2 - ButtonSize)
-        ]
-        + SVerticalBox::Slot().FillHeight((ViewportSize.Y - ContentSize.Y) / 2);
+            + SConstraintCanvas::Slot()
+            .Anchors(FAnchors(0.f, 0.f))
+            .Offset(FMargin((ContentSize.X + offset.X) / viewportScale, (offset.Y + ButtonSize) / viewportScale, ButtonSize / viewportScale, ButtonSize / viewportScale))
+            .Alignment(FVector2D(0.f, 0.f))
+            [
+                SAssignNew(HomeButton, SButton)
+                .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
+                .ContentPadding(FMargin(5.f, 5.f))
+                .Visibility(EVisibility::Hidden)
+                .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked)
+                .Content()
+                [
+                    SNew(SImage).Image(g_SlateBackBrush)
+                ]
+            ];
 
     Background = 
         SNew(SVerticalBox)
-        + SVerticalBox::Slot().FillHeight(1.0f)
+        + SVerticalBox::Slot().FillHeight(1.f)
         [
             SNew(SHorizontalBox)
-            + SHorizontalBox::Slot().FillWidth(1.0f)
+            + SHorizontalBox::Slot().FillWidth(1.f)
             [
-                SNew(SColorBlock).Color(FLinearColor(0.0f, 0.0f, 0.0f, 0.5f))
+                SNew(SColorBlock).Color(FLinearColor(0.f, 0.f, 0.f, 0.5f))
             ]
         ];
 
-    GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 9999);
     GEngine->GameViewport->AddViewportWidgetContent(Background.ToSharedRef(), 9998);
+    GEngine->GameViewport->AddViewportWidgetContent(MainContent.ToSharedRef(), 9999);
 
     bPrevShowMouseCursor = UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor;
     UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
@@ -288,6 +284,8 @@ bool UXsollaWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWin
     args.SupportsTransparency(bSupportsTransparency);
     args.ShowControls(false);
     //args.OnShowDialog_Lambda([](const TWeakPtr<IWebBrowserDialog>& dial) { return EWebBrowserDialogEventResponse::Ignore; });
+    args.OnCreateWindow(BIND_UOBJECT_DELEGATE(FOnCreateWindowDelegate, HandleOnPopupCreate));
+    args.OnSuppressContextMenu_Lambda([]() { return true; });
     args.OnCloseWindow_Lambda([=](const TWeakPtr<IWebBrowserWindow>& win)
     { 
         BrowserOverlay->RemoveSlot(PopupWidgets.size());

@@ -96,23 +96,17 @@ private:
     bool HandleOnPopupCreate(const TWeakPtr<class IWebBrowserWindow>& window, const TWeakPtr<class IWebBrowserPopupFeatures>& feat);
 
 private:
-    TSharedPtr<class SVerticalBox>      MainContent;
-    TSharedPtr<class SWebBrowser>       WebBrowserWidget;
-    TSharedPtr<class SSpinningImage>    SpinnerImage;
-    TSharedPtr<class SButton>           CloseButton;
-    TSharedPtr<class SButton>           HomeButton;
-    TSharedPtr<class SVerticalBox>      Background;
+    TSharedPtr<class SConstraintCanvas>     MainContent;
+    TSharedPtr<class SWebBrowser>           WebBrowserWidget;
+    TSharedPtr<class SVerticalBox>          Background;
+    TSharedPtr<class SOverlay>              BrowserOverlay; 
+    TSharedPtr<class SButton>               CloseButton;
+    TSharedPtr<class SButton>               HomeButton;
 
-    TSharedPtr<class SOverlay>          BrowserOverlay;
-
-    SHorizontalBox::FSlot& BrowserSlot              = SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginLeft    = SHorizontalBox::Slot();
-    SHorizontalBox::FSlot& BrowserSlotMarginRight   = SHorizontalBox::Slot();      
-
-    float       ButtonSize;
     FVector2D   ViewportSize;
     FVector2D   ContentSize;
     FString     ShopSize;
+    float       ButtonSize;
 
     FString     InitialURL = "";
     bool        bSupportsTransparency = false;
