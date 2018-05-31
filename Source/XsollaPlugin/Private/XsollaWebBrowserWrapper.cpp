@@ -245,6 +245,8 @@ void UXsollaWebBrowserWrapper::Clear()
     }
 
     PopupWidgets.clear();
+
+    XsollaPlugin::GetShop()->bIsShopOpen = false;
 }
 
 FReply UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
