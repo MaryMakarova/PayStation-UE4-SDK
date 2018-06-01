@@ -162,11 +162,20 @@ void UXsollaShop::CreateWithToken(
     switch (shopSize)
     {
         case EShopSizeEnum::VE_Small:
+        {
             BrowserWrapper->SetBrowserSize(620, 630);
+            break;
+        }       
         case EShopSizeEnum::VE_Medium:
+        {
             BrowserWrapper->SetBrowserSize(740, 760);
+            break;
+        }    
         case EShopSizeEnum::VE_Large:
+        {
             BrowserWrapper->SetBrowserSize(820, 840);
+            break;
+        }      
     }
 
     // add wrapper to viewport
