@@ -1,5 +1,7 @@
 #include "XsollaTelegramScheme.h"
 
+#include <string>
+
 bool TelegramSchemeHandler::ProcessRequest(const FString& verb, const FString& url, const FSimpleDelegate& onHeadersReady)
 {
 #if PLATFORM_WINDOWS
@@ -27,6 +29,11 @@ bool TelegramSchemeHandler::ProcessRequest(const FString& verb, const FString& u
     {
         UE_LOG(LogTemp, Warning, TEXT("Cant find telegram."));
     }
+#endif
+
+#if PLATFORM_MAC
+    FString telegramCommand = "open -a Telegram.app -- " + url;
+    system(TCHAR_TO_ANSI(*telegramCommand));
 #endif
 
     return false;
