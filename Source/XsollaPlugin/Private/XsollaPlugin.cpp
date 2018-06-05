@@ -31,8 +31,6 @@ void FXsollaPluginModule::StartupModule()
 
     RegisterSettings();
 
-    LoadSlateResources();
-
     // preload web browser module to avoid freeze
     FModuleManager::LoadModuleChecked<IWebBrowserModule>("WebBrowser").GetSingleton();
 }

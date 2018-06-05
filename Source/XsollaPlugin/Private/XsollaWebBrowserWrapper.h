@@ -16,11 +16,6 @@ DECLARE_DELEGATE(FOnShopClosed);
 
 class IWebBrowserWindow;
 
-/**
-* Load slate resources
-*/
-void LoadSlateResources();
-
 UCLASS()
 class XSOLLAPLUGIN_API UXsollaWebBrowserWrapper : public UUserWidget
 {

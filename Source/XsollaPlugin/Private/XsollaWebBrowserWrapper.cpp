@@ -6,34 +6,33 @@
 #include "Widgets/Layout/SBox.h"
 #include "Misc/Base64.h"
 #include "XsollaTelegramScheme.h"
+#include "XsollaPlugin.h"
 
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 #include "Runtime/Engine/Classes/Engine/RendererSettings.h"
 
 #define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
 
-const FSlateBrush* g_SlateCloseBrush;
-const FSlateBrush* g_SlateBackBrush;
-
-TSharedPtr<SWebBrowser> g_WebBrowserWidget;
-
-void LoadSlateResources()
-{
-    TSharedRef<FSlateGameResources> slateButtonResources = FSlateGameResources::New(
-        FName("ButtonStyle"),
-        "/XsollaPlugin/Buttons",
-        "/XsollaPlugin/Buttons"
-    );
-    FSlateGameResources& buttonStyle = slateButtonResources.Get();
-    g_SlateCloseBrush = buttonStyle.GetBrush(FName("close_red_brush"));
-    g_SlateBackBrush = buttonStyle.GetBrush(FName("back_brush"));
-}
+FSlateDynamicImageBrush* g_CloseBrush;
+FSlateDynamicImageBrush* g_BackBrush;
 
 UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer),
     ButtonSize(GetDefault<UXsollaPluginSettings>()->ButtonSize)
 {
     bIsVariable = true;
+
+    UTexture2D* closeImage;
+    UTexture2D* backImage;
+
+    ConstructorHelpers::FObjectFinder<UTexture2D> closeImageFinder(TEXT("Texture2D'/XsollaPlugin/Buttons/close'"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> backImageFinder(TEXT("Texture2D'/XsollaPlugin/Buttons/back'"));
+
+    closeImage = closeImageFinder.Object;
+    backImage = backImageFinder.Object;
+
+    g_CloseBrush = new FSlateDynamicImageBrush(closeImage, FVector2D(512, 512), FName("close"));
+    g_BackBrush = new FSlateDynamicImageBrush(backImage, FVector2D(512, 512), FName("back"));
 }
 
 void UXsollaWebBrowserWrapper::NativeConstruct()
@@ -112,7 +111,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                 .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::CloseShop)
                 .Content()
                 [
-                    SNew(SImage).Image(g_SlateCloseBrush)
+                    SNew(SImage).Image(g_CloseBrush)
                 ]
             ]
             + SConstraintCanvas::Slot()
@@ -127,7 +126,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                 .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked)
                 .Content()
                 [
-                    SNew(SImage).Image(g_SlateBackBrush)
+                    SNew(SImage).Image(g_BackBrush)
                 ]
             ];
 
