@@ -1,32 +1,32 @@
-#include "XsollaWebBrowserWrapper.h"
+#include "WebBrowserWrapper.h"
 
-#include "XsollaShop.h"
-#include "XsollaSettings.h"
+#include "XsollaPayStation.h"
+#include "XsollaPayStationSettings.h"
 #include "SWebBrowser.h"
 #include "Widgets/Layout/SBox.h"
 #include "Misc/Base64.h"
 #include "XsollaTelegramScheme.h"
-#include "XsollaPlugin.h"
+#include "XsollaPayStationPlugin.h"
 
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 #include "Runtime/Engine/Classes/Engine/RendererSettings.h"
 
-#define LOCTEXT_NAMESPACE "XsollaPluginWebBrowserWrapper"
+#define LOCTEXT_NAMESPACE "WebBrowserWrapper"
 
 FSlateDynamicImageBrush* g_CloseBrush;
 FSlateDynamicImageBrush* g_BackBrush;
 
-UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& objectInitializer)
+UWebBrowserWrapper::UWebBrowserWrapper(const FObjectInitializer& objectInitializer)
     : Super(objectInitializer),
-    ButtonSize(GetDefault<UXsollaPluginSettings>()->ButtonSize)
+    ButtonSize(GetDefault<UXsollaPayStationSettings>()->ButtonSize)
 {
     bIsVariable = true;
 
     UTexture2D* closeImage;
     UTexture2D* backImage;
 
-    ConstructorHelpers::FObjectFinder<UTexture2D> closeImageFinder(TEXT("Texture2D'/XsollaPlugin/Buttons/close'"));
-    ConstructorHelpers::FObjectFinder<UTexture2D> backImageFinder(TEXT("Texture2D'/XsollaPlugin/Buttons/back'"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> closeImageFinder(TEXT("Texture2D'/XsollaPayStationPlugin/Buttons/close'"));
+    ConstructorHelpers::FObjectFinder<UTexture2D> backImageFinder(TEXT("Texture2D'/XsollaPayStationPlugin/Buttons/back'"));
 
     closeImage = closeImageFinder.Object;
     backImage = backImageFinder.Object;
@@ -35,12 +35,12 @@ UXsollaWebBrowserWrapper::UXsollaWebBrowserWrapper(const FObjectInitializer& obj
     g_BackBrush = new FSlateDynamicImageBrush(backImage, FVector2D(512, 512), FName("back"));
 }
 
-void UXsollaWebBrowserWrapper::NativeConstruct()
+void UWebBrowserWrapper::NativeConstruct()
 {
     Super::NativeConstruct();
 }
 
-void UXsollaWebBrowserWrapper::Open()
+void UWebBrowserWrapper::Open()
 {
     ViewportSize = FVector2D(GEngine->GameViewport->Viewport->GetSizeXY());
 
@@ -67,7 +67,7 @@ void UXsollaWebBrowserWrapper::Open()
     GEngine->GameViewport->SetIgnoreInput(true);
 }
 
-void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
+void UWebBrowserWrapper::LoadURL(FString newURL)
 {
     if (WebBrowserWidget.IsValid())
     {
@@ -75,7 +75,7 @@ void UXsollaWebBrowserWrapper::LoadURL(FString newURL)
     }
 }
 
-void UXsollaWebBrowserWrapper::ComposeShopWrapper()
+void UWebBrowserWrapper::ComposeShopWrapper()
 {
     float viewportScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(ViewportSize.X, ViewportSize.Y));
     FSlateRenderTransform renderTransform(FScale2D(viewportScale), FVector2D(0.f, 0.f));
@@ -108,7 +108,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                 .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
                 .ContentPadding(FMargin(5.f, 5.f))
                 .Visibility(EVisibility::Hidden)
-                .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::CloseShop)
+                .OnClicked_UObject(this, &UWebBrowserWrapper::CloseShop)
                 .Content()
                 [
                     SNew(SImage).Image(g_CloseBrush)
@@ -123,7 +123,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
                 .ButtonColorAndOpacity(FSlateColor(FLinearColor(0, 0, 0, 0)))
                 .ContentPadding(FMargin(5.f, 5.f))
                 .Visibility(EVisibility::Hidden)
-                .OnClicked_UObject(this, &UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked)
+                .OnClicked_UObject(this, &UWebBrowserWrapper::HandleOnHomeButtonClicked)
                 .Content()
                 [
                     SNew(SImage).Image(g_BackBrush)
@@ -159,7 +159,7 @@ void UXsollaWebBrowserWrapper::ComposeShopWrapper()
     }
 }
 
-FReply UXsollaWebBrowserWrapper::CloseShop()
+FReply UWebBrowserWrapper::CloseShop()
 {
     if (OnShopClosed.IsBound())
     {
@@ -169,16 +169,16 @@ FReply UXsollaWebBrowserWrapper::CloseShop()
     return FReply::Handled();
 }
 
-void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
+void UWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
     UE_LOG(LogTemp, Warning, TEXT("New url: %s"), *(WebBrowserWidget->GetUrl()));
 
-    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) && !WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
+    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) && !WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
     {
         HomeButton->SetVisibility(EVisibility::Visible);
     }
 
-    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
+    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
     {
         HomeButton->SetVisibility(EVisibility::Hidden);
     }
@@ -191,19 +191,19 @@ void UXsollaWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
     }
 }
 
-void UXsollaWebBrowserWrapper::HandleOnLoadCompleted()
+void UWebBrowserWrapper::HandleOnLoadCompleted()
 {
     CloseButton->SetVisibility(EVisibility::Visible);
 
     OnLoadCompleted.Broadcast();
 }
 
-void UXsollaWebBrowserWrapper::HandleOnLoadError()
+void UWebBrowserWrapper::HandleOnLoadError()
 {
     OnLoadError.Broadcast();
 }
 
-bool UXsollaWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& newBrowserWindow)
+bool UWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWindow>& newBrowserWindow)
 {
     UE_LOG(LogTemp, Warning, TEXT("Window closed."));
 
@@ -211,13 +211,13 @@ bool UXsollaWebBrowserWrapper::HandleOnCloseWindow(const TWeakPtr<IWebBrowserWin
     return true;
 }
 
-void UXsollaWebBrowserWrapper::SetBrowserSize(float w, float h)
+void UWebBrowserWrapper::SetBrowserSize(float w, float h)
 {
     ContentSize.X = w;
     ContentSize.Y = h;
 }
 
-void UXsollaWebBrowserWrapper::Clear()
+void UWebBrowserWrapper::Clear()
 {
     ULocalPlayer* player = GEngine->GetFirstGamePlayer(GEngine->GameViewport);
 
@@ -245,10 +245,10 @@ void UXsollaWebBrowserWrapper::Clear()
 
     PopupWidgets.clear();
 
-    XsollaPlugin::GetShop()->bIsShopOpen = false;
+	XsollaPayStationPlugin::GetShop()->bIsShopOpen = false;
 }
 
-FReply UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
+FReply UWebBrowserWrapper::HandleOnHomeButtonClicked()
 {
     if (!PopupWidgets.empty())
     {
@@ -257,8 +257,8 @@ FReply UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
 
         if (PopupWidgets.empty())
         {
-            if (WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPlugin::GetShop()->SandboxApiUrl))
-            {
+			if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
+			{
                 HomeButton->SetVisibility(EVisibility::Hidden);
             }
         }
@@ -267,13 +267,13 @@ FReply UXsollaWebBrowserWrapper::HandleOnHomeButtonClicked()
     }
     else
     {
-        this->LoadURL(XsollaPlugin::GetShop()->ShopUrl);
+        this->LoadURL(XsollaPayStationPlugin::GetShop()->ShopUrl);
     }
 
     return FReply::Handled();
 }
 
-bool UXsollaWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
+bool UWebBrowserWrapper::HandleOnPopupCreate(const TWeakPtr<IWebBrowserWindow>& window, const TWeakPtr<IWebBrowserPopupFeatures>& feat)
 {
     UE_LOG(LogTemp, Warning, TEXT("HandleOnPopupCreate()"));
 

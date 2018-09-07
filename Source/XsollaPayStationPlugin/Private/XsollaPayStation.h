@@ -1,13 +1,13 @@
 #pragma once
 
 #include "XsollaHttpTool.h"
-#include "XsollaWebBrowserWrapper.h"
+#include "WebBrowserWrapper.h"
 
-#include "XsollaShop.generated.h"
+#include "XsollaPayStation.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantSucceeded, FTransactionDetails, transactionDetails);
-DECLARE_DYNAMIC_DELEGATE(FOnPaymantCanceled);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymantFailed, FString, errorText);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymentSucceeded, FTransactionDetails, transactionDetails);
+DECLARE_DYNAMIC_DELEGATE(FOnPayStationClosed);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnPaymentFailed, FString, errorText);
 
 /**
 * Shop size enum. Available sizes - Small, Medium, Large. 
@@ -20,17 +20,10 @@ enum class EShopSizeEnum : uint8
     VE_Large	UMETA(DisplayName = "Large")
 };
 
-UENUM(BlueprintType)
-enum class EIntegrationType : uint8
-{
-    VE_SERVER      UMETA(DisplayName = "Server"),
-    VE_SERVELESS   UMETA(DisplayName = "Serveless")
-};
-
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaShop : public UObject
+class XSOLLAPAYSTATIONPLUGIN_API UXsollaPayStation : public UObject
 {
-    friend class UXsollaWebBrowserWrapper;
+    friend class UWebBrowserWrapper;
 
     GENERATED_UCLASS_BODY()
 
@@ -44,32 +37,11 @@ public:
     * @param onClose - On payment canceled delegate.
     * @param onFailed - On payment failed delegate.
     */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void Create(
         EShopSizeEnum shopSize,
-        FString userId, 
-        FOnPaymantSucceeded onSucceeded,
-        FOnPaymantCanceled onClose,
-        FOnPaymantFailed onFailed);
-
-    /**
-    * Open shop with token.
-    *
-    * @param token - Xsolla shop token.
-    * @param externalId - external id for transaction.
-    * @param shopSize - Size of shop page and wrapper.
-    * @param onSucceeded - On payment succeeded delegate.
-    * @param onClose - On payment canceled delegate.
-    * @param onFailed - On payment failed delegate.
-    */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
-        void CreateWithToken(
-            FString token, 
-            EShopSizeEnum shopSize, 
-            FOnPaymantSucceeded onSucceeded,
-            FOnPaymantCanceled onClose,
-            FOnPaymantFailed onFailed);
-
+        FOnPaymentSucceeded onSucceeded,
+        FOnPayStationClosed onClose,
+        FOnPaymentFailed onFailed);
     
     /**
      * Set number property in token json.
@@ -78,7 +50,6 @@ public:
      * @param value - Int value to set.
      * @param bOverride - Can the method overrides property value if exists.
      */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void SetNumberProperty(FString prop, int value, bool bOverride = true);
 
     /**
@@ -88,7 +59,6 @@ public:
     * @param value - Bool value to set.
     * @param bOverride - Can the method overrides property value if exists.
     */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void SetBoolProperty(FString prop, bool value, bool bOverride = true);
 
     /**
@@ -98,40 +68,36 @@ public:
     * @param value - String value to set.
     * @param bOverride - Can the method overrides property value if exists.
     */
-    UFUNCTION(BlueprintCallable, Category = "Xsolla")
     void SetStringProperty(FString prop, FString value, bool bOverride = true);
 
 private:
-    void LoadConfig(EIntegrationType type);
+    void LoadConfig();
     void SetToken(FString token);
-    void SetAccessData(FString data);
-    void SetDefaultTokenProperties();
     void OnShopClosed();
 
 public:
     bool bIsShopOpen = false;
 
 private:
-    XsollaPluginHttpTool * HttpTool;
+    XsollaPayStationHttpTool * HttpTool;
 
     UPROPERTY()
-    UXsollaWebBrowserWrapper* BrowserWrapper;
+    UWebBrowserWrapper* BrowserWrapper;
 
     FString ApiUrl          = "https://secure.xsolla.com/paystation3";
     FString SandboxApiUrl   = "https://sandbox-secure.xsolla.com/paystation3";
 
     FString ShopUrl;
-    FString ServerUrl;
+    FString GetTokenUrl;
+	FString GetPaymentStatusUrl;
     
     FString XsollaToken;
-    FString XsollaAccessString;
-    FString ProjectId;
     FString ExternalId;
     bool bIsSandbox;
 
     TSharedPtr<FJsonObject> TokenRequestJson;
 
-    FOnPaymantSucceeded OnSucceeded;
-    FOnPaymantCanceled onClose;
-    FOnPaymantFailed OnFailed;
+    FOnPaymentSucceeded OnSucceeded;
+    FOnPayStationClosed onClose;
+    FOnPaymentFailed OnFailed;
 };

@@ -1,16 +1,16 @@
-#include "XsollaPlugin.h"
+#include "XsollaPayStationPlugin.h"
 
-#include "XsollaSettings.h"
-#include "XsollaShop.h"
+#include "XsollaPayStationSettings.h"
+#include "XsollaPayStation.h"
 #include "Developer/Settings/Public/ISettingsModule.h"
 #include "Developer/Settings/Public/ISettingsContainer.h"
 #include "Developer/Settings/Public/ISettingsSection.h"
 
 #include "WebBrowserModule.h"
 
-#define LOCTEXT_NAMESPACE "FXsollaPluginModule"
+#define LOCTEXT_NAMESPACE "FXsollaPayStationPluginModule"
 
-class FXsollaPluginModule : public IXsollaPluginModule
+class FXsollaPayStationPluginModule : public IXsollaPayStationPluginModule
 {
 public:
 
@@ -23,9 +23,9 @@ private:
     void UnregisterSettings();
 };
 
-IMPLEMENT_MODULE(FXsollaPluginModule, XsollaPlugin)
+IMPLEMENT_MODULE(FXsollaPayStationPluginModule, XsollaPayStationPlugin)
 
-void FXsollaPluginModule::StartupModule()
+void FXsollaPayStationPluginModule::StartupModule()
 {
     // This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 
@@ -35,7 +35,7 @@ void FXsollaPluginModule::StartupModule()
     FModuleManager::LoadModuleChecked<IWebBrowserModule>("WebBrowser").GetSingleton();
 }
 
-void FXsollaPluginModule::ShutdownModule()
+void FXsollaPayStationPluginModule::ShutdownModule()
 {
     // This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
     // we call this function before unloading the module.
@@ -46,7 +46,7 @@ void FXsollaPluginModule::ShutdownModule()
     }
 }
 
-void FXsollaPluginModule::RegisterSettings()
+void FXsollaPayStationPluginModule::RegisterSettings()
 {
     // Registering some settings is just a matter of exposing the default UObject of
     // your desired class, feel free to add here all those settings you want to expose
@@ -55,22 +55,22 @@ void FXsollaPluginModule::RegisterSettings()
     if (ISettingsModule* settingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
     {
         // Register the settings
-        ISettingsSectionPtr settingsSection = settingsModule->RegisterSettings("Project", "Plugins", "Xsolla",
-            LOCTEXT("RuntimeGeneralSettingsName", "Xsolla"),
+        ISettingsSectionPtr settingsSection = settingsModule->RegisterSettings("Project", "Plugins", "Xsolla PayStation",
+            LOCTEXT("RuntimeGeneralSettingsName", "Xsolla PayStation"),
             LOCTEXT("RuntimeGeneralSettingsDescription", "Base configuration"),
-            GetMutableDefault<UXsollaPluginSettings>()
+            GetMutableDefault<UXsollaPayStationSettings>()
         );
     }
 }
 
-void FXsollaPluginModule::UnregisterSettings()
+void FXsollaPayStationPluginModule::UnregisterSettings()
 {
     // Ensure to unregister all of your registered settings here, hot-reload would
     // otherwise yield unexpected results.
 
     if (ISettingsModule* settingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
     {
-        settingsModule->UnregisterSettings("Project", "Xsolla", "General");
+        settingsModule->UnregisterSettings("Project", "Xsolla PayStation", "General");
     }
 }
 

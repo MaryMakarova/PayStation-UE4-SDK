@@ -2,15 +2,15 @@
 
 using UnrealBuildTool;
 
-public class XsollaPlugin : ModuleRules
+public class XsollaPayStationPlugin : ModuleRules
 {
-    public XsollaPlugin(ReadOnlyTargetRules Target) : base(Target)
+    public XsollaPayStationPlugin(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
         
         PublicIncludePaths.AddRange(
             new string[] {
-                "XsollaPlugin/Public"
+                "XsollaPayStationPlugin/Public"
                 
                 // ... add public include paths required here ...
             }
@@ -19,7 +19,7 @@ public class XsollaPlugin : ModuleRules
         
         PrivateIncludePaths.AddRange(
             new string[] {
-                "XsollaPlugin/Private",
+                "XsollaPayStationPlugin/Private",
                 
                 // ... add other private include paths required here ...
             }

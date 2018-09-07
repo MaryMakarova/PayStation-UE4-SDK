@@ -4,10 +4,10 @@
 #include "Runtime/Json/Public/Json.h"
 #include "Runtime/JsonUtilities/Public/JsonUtilities.h"
 
-class XsollaPluginHttpTool
+class XsollaPayStationHttpTool
 {
 public:
-    XsollaPluginHttpTool();
+    XsollaPayStationHttpTool();
 
     /**
     * Set request authorization header. 

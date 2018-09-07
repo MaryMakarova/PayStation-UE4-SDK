@@ -1,16 +1,16 @@
 #include "XsollaHttpTool.h"
 
-XsollaPluginHttpTool::XsollaPluginHttpTool()
+XsollaPayStationHttpTool::XsollaPayStationHttpTool()
 {
     Http = &FHttpModule::Get();
 }
 
-void XsollaPluginHttpTool::SetAuthorizationHash(FString hash, TSharedRef<IHttpRequest>& request)
+void XsollaPayStationHttpTool::SetAuthorizationHash(FString hash, TSharedRef<IHttpRequest>& request)
 {
     request->SetHeader(AuthorizationHeader, hash);
 }
 
-TSharedRef<IHttpRequest> XsollaPluginHttpTool::RequestWithRoute(FString route)
+TSharedRef<IHttpRequest> XsollaPayStationHttpTool::RequestWithRoute(FString route)
 {
     TSharedRef<IHttpRequest> Request = Http->CreateRequest();
     Request->SetURL(route);
@@ -19,13 +19,13 @@ TSharedRef<IHttpRequest> XsollaPluginHttpTool::RequestWithRoute(FString route)
     return Request;
 }
 
-void XsollaPluginHttpTool::SetRequestHeaders(TSharedRef<IHttpRequest>& request)
+void XsollaPayStationHttpTool::SetRequestHeaders(TSharedRef<IHttpRequest>& request)
 {
     request->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
     request->SetHeader(TEXT("Accept"), TEXT("application/json"));
 }
 
-TSharedRef<IHttpRequest> XsollaPluginHttpTool::GetRequest(FString route)
+TSharedRef<IHttpRequest> XsollaPayStationHttpTool::GetRequest(FString route)
 {
     TSharedRef<IHttpRequest> Request = RequestWithRoute(route);
     Request->SetVerb("GET");
@@ -33,7 +33,7 @@ TSharedRef<IHttpRequest> XsollaPluginHttpTool::GetRequest(FString route)
     return Request;
 }
 
-TSharedRef<IHttpRequest> XsollaPluginHttpTool::PostRequest(FString route, FString contentJsonString)
+TSharedRef<IHttpRequest> XsollaPayStationHttpTool::PostRequest(FString route, FString contentJsonString)
 {
     TSharedRef<IHttpRequest> Request = RequestWithRoute(route);
     Request->SetVerb("POST");
@@ -42,12 +42,12 @@ TSharedRef<IHttpRequest> XsollaPluginHttpTool::PostRequest(FString route, FStrin
     return Request;
 }
 
-void XsollaPluginHttpTool::Send(TSharedRef<IHttpRequest>& request)
+void XsollaPayStationHttpTool::Send(TSharedRef<IHttpRequest>& request)
 {
     request->ProcessRequest();
 }
 
-bool XsollaPluginHttpTool::ResponseIsValid(FHttpResponsePtr response, bool bWasSuccessful)
+bool XsollaPayStationHttpTool::ResponseIsValid(FHttpResponsePtr response, bool bWasSuccessful)
 {
     if (!bWasSuccessful || !response.IsValid())
         return false;

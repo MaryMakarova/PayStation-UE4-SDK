@@ -1,5 +1,11 @@
 #include "XsollaTelegramScheme.h"
 
+#if PLATFORM_WINDOWS
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <winreg.h>
+#endif
+
 #include <string>
 
 bool TelegramSchemeHandler::ProcessRequest(const FString& verb, const FString& url, const FSimpleDelegate& onHeadersReady)

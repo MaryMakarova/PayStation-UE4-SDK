@@ -5,11 +5,6 @@
 #include "IWebBrowserDialog.h"
 #include "IWebBrowserSchemeHandler.h"
 
-#if PLATFORM_WINDOWS
-#include <windows.h>
-#include <winreg.h>
-#endif
-
 class TelegramSchemeHandler : public IWebBrowserSchemeHandler
 {
 public:

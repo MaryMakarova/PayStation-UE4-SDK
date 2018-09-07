@@ -1,0 +1,27 @@
+{
+    "FileVersion": 3,
+    "Version": 1,
+    "VersionName": "1.0",
+    "FriendlyName": "XsollaPayStationPlugin",
+    "Description": "",
+    "Category": "Payments",
+    "CreatedBy": "Xsolla",
+    "CreatedByURL": "https://xsolla.com/",
+    "DocsURL": "",
+    "MarketplaceURL": "",
+    "SupportURL": "",
+    "CanContainContent": true,
+    "IsBetaVersion": false,
+    "Installed": false,
+    "Modules": [
+        {
+            "Name": "XsollaPayStationPlugin",
+            "Type": "Runtime",
+            "LoadingPhase": "Default",
+            "WhitelistPlatforms": [
+                "Win64",
+                "Win32"
+            ]
+        }
+    ]
+}

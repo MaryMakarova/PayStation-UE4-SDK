@@ -1,22 +1,22 @@
 #pragma once
 
 #include "ModuleManager.h"
-#include "XsollaShop.h"
+#include "XsollaPayStation.h"
 
-namespace XsollaPlugin
+namespace XsollaPayStationPlugin
 {
     /**
     * Returns default Xsolla Shop object.
     *
     * @return Xsolla Shop
     */
-    inline UXsollaShop* GetShop()
+    inline UXsollaPayStation* GetShop()
     {
-        return GetMutableDefault<UXsollaShop>();
+        return GetMutableDefault<UXsollaPayStation>();
     }
 }
 
-class IXsollaPluginModule : public IModuleInterface
+class IXsollaPayStationPluginModule : public IModuleInterface
 {
 public:
 
@@ -26,9 +26,9 @@ public:
     *
     * @return Returns singleton instance, loading the module on demand if needed
     */
-    static inline IXsollaPluginModule& Get()
+    static inline IXsollaPayStationPluginModule& Get()
     {
-        return FModuleManager::LoadModuleChecked< IXsollaPluginModule >("XsollaPlugin");
+        return FModuleManager::LoadModuleChecked< IXsollaPayStationPluginModule >("XsollaPayStationPlugin");
     }
 
     /**
@@ -38,6 +38,6 @@ public:
     */
     static inline bool IsAvailable()
     {
-        return FModuleManager::Get().IsModuleLoaded("XsollaPlugin");
+        return FModuleManager::Get().IsModuleLoaded("XsollaPayStationPlugin");
     }
 };

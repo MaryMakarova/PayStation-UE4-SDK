@@ -7,17 +7,14 @@
 
 #include <vector>
 
-#include "XsollaWebBrowserWrapper.generated.h"
-
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetSucceeded, FTransactionDetails, transactionDetails);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnTransactionsGetFailed, FString, errorText);
+#include "WebBrowserWrapper.generated.h"
 
 DECLARE_DELEGATE(FOnShopClosed);
 
 class IWebBrowserWindow;
 
 UCLASS()
-class XSOLLAPLUGIN_API UXsollaWebBrowserWrapper : public UUserWidget
+class XSOLLAPAYSTATIONPLUGIN_API UWebBrowserWrapper : public UUserWidget
 {
     GENERATED_UCLASS_BODY()
 
