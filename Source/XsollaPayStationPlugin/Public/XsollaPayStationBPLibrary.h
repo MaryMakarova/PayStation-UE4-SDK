@@ -21,32 +21,5 @@ public:
     * @param onFailed - On payment failed delegate.
     */
     UFUNCTION(BlueprintCallable, Category = "XsollaPayStation")
-        static void OpenXsollaPayStation(
-            EShopSizeEnum shopSize,
-            FOnPaymentSucceeded onPaymentSucceeded,
-            FOnPayStationClosed onPayStationClosed,
-            FOnPaymentFailed onPaymentFailed);
-
-    UFUNCTION(BlueprintCallable, Category = "XsollaPayStation")
-        static void SetNumberProperty(FString prop, int value, bool bOverride = true);
-
-    /**
-    * Set bool property in token json.
-    *
-    * @param prop - Property name.
-    * @param value - Bool value to set.
-    * @param bOverride - Can the method overrides property value if exists.
-    */
-    UFUNCTION(BlueprintCallable, Category = "XsollaPayStation")
-        static void SetBoolProperty(FString prop, bool value, bool bOverride = true);
-
-    /**
-    * Set string property in token json.
-    *
-    * @param prop - Property name.
-    * @param value - String value to set.
-    * @param bOverride - Can the method overrides property value if exists.
-    */
-    UFUNCTION(BlueprintCallable, Category = "XsollaPayStation")
-        static void SetStringProperty(FString prop, FString value, bool bOverride = true);
+        static void OpenXsollaPayStation(EShopSizeEnum shopSize, FString userId, FOnPayStationClosed onPayStationClosed);
 };

@@ -14,10 +14,7 @@ public:
     UXsollaPayStationSettings(const FObjectInitializer& objectInitializer);
 
     UPROPERTY(config, EditAnywhere)
-        FString GetTokenUrl;
-
-	UPROPERTY(config, EditAnywhere)
-		FString GetPaymentStatusUrl;
+        FString ServerUrl;
 
     UPROPERTY(config, EditAnywhere)
         bool bSandboxMode;

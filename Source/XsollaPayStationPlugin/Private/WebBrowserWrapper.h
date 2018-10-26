@@ -3,7 +3,6 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate/SlateGameResources.h"
 #include "XsollaHttpTool.h"
-#include "XsollaTransactionDetails.h"
 
 #include <vector>
 

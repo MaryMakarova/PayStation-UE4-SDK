@@ -173,12 +173,14 @@ void UWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
     UE_LOG(LogTemp, Warning, TEXT("New url: %s"), *(WebBrowserWidget->GetUrl()));
 
-    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) && !WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
+    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1)) 
+		&& !WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
     {
         HomeButton->SetVisibility(EVisibility::Visible);
     }
 
-    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
+    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1))
+		|| WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
     {
         HomeButton->SetVisibility(EVisibility::Hidden);
     }
@@ -257,7 +259,7 @@ FReply UWebBrowserWrapper::HandleOnHomeButtonClicked()
 
         if (PopupWidgets.empty())
         {
-			if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl))
+			if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1)) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
 			{
                 HomeButton->SetVisibility(EVisibility::Hidden);
             }

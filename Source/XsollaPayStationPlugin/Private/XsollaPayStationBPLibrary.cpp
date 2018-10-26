@@ -7,29 +7,10 @@ UXsollaPayStationBPLibrary::UXsollaPayStationBPLibrary(const FObjectInitializer&
 {
 }
 
-void UXsollaPayStationBPLibrary::OpenXsollaPayStation(
-    EShopSizeEnum shopSize,
-    FOnPaymentSucceeded onPaymentSucceeded,
-    FOnPayStationClosed onPayStationClosed,
-    FOnPaymentFailed onPaymentFailed)
+void UXsollaPayStationBPLibrary::OpenXsollaPayStation(EShopSizeEnum shopSize, FString userId, FOnPayStationClosed onPayStationClosed)
 {
     if (!XsollaPayStationPlugin::GetShop()->bIsShopOpen)
     {
-		XsollaPayStationPlugin::GetShop()->Create(shopSize, onPaymentSucceeded, onPayStationClosed, onPaymentFailed);
+		XsollaPayStationPlugin::GetShop()->Create(shopSize, userId, onPayStationClosed);
     }
-}
-
-void UXsollaPayStationBPLibrary::SetNumberProperty(FString prop, int value, bool bOverride/*= true*/)
-{
-	XsollaPayStationPlugin::GetShop()->SetNumberProperty(prop, value, bOverride);
-}
-
-void UXsollaPayStationBPLibrary::SetBoolProperty(FString prop, bool value, bool bOverride/*= true*/)
-{
-	XsollaPayStationPlugin::GetShop()->SetBoolProperty(prop, value, bOverride);
-}
-
-void UXsollaPayStationBPLibrary::SetStringProperty(FString prop, FString value, bool bOverride/*= true*/)
-{
-	XsollaPayStationPlugin::GetShop()->SetStringProperty(prop, value, bOverride);
 }

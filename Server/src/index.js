@@ -2,7 +2,6 @@ const express = require('express');
 
 const TokenRouter           = require('./tokenRouter');
 const NotificationsRouter   = require('./notificationsRouter');
-const PaymentRouter         = require('./paymentRouter');
 
 const Globals = {
     port: 3333,
@@ -34,10 +33,8 @@ app.use((req, res, next) => {
 
 const tokenRouter           = new TokenRouter(Globals);
 const notificationsRouter   = new NotificationsRouter(Globals);
-const paymentRouter         = new PaymentRouter(Globals);
 
 app.use('/token', tokenRouter.getRouter());
 app.use('/notifications', notificationsRouter.getRouter());
-app.use('/payment', paymentRouter.getRouter());
 
 app.listen(Globals.port);
