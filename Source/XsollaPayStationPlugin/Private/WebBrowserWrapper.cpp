@@ -173,14 +173,14 @@ void UWebBrowserWrapper::HandleOnUrlChanged(const FText& inText)
 {
     UE_LOG(LogTemp, Warning, TEXT("New url: %s"), *(WebBrowserWidget->GetUrl()));
 
-    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1)) 
-		&& !WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
+    if (!WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->ApiUrl.LeftChop(1)) 
+		&& !WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->SandboxApiUrl.LeftChop(1)))
     {
         HomeButton->SetVisibility(EVisibility::Visible);
     }
 
-    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1))
-		|| WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
+    if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->ApiUrl.LeftChop(1))
+		|| WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->SandboxApiUrl.LeftChop(1)))
     {
         HomeButton->SetVisibility(EVisibility::Hidden);
     }
@@ -247,7 +247,7 @@ void UWebBrowserWrapper::Clear()
 
     PopupWidgets.clear();
 
-	XsollaPayStationPlugin::GetShop()->bIsShopOpen = false;
+	XsollaPayStationPlugin::Get()->bIsShopOpen = false;
 }
 
 FReply UWebBrowserWrapper::HandleOnHomeButtonClicked()
@@ -259,7 +259,7 @@ FReply UWebBrowserWrapper::HandleOnHomeButtonClicked()
 
         if (PopupWidgets.empty())
         {
-			if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->ApiUrl.LeftChop(1)) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::GetShop()->SandboxApiUrl.LeftChop(1)))
+			if (WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->ApiUrl.LeftChop(1)) || WebBrowserWidget->GetUrl().StartsWith(XsollaPayStationPlugin::Get()->SandboxApiUrl.LeftChop(1)))
 			{
                 HomeButton->SetVisibility(EVisibility::Hidden);
             }
@@ -269,7 +269,7 @@ FReply UWebBrowserWrapper::HandleOnHomeButtonClicked()
     }
     else
     {
-        this->LoadURL(XsollaPayStationPlugin::GetShop()->ShopUrl);
+        this->LoadURL(XsollaPayStationPlugin::Get()->ShopUrl);
     }
 
     return FReply::Handled();

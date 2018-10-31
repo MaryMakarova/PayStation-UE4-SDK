@@ -9,8 +9,8 @@ UXsollaPayStationBPLibrary::UXsollaPayStationBPLibrary(const FObjectInitializer&
 
 void UXsollaPayStationBPLibrary::OpenXsollaPayStation(EShopSizeEnum shopSize, FString userId, FOnPayStationClosed onPayStationClosed)
 {
-    if (!XsollaPayStationPlugin::GetShop()->bIsShopOpen)
+    if (!XsollaPayStationPlugin::Get()->bIsShopOpen)
     {
-		XsollaPayStationPlugin::GetShop()->Create(shopSize, userId, onPayStationClosed);
+		XsollaPayStationPlugin::Get()->Create(shopSize, userId, onPayStationClosed);
     }
 }

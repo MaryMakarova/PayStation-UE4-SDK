@@ -10,7 +10,7 @@ namespace XsollaPayStationPlugin
     *
     * @return Xsolla Shop
     */
-    inline UXsollaPayStation* GetShop()
+    inline UXsollaPayStation* Get()
     {
         return GetMutableDefault<UXsollaPayStation>();
     }
