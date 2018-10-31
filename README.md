@@ -9,7 +9,7 @@
 Unpack downloaded archive to `{YourProject}/Plugins/`. Create folder, if not exists.
 
 ### Setting up
-Open plugin settings `Setting > Project Settings > Xsolla`, then set `Server Url`, check `Sandbox Mode` checkbox. Server example for server integration located in `/Server` folder.
+Open plugin settings `Setting > Project Settings > Xsolla PayStation`, then set `Server Url`, check `Sandbox Mode` checkbox. Server example for server integration located in `/Server` folder.
 
 ### How to use in blueprint
 `Xsolla Plugin BP Library` has 5 blueprint function.
