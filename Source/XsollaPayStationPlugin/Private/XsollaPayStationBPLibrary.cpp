@@ -43,6 +43,8 @@ bool IsMacOSVersionEqualOrHigher(int majorVer, int minorVer = -1, int patchVer =
 		result.erase(0, pos + std::string(".").length());
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("macOS version: %d.%d"), version[0], version[1]);
+
 	bool bIsEqualOrHigher = false;
 
 	if (version.size() > 0)
@@ -72,7 +74,7 @@ UXsollaPayStationBPLibrary::UXsollaPayStationBPLibrary(const FObjectInitializer&
 void UXsollaPayStationBPLibrary::OpenXsollaPayStation(EShopSizeEnum shopSize, FString userId, FOnPayStationClosed onPayStationClosed)
 {
 #if PLATFORM_MAC
-	if (/*IsMacOSVersionEqualOrHigher(10, 14)*/ true)
+	if (IsMacOSVersionEqualOrHigher(10, 14))
 	{
 		XsollaPayStationPlugin::Get()->CreateInSystemDefaultBrowser(userId);
 	}

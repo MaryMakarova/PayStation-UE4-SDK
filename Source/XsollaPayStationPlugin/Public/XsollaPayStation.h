@@ -37,7 +37,7 @@ public:
 
 	/**
 	* Open shop in the system default web brower. 
-	* Should be used on macOS 10.14 (Mojave), because CEF causing application crash
+	* Should be used on macOS 10.14 (Mojave), because CEF cause application crash
 	*
 	* @param userId - user ID
 	*/
