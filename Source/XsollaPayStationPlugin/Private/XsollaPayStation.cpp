@@ -80,6 +80,41 @@ void UXsollaPayStation::Create(EShopSizeEnum shopSize, FString userId, FOnPaySta
     bIsShopOpen = true;
 }
 
+#if PLATFORM_MAC
+void UXsollaPayStation::CreateInSystemDefaultBrowser(FString userId)
+{
+	LoadConfig();
+
+	// make request to get token
+	TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(GetDefault<UXsollaPayStationSettings>()->ServerUrl + "/token", userId);
+	tokenRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
+	{
+		if (bWasSuccessful)
+		{
+			if (!response->GetContentAsString().IsEmpty())
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Http tool: /token recieved token: %s"), *(response->GetContentAsString()));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token, probably wrong Project Id"));
+			}
+
+			SetToken(response->GetContentAsString());
+			
+			// open url in default browser
+			FString command = FString(TEXT("open ")) + ShopUrl;
+			system( TCHAR_TO_UTF8(*command) );
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Http tool: /token failed to get token."));
+		}
+	});
+	HttpTool->Send(tokenRequest);
+}
+#endif
+
 void UXsollaPayStation::LoadConfig()
 {
     // load properties from global game config

@@ -31,11 +31,19 @@ public:
     *
     * @param shopSize - Size of shop page and wrapper.
     * @param userId - user ID
-    * @param onSucceeded - On payment succeeded delegate.
-    * @param onClose - On payment canceled delegate.
-    * @param onFailed - On payment failed delegate.
+	* @param onClose - On payment canceled delegate.
     */
     void Create(EShopSizeEnum shopSize, FString userId, FOnPayStationClosed onClose);
+
+	/**
+	* Open shop in the system default web brower. 
+	* Should be used on macOS 10.14 (Mojave), because CEF causing application crash
+	*
+	* @param userId - user ID
+	*/
+#if PLATFORM_MAC
+	void CreateInSystemDefaultBrowser(FString userId);
+#endif
 
 private:
     void LoadConfig();
