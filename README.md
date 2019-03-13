@@ -4,14 +4,20 @@
 Xsolla Pay Station Unreal Engine SDK library is used to integrate the Xsolla payment interface with apps based on Unreal Engine.
 
 See demo:
+
 *[For Windows](https://drive.google.com/open?id=110iBIbPGCkP1H_UjDRboe-HYJvVYnqxx)
+
 *[For Mac OS](https://drive.google.com/open?id=1hiiolSZI3NMbXdboAZ29p1O2REtimHU_)
 
 ### System Requirements
 *64-bit OS
+
 *Windows 10
+
 *Mac OS X 10.11 and higher
+
 *Visual Studio 2017
+
 *Unreal Engine v4.19 and higher
 
 ### Integration Flow
@@ -22,10 +28,14 @@ See demo:
 5. Install and set up the plugin for the Unreal Engine project.
 
 For integration you will need the following parameters:
-*merchantId – ID of a merchant, shown in Project settings > Webhooks.
-*apiKey – API key. Parameter is generated in the Company settings > API key section
-*projectId – ID of the project, shown in Project settings > Webhooks
-*projectSecretKey – A secret key of the project. Parameter is generated in the Project settings > Webhooks section
+
+*`merchantId` – ID of a merchant, shown in Project settings > Webhooks.
+
+*`apiKey` – API key. Parameter is generated in the Company settings > API key section
+
+*`projectId` – ID of the project, shown in Project settings > Webhooks
+
+*`projectSecretKey` – A secret key of the project. Parameter is generated in the Project settings > Webhooks section
 
 ### Creating a Project
 
@@ -83,9 +93,12 @@ You can find the full list of parameters in the [API Reference](https://develope
 ### Setting up Webhooks
 
 You need to implement the following webhooks:
-    *[User validation](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_user_validation)
-    *[Payment](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_payment)
-    *[Refund](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund)
+
+   *[User validation](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_user_validation)
+    
+   *[Payment](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_payment)
+    
+   *[Refund](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund)
 
 To confirm the receipt of a webhook, your server will respond with HTTP code 204 without a message body. You can read more about webhooks, including examples, in the [API Reference](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund).
 
@@ -106,7 +119,7 @@ Note: To open the payment interface in the sandbox mode, please tick the Sandbox
 ### Usage
 ### Setting up a C++ Project
 ```
-`Note:` To set up your project, use Visual Studio for Windows or Xcode for Mac OS
+Note: To set up your project, use Visual Studio for Windows or Xcode for Mac OS
 ```
 
 1. Generate project files by choosing in your project context menu:
@@ -164,10 +177,13 @@ UE_LOG(LogTemp, Warning, TEXT(""));
 ```
 ### Setting up a Blueprint Project
 
-Set up the opening of the payment interface using the `Open Xsolla Pay Station` function. Specify the following parameters: 
-    *`Shop Size` – interface window size. Possible parameters: Small – 620 x 630, Medium – 740 x 760, and Large – 820 x 840.
-    *`User id` – user ID. 
-    *`On Pay Station Closed` – activating оf a callback function upon closing Pay Station.
+Set up the opening of the payment interface using the `Open Xsolla Pay Station` function. Specify the following parameters:
+
+   * Shop Size – interface window size. Possible parameters: Small – 620 x 630, Medium – 740 x 760, and Large – 820 x 840.
+
+   * User id – user ID. 
+
+   * On Pay Station Closed – activating оf a callback function upon closing Pay Station.
     
 After activating the `Open Xsolla Pay Station` function, the plugin:
     1. Sends a request to the server using the URL from the project settings in the `Server URL` parameter. User ID and Sandbox mode indicator are passed in the request.
