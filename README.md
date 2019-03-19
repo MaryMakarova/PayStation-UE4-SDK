@@ -5,9 +5,9 @@ Xsolla Pay Station Unreal Engine SDK library is used to integrate the Xsolla pay
 
 See demo:
 
-*[For Windows](https://drive.google.com/open?id=110iBIbPGCkP1H_UjDRboe-HYJvVYnqxx)
+*[For Windows](http://livedemo.xsolla.com/ue4/PayStation-Win.zip)
 
-*[For Mac OS](https://drive.google.com/open?id=1hiiolSZI3NMbXdboAZ29p1O2REtimHU_)
+*[For Mac OS](http://livedemo.xsolla.com/ue4/PayStation-Mac.zip)
 
 ### System Requirements
 *64-bit OS
