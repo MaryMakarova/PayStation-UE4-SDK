@@ -130,7 +130,7 @@ Note: To set up your project, use Visual Studio for Windows or Xcode for Mac OS
 4. Include the XsollaPayStationPlugin.h file.
 5. Set up the opening of the payment interface by using the `XsollaPayStationPlugin::Get()->Create()` function. Specify the following parameters:
         a. `EShopSizeEnum` - the interface size. Available sizes: VE_Small – 620 x 630, VE_Medium – 740 x 760, and VE_Large – 820 x 840.
-        b. `FString` – in-game user ID.
+        b. `userid` – in-game user ID.
         c. `OnShopClosed()` – activating a callback function upon closing Pay Station.
 
 After calling the `XsollaPayStationPlugin::Get()->Create()` function, the plugin:
@@ -164,7 +164,7 @@ Super::BeginPlay();
 FOnPaymantSucceeded OnPayStationClosedCallback;
 OnPayStationClosedCallback.BindUFunction(this, "OnPayStationClosedCallback");
 
-XsollaPayStationPlugin::Get()->Create(EShopSizeEnum::VE_Large, FString("exampleid"), OnPayStationClosedCallback);
+XsollaPayStationPlugin::Get()->Create(EShopSizeEnum::VE_Large, userid("exampleid"), OnPayStationClosedCallback);
 
 }
 
