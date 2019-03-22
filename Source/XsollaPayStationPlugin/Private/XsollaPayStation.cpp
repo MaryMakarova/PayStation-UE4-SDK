@@ -48,7 +48,7 @@ void UXsollaPayStation::Create(EShopSizeEnum shopSize, FString userId, FOnPaySta
     BrowserWrapper->Open();
 
 	// make request to get token
-	TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(GetDefault<UXsollaPayStationSettings>()->ServerUrl + "/token", userId);
+	TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(GetDefault<UXsollaPayStationSettings>()->ServerUrl, userId);
 	tokenRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 	{
 		if (bWasSuccessful)
@@ -86,7 +86,7 @@ void UXsollaPayStation::CreateInSystemDefaultBrowser(FString userId)
 	LoadConfig();
 
 	// make request to get token
-	TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(GetDefault<UXsollaPayStationSettings>()->ServerUrl + "/token", userId);
+	TSharedRef<IHttpRequest> tokenRequest = HttpTool->PostRequest(GetDefault<UXsollaPayStationSettings>()->ServerUrl, userId);
 	tokenRequest->OnProcessRequestComplete().BindLambda([this](FHttpRequestPtr request, FHttpResponsePtr response, bool bWasSuccessful)
 	{
 		if (bWasSuccessful)
