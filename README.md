@@ -1,24 +1,24 @@
-# Xsolla PayStation UE4 Plugin
+# Pay Station UE4 SDK
 
 ### Introduction
-Xsolla Pay Station Unreal Engine SDK library is used to integrate the Xsolla payment interface with apps based on Unreal Engine.
+Pay Station UE4 SDK is used to integrate the Xsolla payment interface with apps based on Unreal Engine.
 
 See demo:
 
-*[For Windows](http://livedemo.xsolla.com/ue4/PayStation-Win.zip)
+* [For Windows](http://livedemo.xsolla.com/ue4/PayStation-Win.zip)
 
-*[For Mac OS](http://livedemo.xsolla.com/ue4/PayStation-Mac.zip)
+* [For Mac OS](http://livedemo.xsolla.com/ue4/PayStation-Mac.zip)
 
 ### System Requirements
-*64-bit OS
+* 64-bit OS
 
-*Windows 10
+* Windows 10
 
-*Mac OS X 10.11 and higher
+* Mac OS X 10.11 and higher
 
-*Visual Studio 2017
+* Visual Studio 2017
 
-*Unreal Engine v4.19 and higher
+* Unreal Engine v4.19 and higher
 
 ### Integration Flow
 1. Register an [Xsolla Publisher Account](https://publisher.xsolla.com/).
@@ -29,21 +29,21 @@ See demo:
 
 For integration you will need the following parameters:
 
-*`merchantId` – ID of a merchant, shown in Project settings > Webhooks.
+* `merchantId` – ID of a merchant, shown in Project settings > Webhooks.
 
-*`apiKey` – API key. Parameter is generated in the Company settings > API key section
+* `apiKey` – API key. Parameter is generated in the Company settings > API key section
 
-*`projectId` – ID of the project, shown in Project settings > Webhooks
+* `projectId` – ID of the project, shown in Project settings > Webhooks
 
-*`projectSecretKey` – A secret key of the project. Parameter is generated in the Project settings > Webhooks section
+* `projectSecretKey` – A secret key of the project. Parameter is generated in the Project settings > Webhooks section
 
 ### Creating a Project
 
 1. Log in to Publisher Account.
 2. Go to Projects and click Create new project.
 3. In project settings:
-    *Specify the webhook URL
-    *Generate a secret key to sign project webhooks
+    * Specify the webhook URL
+    * Generate a secret key to sign project webhooks
 
 ### Getting a Token
 
@@ -94,11 +94,11 @@ You can find the full list of parameters in the [API Reference](https://develope
 
 You need to implement the following webhooks:
 
-   *[User validation](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_user_validation)
+   * [User validation](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_user_validation)
     
-   *[Payment](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_payment)
+   * [Payment](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_payment)
     
-   *[Refund](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund)
+   * [Refund](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund)
 
 To confirm the receipt of a webhook, your server will respond with HTTP code 204 without a message body. You can read more about webhooks, including examples, in the [API Reference](https://developers.xsolla.com/api/v2/getting-started/#api_webhooks_refund).
 
@@ -106,11 +106,11 @@ To test webhooks, open Project settings > Webhooks section.
 
 ### Installing and Setting up the Plugin
 
-1. Run the [Epic Games Launcher](https://www.epicgames.com/unrealtournament/download), go to My projects and select a project for which you want to add the plugin.
-2. Download the plugin.
-3. Unpack the archive into the {YourProject}/Plugins/ folder. If there is no Plugins folder, create it.
+1. Run the [Epic Games Launcher](https://www.epicgames.com/unrealtournament/download), go to **My projects** and select a project for which you want to add the plugin.
+2. [Download the plugin](https://github.com/xsolla/PayStation-UE4-SDK/releases).
+3. Unpack the archive into the **{YourProject}/Plugins/** folder. If there is no **Plugins** folder, create it.
 4. Open the plugin settings: Settings > Project Settings > Xsolla Pay Station.
-5. Specify the Server URL parameter, which is the URL for getting a token. You can use the (https://livedemo.xsolla.com/paystation/token_unreal.php) URL for testing.
+5. Specify the **Server URL** parameter, which is the URL for getting a token. You can use the (https://livedemo.xsolla.com/paystation/token_unreal.php) URL for testing.
 
 ```
 Note: To open the payment interface in the sandbox mode, please tick the Sandbox mode checkbox and pass settings.mode: sandbox in the Get token request. 
@@ -179,11 +179,11 @@ UE_LOG(LogTemp, Warning, TEXT(""));
 
 Set up the opening of the payment interface using the `Open Xsolla Pay Station` function. Specify the following parameters:
 
-   * Shop Size – interface window size. Possible parameters: Small – 620 x 630, Medium – 740 x 760, and Large – 820 x 840.
+   * **Shop Size** – interface window size. Possible parameters: Small – 620 x 630, Medium – 740 x 760, and Large – 820 x 840.
 
-   * User id – user ID. 
+   * **User id** – user ID. 
 
-   * On Pay Station Closed – activating оf a callback function upon closing Pay Station.
+   * **On Pay Station Closed** – activating оf a callback function upon closing Pay Station.
     
 After activating the `Open Xsolla Pay Station` function, the plugin:
     1. Sends a request to the server using the URL from the project settings in the `Server URL` parameter. User ID and Sandbox mode indicator are passed in the request.
