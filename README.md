@@ -123,15 +123,15 @@ Note: To set up your project, use Visual Studio for Windows or Xcode for Mac OS
 ```
 
 1. Generate project files by choosing in your project context menu:
-  -`Generate Visual Studio project files` – for Windows,
-  -`Open Xcode` – for Mac OS.
+  * `Generate Visual Studio project files` – for Windows,
+  * `Open Xcode` – for Mac OS.
 2. Add `XsollaPayStationPlugin` into `ExtraModuleNames` in the {YourProject}.Target.cs and {YourProjectEditor}.Target.cs files.
 3. Add `XsollaPayStationPlugin` into `PublicDependencyModuleNames` or into `PrivateDependencyModuleNames` in the {YourModule}.Build.cs file.
 4. Include the XsollaPayStationPlugin.h file.
 5. Set up the opening of the payment interface by using the `XsollaPayStationPlugin::Get()->Create()` function. Specify the following parameters:
-  -`EShopSizeEnum` - the interface size. Available sizes: VE_Small – 620 x 630, VE_Medium – 740 x 760, and VE_Large – 820 x 840.
-  -`userid` – in-game user ID.
-  -`OnShopClosed()` – activating a callback function upon closing Pay Station.
+  * `EShopSizeEnum` - the interface size. Available sizes: VE_Small – 620 x 630, VE_Medium – 740 x 760, and VE_Large – 820 x 840.
+  * `userid` – in-game user ID.
+  * `OnShopClosed()` – activating a callback function upon closing Pay Station.
 
 After calling the `XsollaPayStationPlugin::Get()->Create()` function, the plugin:
     1. Sends a request to the server using the URL from the project settings in the `Get Token URL` parameter. User ID and Sandbox mode indicator are passed in the request.
