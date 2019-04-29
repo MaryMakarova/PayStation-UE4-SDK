@@ -9,7 +9,7 @@
     "CreatedByURL": "https://xsolla.com/",
     "DocsURL": "https://developers.xsolla.com/doc/sdk/#unreal_sdk",
     "MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/ce35d6a43642419abbcd7328839733c3",
-    "EngineVersion" : "4.20.0",
+    "EngineVersion" : "4.21.0",
     "SupportURL": "https://developers.xsolla.com",
     "CanContainContent": true,
     "IsBetaVersion": false,
