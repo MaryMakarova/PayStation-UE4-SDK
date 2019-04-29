@@ -1,3 +1,5 @@
+// Copyright 2019 Xsolla Inc. All Rights Reserved.
+// <support@xsolla.com>
 #pragma once
 
 #include "ModuleManager.h"

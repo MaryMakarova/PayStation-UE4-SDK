@@ -1,3 +1,5 @@
+// Copyright 2019 Xsolla Inc. All Rights Reserved.
+// <support@xsolla.com>
 #include "XsollaTelegramScheme.h"
 
 #if PLATFORM_WINDOWS

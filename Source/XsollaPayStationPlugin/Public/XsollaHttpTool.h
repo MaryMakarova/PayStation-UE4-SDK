@@ -1,3 +1,5 @@
+// Copyright 2019 Xsolla Inc. All Rights Reserved.
+// <support@xsolla.com>
 #pragma once
 
 #include "Runtime/Online/HTTP/Public/Http.h"

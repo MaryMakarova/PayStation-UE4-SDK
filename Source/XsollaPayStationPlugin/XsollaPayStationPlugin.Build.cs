@@ -1,4 +1,5 @@
-// Some copyright should be here...
+// Copyright 2019 Xsolla Inc. All Rights Reserved.
+// <support@xsolla.com>
 
 using UnrealBuildTool;
 

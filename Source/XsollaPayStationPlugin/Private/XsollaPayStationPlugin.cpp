@@ -1,3 +1,5 @@
+// Copyright 2019 Xsolla Inc. All Rights Reserved.
+// <support@xsolla.com>
 #include "XsollaPayStationPlugin.h"
 
 #include "XsollaPayStationSettings.h"
